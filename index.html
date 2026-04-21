@@ -29,7 +29,6 @@
             overflow-x: hidden;
         }
 
-        /* ─── BACKGROUND DECOR ─── */
         body::before {
             content: '';
             position: fixed;
@@ -74,14 +73,37 @@
         main {
             flex: 1;
             padding: 2rem;
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
             width: 100%;
         }
 
+        .year-section {
+            margin-bottom: 5rem;
+        }
+
+        .year-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--accent-a);
+            text-transform: uppercase;
+            letter-spacing: 0.4em;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .year-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
         }
 
@@ -111,34 +133,34 @@
             bottom: 2rem;
             right: 2rem;
             font-size: 1.5rem;
-            opacity: 0;
-            transform: translateX(-10px);
+            opacity: 0.3;
             transition: all 0.3s;
-            color: var(--accent-c);
         }
 
         .card:hover::after {
             opacity: 1;
-            transform: translateX(0);
+            color: var(--accent-c);
+            transform: translateX(5px);
         }
 
         .card-num {
             font-family: 'Space Mono', monospace;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: var(--muted);
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
         }
 
         .card h2 {
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
+            font-size: 1.6rem;
+            margin-bottom: 0.8rem;
             line-height: 1.1;
         }
 
         .card p {
             color: var(--muted);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             margin-bottom: 2rem;
+            line-height: 1.5;
         }
 
         .tag-row {
@@ -150,43 +172,37 @@
 
         .tag {
             font-family: 'Space Mono', monospace;
-            font-size: 0.65rem;
-            padding: 0.3rem 0.6rem;
+            font-size: 0.6rem;
+            padding: 0.25rem 0.6rem;
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 4px;
-            text-transform: uppercase;
+            border-radius: 3px;
         }
 
         /* ─── VARIANTS ─── */
         .card.p:hover { border-color: var(--accent-p); }
         .card.p:hover h2 { color: var(--accent-p); }
-        .card.p:hover::after { color: var(--accent-p); }
-
-        .card.c:hover { border-color: var(--accent-c); }
-        .card.c:hover h2 { color: var(--accent-c); }
-        .card.c:hover::after { color: var(--accent-c); }
-
         .card.a:hover { border-color: var(--accent-a); }
         .card.a:hover h2 { color: var(--accent-a); }
-        .card.a:hover::after { color: var(--accent-a); }
+        .card.c:hover { border-color: var(--accent-c); }
+        .card.c:hover h2 { color: var(--accent-c); }
 
         footer {
             padding: 4rem 2rem;
             text-align: center;
             border-top: 1px solid var(--border);
-            margin-top: 4rem;
+            margin-top: 2rem;
         }
 
         footer p {
             font-family: 'Space Mono', monospace;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--muted);
         }
 
         @media (max-width: 768px) {
             header { padding: 3rem 1.5rem; }
-            h1 { font-size: 3rem; }
+            h1 { font-size: 2.8rem; }
             .grid { grid-template-columns: 1fr; }
         }
     </style>
@@ -195,51 +211,61 @@
     <header>
         <div class="eyebrow">Repositorio Central</div>
         <h1>Clases <span>Software</span></h1>
-        <p class="sub">Recursos, apuntes y demos de la Tecnicatura Superior en Software del Instituto I26.</p>
+        <p class="sub">Recursos organizados por año y materia · Instituto I26.</p>
     </header>
 
     <main>
-        <div class="grid">
-            <!-- CLASE 1: ARQUITECTURA -->
-            <a href="clase-arquitectura-I26.html" class="card p">
-                <div class="card-num">CLASE 01</div>
-                <h2>Arquitectura & MVP</h2>
-                <p>De la idea al sistema real. Definición de visión, épicas, historias de usuario y diseño de sistemas monolíticos.</p>
-                <div class="tag-row">
-                    <span class="tag">AGILE</span>
-                    <span class="tag">MVP</span>
-                    <span class="tag">DOCS</span>
-                </div>
-            </a>
+        <!-- SEGUNDO AÑO -->
+        <section class="year-section">
+            <h2 class="year-title">Segundo Año · Desarrollo App</h2>
+            <div class="grid">
+                <!-- CLASE 2: PHP & MYSQL -->
+                <a href="2do/clase-php-mysql-I26.html" class="card a">
+                    <div class="card-num">CLASE 01</div>
+                    <h2>Backend con PHP</h2>
+                    <p>Fundamentos de servidor con PHP, MySQL y XAMPP. Variables, operadores y lógica de negocio inicial.</p>
+                    <div class="tag-row">
+                        <span class="tag">PHP</span>
+                        <span class="tag">SQL</span>
+                        <span class="tag">BACKEND</span>
+                    </div>
+                </a>
 
-            <!-- CLASE 2: PHP & MYSQL -->
-            <a href="clase-php-mysql-I26.html" class="card a">
-                <div class="card-num">CLASE 02</div>
-                <h2>Backend Clásico</h2>
-                <p>Persistencia de datos y lógica de servidor con PHP y MySQL. CRUD fundamental para aplicaciones web dinámicas.</p>
-                <div class="tag-row">
-                    <span class="tag">PHP</span>
-                    <span class="tag">SQL</span>
-                    <span class="tag">MVC</span>
-                </div>
-            </a>
+                <!-- CLASE 3: REACT NATIVE -->
+                <a href="2do/clase_2do_soft_I26_ReactNative.html" class="card c">
+                    <div class="card-num">CLASE 02</div>
+                    <h2>Móvil con React Native</h2>
+                    <p>Desarrollo multiplataforma nativo. Estructura de proyectos Expo, componentes y navegación móvil.</p>
+                    <div class="tag-row">
+                        <span class="tag">REACT</span>
+                        <span class="tag">EXPO</span>
+                        <span class="tag">MOBILE</span>
+                    </div>
+                </a>
+            </div>
+        </section>
 
-            <!-- CLASE 3: REACT NATIVE -->
-            <a href="clase_2do_soft_I26_ReactNative.html" class="card c">
-                <div class="card-num">CLASE 03</div>
-                <h2>Móvil con React Native</h2>
-                <p>Desarrollo multiplataforma. Componentes, estilos, navegación y estado en dispositivos móviles.</p>
-                <div class="tag-row">
-                    <span class="tag">REACT</span>
-                    <span class="tag">MOBILE</span>
-                    <span class="tag">JSX</span>
-                </div>
-            </a>
-        </div>
+        <!-- TERCERO AÑO -->
+        <section class="year-section">
+            <h2 class="year-title">Tercer Año · Desarrollo Web</h2>
+            <div class="grid">
+                <!-- CLASE 1: ARQUITECTURA -->
+                <a href="3ro/clase-arquitectura-I26.html" class="card p">
+                    <div class="card-num">CLASE 01</div>
+                    <h2>Arquitectura & MVP</h2>
+                    <p>De la idea al sistema real. Definición de visión, épicas e implementación de arquitecturas escalables.</p>
+                    <div class="tag-row">
+                        <span class="tag">AGILE</span>
+                        <span class="tag">MVP</span>
+                        <span class="tag">ARCH</span>
+                    </div>
+                </a>
+            </div>
+        </section>
     </main>
 
     <footer>
-        <p>3° Año · Tecnicatura Superior en Software · Instituto I26 · 2026</p>
+        <p>Tecnicatura Superior en Software · Instituto I26 · 2026</p>
     </footer>
 </body>
 </html>

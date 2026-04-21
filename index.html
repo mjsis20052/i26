@@ -557,6 +557,177 @@
             color: var(--accent-a) !important;
             font-size: 0.85rem !important;
         }
+
+        /* ─── RUTA DE APRENDIZAJE ─── */
+        .path-section {
+            margin-bottom: 5rem;
+        }
+        .path-section-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--accent-c);
+            text-transform: uppercase;
+            letter-spacing: 0.4em;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .path-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+        .path-intro {
+            color: var(--muted);
+            font-size: 0.95rem;
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            line-height: 1.7;
+        }
+        .path-timeline {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .path-timeline::before {
+            content: '';
+            position: absolute;
+            left: 28px;
+            top: 28px;
+            bottom: 28px;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent-a), var(--accent-c), var(--accent-p));
+            z-index: 0;
+        }
+        .path-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            padding: 1.5rem 0;
+            position: relative;
+            z-index: 1;
+            cursor: default;
+        }
+        .path-dot {
+            flex-shrink: 0;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            border: 2px solid var(--border);
+            background: var(--surface);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+        .path-item:hover .path-dot {
+            transform: scale(1.12);
+        }
+        .path-dot.yr2a {
+            border-color: rgba(245,158,11,0.5);
+            box-shadow: 0 0 0 4px rgba(245,158,11,0.08);
+        }
+        .path-dot.yr2b {
+            border-color: rgba(6,182,212,0.5);
+            box-shadow: 0 0 0 4px rgba(6,182,212,0.08);
+        }
+        .path-dot.yr3a {
+            border-color: rgba(124,58,237,0.5);
+            box-shadow: 0 0 0 4px rgba(124,58,237,0.08);
+        }
+        .path-item:hover .path-dot.yr2a { box-shadow: 0 0 20px rgba(245,158,11,0.3); }
+        .path-item:hover .path-dot.yr2b { box-shadow: 0 0 20px rgba(6,182,212,0.3); }
+        .path-item:hover .path-dot.yr3a { box-shadow: 0 0 20px rgba(124,58,237,0.3); }
+        .path-body {
+            flex: 1;
+            padding-top: 0.6rem;
+        }
+        .path-meta {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .path-badge {
+            padding: 0.15rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.55rem;
+        }
+        .path-badge.yr2 { background: rgba(245,158,11,0.15); color: var(--accent-a); border: 1px solid rgba(245,158,11,0.25); }
+        .path-badge.yr3 { background: rgba(124,58,237,0.15); color: var(--accent-p); border: 1px solid rgba(124,58,237,0.25); }
+        .path-body h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.4rem;
+            line-height: 1.2;
+        }
+        .path-body p {
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.6;
+            margin-bottom: 0.8rem;
+        }
+        .path-link {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-decoration: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            border: 1px solid;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.25s;
+        }
+        .path-link.yr2a { color: var(--accent-a); border-color: rgba(245,158,11,0.3); }
+        .path-link.yr2a:hover { background: rgba(245,158,11,0.1); }
+        .path-link.yr2b { color: var(--accent-c); border-color: rgba(6,182,212,0.3); }
+        .path-link.yr2b:hover { background: rgba(6,182,212,0.1); }
+        .path-link.yr3a { color: var(--accent-p); border-color: rgba(124,58,237,0.3); }
+        .path-link.yr3a:hover { background: rgba(124,58,237,0.1); }
+        .path-connector {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            padding: 0.5rem 0;
+        }
+        .path-connector-line {
+            flex-shrink: 0;
+            width: 56px;
+            display: flex;
+            justify-content: center;
+        }
+        .path-connector-msg {
+            flex: 1;
+            background: rgba(255,255,255,0.02);
+            border: 1px dashed rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 0.7rem 1rem;
+            margin-top: 0.2rem;
+        }
+        .path-connector-msg p {
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin: 0;
+            line-height: 1.5;
+        }
+        .path-connector-msg p strong { color: var(--text); }
+        @media(max-width: 600px) {
+            .path-timeline::before { left: 20px; }
+            .path-dot { width: 40px; height: 40px; font-size: 1rem; }
+            .path-connector-line { width: 40px; }
+            .path-item { gap: 1rem; }
+        }
     </style>
 </head>
 <body>
@@ -595,6 +766,74 @@
                     <h2>Visión del Proyecto</h2>
                     <p>Integrar el desarrollo de aplicaciones móviles y web en un ecosistema profesional. Buscamos transformar conceptos en sistemas reales mediante el dominio de tecnologías modernas, arquitecturas escalables y metodologías ágiles.</p>
                 </div>
+            </div>
+        </section>
+
+        <!-- ─── RUTA DE APRENDIZAJE ─── -->
+        <section class="path-section">
+            <h2 class="path-section-title">Ruta de Aprendizaje</h2>
+            <p class="path-intro">Cada clase construye sobre la anterior. Seguí el hilo — cada concepto que aprendés hoy es un bloque del sistema que vas a construir mañana.</p>
+
+            <div class="path-timeline">
+
+                <!-- CLASE 1 -->
+                <div class="path-item">
+                    <div class="path-dot yr2a">🗄️</div>
+                    <div class="path-body">
+                        <div class="path-meta">
+                            <span class="path-badge yr2">2° Año</span>
+                            CLASE 01
+                        </div>
+                        <h3>Backend con PHP & MySQL</h3>
+                        <p>El punto de partida. Aprendemos a construir el servidor: variables, tipos de datos, operadores y estructuras de decisión en PHP, más la base de datos MySQL. Acá nace la lógica de negocio de todo sistema.</p>
+                        <a href="2do/clase-php-mysql-I26.html" class="path-link yr2a">Ir a la clase →</a>
+                    </div>
+                </div>
+
+                <!-- CONEXIÓN 1→2 -->
+                <div class="path-connector">
+                    <div class="path-connector-line"></div>
+                    <div class="path-connector-msg">
+                        <p>💡 El servidor PHP que construiste en clase 01 va a ser la <strong>API</strong> que consume la app móvil. El backend no cambia — solo cambia quién lo llama.</p>
+                    </div>
+                </div>
+
+                <!-- CLASE 2 -->
+                <div class="path-item">
+                    <div class="path-dot yr2b">📱</div>
+                    <div class="path-body">
+                        <div class="path-meta">
+                            <span class="path-badge yr2">2° Año</span>
+                            CLASE 02
+                        </div>
+                        <h3>Apps Móviles con React Native</h3>
+                        <p>Con el backend funcionando, damos el salto al frontend móvil. React Native + Expo nos permiten crear apps iOS y Android reales. El servidor PHP del paso anterior responde en JSON — la app lo consume con <code style="color:var(--accent-c);font-family:monospace;font-size:0.85em">fetch()</code>.</p>
+                        <a href="2do/clase_2do_soft_I26_ReactNative.html" class="path-link yr2b">Ir a la clase →</a>
+                    </div>
+                </div>
+
+                <!-- CONEXIÓN 2→3 -->
+                <div class="path-connector">
+                    <div class="path-connector-line"></div>
+                    <div class="path-connector-msg">
+                        <p>🚀 En 3° año vas a construir la <strong>web app</strong> que comparte la misma API que la app móvil de 2°. PHP → JSON → React Native (móvil) <em>y</em> React (web) al mismo tiempo. Un solo backend, dos frontends.</p>
+                    </div>
+                </div>
+
+                <!-- CLASE 3: 3RO -->
+                <div class="path-item">
+                    <div class="path-dot yr3a">🏗️</div>
+                    <div class="path-body">
+                        <div class="path-meta">
+                            <span class="path-badge yr3">3° Año</span>
+                            CLASE 01
+                        </div>
+                        <h3>Arquitectura & MVP — De la Idea al Sistema Real</h3>
+                        <p>Con las bases del backend y el frontend móvil claras, en 3° año estructuramos el sistema completo: visión de producto, épicas, arquitectura monolítica, y código React + Node + MySQL que funciona de verdad en producción.</p>
+                        <a href="3ro/clase-arquitectura-I26.html" class="path-link yr3a">Ir a la clase →</a>
+                    </div>
+                </div>
+
             </div>
         </section>
 

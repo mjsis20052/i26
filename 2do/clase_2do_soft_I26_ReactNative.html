@@ -1366,10 +1366,106 @@ npx expo start
 </div>
 </section>
 
+<style>
+.clase-nav {
+  max-width: 980px; margin: 0 auto;
+  padding: 3rem 2.5rem 0;
+  display: flex; flex-direction: column; gap: 1.5rem;
+  position: relative; z-index: 1;
+}
+.clase-progress {
+  display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+  font-family: 'DM Mono', monospace; font-size: 0.63rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+.progress-step {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.28rem 0.65rem; border-radius: 3px;
+  border: 1.5px solid var(--border); background: var(--surface);
+  text-decoration: none; color: var(--muted);
+  transition: all 0.2s; white-space: nowrap;
+}
+.progress-step.done {
+  opacity: 0.5;
+}
+.progress-step.done-link {
+  opacity: 0.7; text-decoration: none;
+}
+.progress-step.done-link:hover { opacity: 1; border-color: var(--accent); color: var(--accent); }
+.progress-step.current {
+  border-color: var(--accent); color: var(--accent);
+  background: rgba(212,70,10,0.07); font-weight: 700;
+}
+.progress-step.upcoming:hover { border-color: var(--accent3); color: var(--accent3); }
+.progress-arrow { color: var(--border); font-size: 0.9rem; }
+.clase-nav-cards {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.nav-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 6px; padding: 1.4rem;
+  text-decoration: none; color: inherit;
+  display: flex; flex-direction: column; gap: 0.4rem;
+  transition: all 0.25s;
+  box-shadow: 3px 3px 0 transparent;
+}
+.nav-card:hover { box-shadow: 3px 3px 0 var(--border); transform: translateY(-2px); }
+.nav-card.prev:hover { border-color: rgba(26,107,74,0.4); }
+.nav-card.next:hover { border-color: var(--accent3); }
+.nav-card-label {
+  font-family: 'DM Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted);
+}
+.nav-card-title { font-size: 1rem; font-weight: 700; color: var(--ink); }
+.nav-card-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+.nav-card.next .nav-card-title { color: var(--accent3); }
+.nav-card.next { text-align: right; }
+@media(max-width:640px) {
+  .clase-nav-cards { grid-template-columns: 1fr; }
+  .nav-card.next { text-align: left; }
+  .progress-step span:not(.ps-n) { display: none; }
+}
+</style>
+
+<div class="clase-nav">
+  <!-- progreso -->
+  <div class="clase-progress">
+    <a href="clase-php-mysql-I26.html" class="progress-step done-link">
+      <span class="ps-n">01</span>
+      <span>PHP &amp; MySQL</span>
+    </a>
+    <span class="progress-arrow">&rsaquo;</span>
+    <div class="progress-step current">
+      <span class="ps-n">02</span>
+      <span>React Native</span>
+    </div>
+    <span class="progress-arrow">&rsaquo;</span>
+    <a href="../3ro/clase-arquitectura-I26.html" class="progress-step upcoming">
+      <span class="ps-n">3&deg;</span>
+      <span>Arquitectura</span>
+    </a>
+  </div>
+
+  <!-- cards prev/next -->
+  <div class="clase-nav-cards">
+    <a href="clase-php-mysql-I26.html" class="nav-card prev">
+      <div class="nav-card-label">&larr; Clase anterior &mdash; 2&deg; A&ntilde;o</div>
+      <div class="nav-card-title">Backend con PHP &amp; MySQL</div>
+      <div class="nav-card-desc">El servidor que esta app m&oacute;vil consume como API.</div>
+    </a>
+    <a href="../3ro/clase-arquitectura-I26.html" class="nav-card next">
+      <div class="nav-card-label">Siguiente &mdash; 3&deg; A&ntilde;o &rarr;</div>
+      <div class="nav-card-title">Arquitectura &amp; MVP</div>
+      <div class="nav-card-desc">Con el backend y el m&oacute;vil listos, construimos la web app completa.</div>
+    </a>
+  </div>
+</div>
+
 <footer>
   <div>
-    <p><strong>Tecnicatura Superior en Software · I26 · 2° Año</strong></p>
-    <p>Desarrollo de Aplicaciones · React Native · Conexión con 3° año</p>
+    <p><strong>Tecnicatura Superior en Software &middot; I26 &middot; 2&deg; A&ntilde;o</strong></p>
+    <p>Desarrollo de Aplicaciones &middot; React Native &middot; Conexi&oacute;n con 3&deg; a&ntilde;o</p>
   </div>
   <button class="btn" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
 </footer>

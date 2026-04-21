@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>React Native & Apps Móviles · 2° Año Software I26</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #f5f2ec;
+    --surface:  #ffffff;
+    --surface2: #eee9e0;
+    --border:   #d8d1c4;
+    --ink:      #1a1612;
+    --muted:    #7a7060;
+    --accent:   #d4460a;      /* naranja quemado */
+    --accent2:  #1a6b4a;      /* verde oscuro */
+    --accent3:  #1d4e8f;      /* azul profundo */
+    --accent4:  #8b2fc9;      /* violeta */
+    --code-bg:  #1a1612;
+    --code-text:#e8dfd0;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+
+  body {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  /* ── grain overlay ── */
+  body::before {
+    content:'';
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity:.5;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:200;
+    background: rgba(245,242,236,0.9);
+    backdrop-filter: blur(10px);
+    border-bottom: 1.5px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 0 2.5rem; height:54px;
+  }
+  .nav-brand {
+    font-size:.78rem; font-weight:800;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--accent);
+  }
+  .nav-links { display:flex; gap:1.8rem; list-style:none; }
+  .nav-links a {
+    color:var(--muted); text-decoration:none; font-size:.73rem;
+    letter-spacing:.08em; text-transform:uppercase; font-family:'DM Mono',monospace;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color:var(--ink); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display:flex; flex-direction:column; justify-content:flex-end;
+    padding: 6rem 4rem 4rem;
+    position:relative; overflow:hidden;
+    border-bottom: 1.5px solid var(--border);
+  }
+  .hero-bg-text {
+    position:absolute; top:50%; left:50%;
+    transform: translate(-50%,-50%);
+    font-size: clamp(6rem,18vw,18rem);
+    font-weight:800; color:transparent;
+    -webkit-text-stroke: 1.5px var(--border);
+    letter-spacing:-.04em; white-space:nowrap;
+    pointer-events:none; user-select:none;
+    opacity:.6;
+  }
+  .hero-eyebrow {
+    font-family:'DM Mono',monospace;
+    font-size:.72rem; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--accent); margin-bottom:1.4rem;
+    display:inline-flex; align-items:center; gap:.6rem;
+  }
+  .hero-eyebrow::before {
+    content:''; width:28px; height:1.5px; background:var(--accent);
+  }
+  h1 {
+    font-size: clamp(2.8rem,6.5vw,5.5rem);
+    font-weight:800; line-height:1.02;
+    letter-spacing:-.02em; max-width:820px;
+    margin-bottom:1.4rem;
+  }
+  h1 em { font-style:normal; color:var(--accent); }
+  .hero-sub {
+    font-size:1.05rem; color:var(--muted);
+    max-width:520px; margin-bottom:2.5rem;
+  }
+  .tag-row { display:flex; flex-wrap:wrap; gap:.5rem; }
+  .tag {
+    font-family:'DM Mono',monospace; font-size:.68rem;
+    padding:.22rem .7rem; border-radius:2px; letter-spacing:.05em;
+  }
+  .tag-o { background:rgba(212,70,10,.1); color:var(--accent); border:1px solid rgba(212,70,10,.25); }
+  .tag-g { background:rgba(26,107,74,.1); color:var(--accent2); border:1px solid rgba(26,107,74,.25); }
+  .tag-b { background:rgba(29,78,143,.1); color:var(--accent3); border:1px solid rgba(29,78,143,.25); }
+  .tag-v { background:rgba(139,47,201,.1); color:var(--accent4); border:1px solid rgba(139,47,201,.25); }
+
+  .connection-badge {
+    margin-top:2rem; display:inline-flex; align-items:center; gap:.8rem;
+    background:var(--surface); border:1.5px solid var(--accent2);
+    padding:.6rem 1.2rem; border-radius:4px;
+  }
+  .connection-badge .dot {
+    width:8px; height:8px; border-radius:50%;
+    background:var(--accent2); animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100%{ box-shadow:0 0 0 0 rgba(26,107,74,.4); }
+    50%{ box-shadow:0 0 0 6px rgba(26,107,74,0); }
+  }
+  .connection-badge span { font-family:'DM Mono',monospace; font-size:.75rem; color:var(--accent2); }
+
+  /* ── LAYOUT ── */
+  .container { max-width:980px; margin:0 auto; padding:0 2.5rem; position:relative; z-index:1; }
+  section { padding:5rem 0; }
+  section + section { border-top:1.5px solid var(--border); }
+
+  /* ── HEADINGS ── */
+  .sec-num {
+    font-family:'DM Mono',monospace; font-size:.68rem;
+    letter-spacing:.22em; color:var(--muted); text-transform:uppercase;
+    margin-bottom:.7rem;
+  }
+  h2 { font-size:clamp(1.7rem,3vw,2.4rem); font-weight:800; margin-bottom:1.2rem; letter-spacing:-.01em; }
+  h2 mark { background:transparent; color:var(--accent); }
+  h3 { font-size:1.1rem; font-weight:700; color:var(--accent3); margin:2.2rem 0 .7rem; }
+  h4 { font-size:.92rem; font-weight:700; color:var(--accent); margin:1.2rem 0 .4rem; }
+  p { color:#4a4438; margin-bottom:.9rem; }
+  ul,ol { color:#4a4438; padding-left:1.4rem; }
+  li { margin-bottom:.35rem; }
+  strong { color:var(--ink); }
+  code {
+    font-family:'DM Mono',monospace; font-size:.8em;
+    background:var(--surface2); padding:.1rem .35rem; border-radius:2px;
+    color:var(--accent);
+  }
+
+  /* ── COMPARISON TABLE ── */
+  .table-wrap { overflow-x:auto; margin:1.4rem 0; }
+  table { width:100%; border-collapse:collapse; font-size:.86rem; }
+  th {
+    background:var(--ink); color:var(--bg);
+    font-family:'DM Mono',monospace; font-size:.68rem;
+    letter-spacing:.1em; text-transform:uppercase;
+    padding:.7rem 1rem; text-align:left;
+  }
+  td { padding:.75rem 1rem; border-bottom:1px solid var(--border); color:#4a4438; }
+  tr:last-child td { border-bottom:none; }
+  tr:nth-child(even) td { background:rgba(0,0,0,.02); }
+  .check { color:var(--accent2); font-weight:700; }
+  .cross { color:var(--accent); }
+  .mid   { color:var(--accent3); }
+
+  /* ── CARDS ── */
+  .card-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:1rem; margin:1.5rem 0; }
+  .card {
+    background:var(--surface); border:1.5px solid var(--border);
+    border-radius:6px; padding:1.4rem;
+    transition: border-color .2s, transform .2s, box-shadow .2s;
+  }
+  .card:hover {
+    border-color:var(--accent); transform:translateY(-3px);
+    box-shadow: 4px 4px 0 var(--border);
+  }
+  .card-icon { font-size:1.8rem; margin-bottom:.6rem; }
+  .card h4 { margin-top:0; }
+  .card p { font-size:.86rem; margin:0; }
+
+  /* ── CODE BLOCKS ── */
+  .code-block {
+    background:var(--code-bg); border:1.5px solid #2e2720;
+    border-left:4px solid var(--accent);
+    border-radius:4px; padding:1.4rem 1.6rem;
+    margin:1.2rem 0; overflow-x:auto; position:relative;
+  }
+  .code-block.green { border-left-color:var(--accent2); }
+  .code-block.blue  { border-left-color:var(--accent3); }
+  .code-block .lang {
+    position:absolute; top:.6rem; right:.8rem;
+    font-family:'DM Mono',monospace; font-size:.62rem;
+    color:#6b5f52; letter-spacing:.1em; text-transform:uppercase;
+  }
+  .code-block pre {
+    font-family:'DM Mono',monospace; font-size:.76rem;
+    line-height:1.75; color:var(--code-text);
+    white-space:pre; tab-size:2;
+  }
+  .kw  { color:#f08d49; }
+  .fn  { color:#6ec2f7; }
+  .str { color:#a5d6a7; }
+  .cmt { color:#5c5248; font-style:italic; }
+  .num { color:#f8bbd0; }
+  .type{ color:#ffe082; }
+  .tag-jsx { color:#ef9a9a; }
+  .prop{ color:#b39ddb; }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-radius:4px; padding:1.1rem 1.3rem;
+    margin:1.4rem 0; display:flex; gap:.9rem; align-items:flex-start;
+  }
+  .callout-icon { font-size:1.3rem; flex-shrink:0; }
+  .callout-body strong { display:block; margin-bottom:.2rem; font-size:.88rem; }
+  .callout-body p { font-size:.86rem; margin:0; }
+  .c-tip  { background:rgba(26,107,74,.08);  border:1px solid rgba(26,107,74,.3); }
+  .c-warn { background:rgba(212,70,10,.08);  border:1px solid rgba(212,70,10,.3); }
+  .c-info { background:rgba(29,78,143,.08);  border:1px solid rgba(29,78,143,.3); }
+  .c-link { background:rgba(139,47,201,.08); border:1px solid rgba(139,47,201,.3); }
+
+  /* ── FLOW ── */
+  .flow { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; margin:1.4rem 0; }
+  .flow-step {
+    background:var(--surface); border:1.5px solid var(--border);
+    border-radius:3px; padding:.45rem .9rem;
+    font-family:'DM Mono',monospace; font-size:.75rem; color:var(--ink);
+  }
+  .flow-step.hi { border-color:var(--accent); color:var(--accent); background:rgba(212,70,10,.06); }
+  .flow-step.hi2{ border-color:var(--accent2); color:var(--accent2); background:rgba(26,107,74,.06); }
+  .flow-arrow { color:var(--muted); font-size:1rem; }
+
+  /* ── FILE TREE ── */
+  .tree {
+    background:var(--code-bg); border:1.5px solid #2e2720;
+    border-radius:4px; padding:1.4rem 1.6rem;
+    font-family:'DM Mono',monospace; font-size:.75rem; line-height:2.1;
+    margin:1.2rem 0;
+  }
+  .tf { color:#ffe082; }
+  .td { color:var(--code-text); }
+  .tc { color:#5c5248; font-size:.68rem; }
+
+  /* ── ACTIVITY ── */
+  .activity {
+    background:var(--surface); border:1.5px solid var(--border);
+    border-radius:8px; padding:2rem; margin:2rem 0;
+    box-shadow: 6px 6px 0 var(--border);
+  }
+  .activity-header { display:flex; align-items:center; gap:.8rem; margin-bottom:1.4rem; }
+  .act-badge {
+    background:var(--ink); color:var(--bg);
+    font-family:'DM Mono',monospace; font-size:.66rem;
+    font-weight:500; letter-spacing:.12em; text-transform:uppercase;
+    padding:.22rem .7rem; border-radius:2px;
+  }
+  .activity h3 { margin:0; color:var(--ink); font-size:1rem; }
+
+  /* ── FILL INPUTS ── */
+  .fill { background:var(--surface2); border:1.5px solid var(--border); border-radius:4px; padding:1rem 1.1rem; margin:.6rem 0; }
+  .fill-label { font-family:'DM Mono',monospace; font-size:.66rem; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; margin-bottom:.4rem; }
+  .fill-input {
+    width:100%; background:transparent; border:none;
+    border-bottom:1.5px solid var(--border);
+    color:var(--ink); font-family:'Bricolage Grotesque',sans-serif;
+    font-size:.9rem; padding:.4rem 0; outline:none; transition:border-color .2s;
+    margin-bottom:.4rem;
+  }
+  .fill-input:focus { border-color:var(--accent); }
+  textarea.fill-input {
+    border:1.5px solid var(--border); border-radius:3px;
+    padding:.6rem; resize:vertical; min-height:70px;
+  }
+  textarea.fill-input:focus { border-color:var(--accent); }
+
+  /* ── CONNECT DIAGRAM ── */
+  .connect-diagram {
+    background:var(--surface); border:1.5px solid var(--border);
+    border-radius:8px; padding:2rem; margin:1.8rem 0;
+    display:flex; flex-wrap:wrap; align-items:center;
+    justify-content:center; gap:1rem; text-align:center;
+  }
+  .conn-box {
+    background:var(--bg); border:1.5px solid var(--border);
+    border-radius:6px; padding:1rem 1.4rem; min-width:140px;
+  }
+  .conn-box .cb-icon { font-size:2rem; margin-bottom:.3rem; }
+  .conn-box .cb-label { font-family:'DM Mono',monospace; font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; }
+  .conn-box .cb-tech { font-weight:800; font-size:.9rem; }
+  .conn-box.hi { border-color:var(--accent); }
+  .conn-box.hi2 { border-color:var(--accent2); }
+  .conn-box.hi3 { border-color:var(--accent3); }
+  .conn-arrow { font-size:1.6rem; color:var(--muted); }
+
+  /* ── PLAN TABLE ── */
+  .plan-row { display:grid; grid-template-columns:auto 1fr 1fr; gap:0; }
+  .plan-cell {
+    padding:.8rem 1rem; border-bottom:1px solid var(--border);
+    border-right:1px solid var(--border); font-size:.86rem;
+  }
+  .plan-cell:last-child { border-right:none; }
+  .plan-head {
+    background:var(--ink); color:var(--bg);
+    font-family:'DM Mono',monospace; font-size:.68rem;
+    letter-spacing:.1em; text-transform:uppercase;
+    padding:.6rem 1rem;
+    border-right:1px solid rgba(255,255,255,.1);
+  }
+  .plan-head:last-child { border-right:none; }
+
+  /* ── REFS ── */
+  .ref-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:.8rem; margin:1.2rem 0; }
+  .ref-card {
+    background:var(--surface); border:1.5px solid var(--border);
+    border-radius:4px; padding:1rem; text-decoration:none;
+    transition: border-color .2s, transform .2s, box-shadow .2s;
+    display:block;
+  }
+  .ref-card:hover { border-color:var(--accent3); transform:translateY(-2px); box-shadow:3px 3px 0 var(--border); }
+  .ref-cat { font-family:'DM Mono',monospace; font-size:.63rem; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; margin-bottom:.25rem; }
+  .ref-title { color:var(--accent3); font-size:.88rem; font-weight:700; }
+  .ref-url { color:var(--muted); font-size:.7rem; font-family:'DM Mono',monospace; margin-top:.2rem; }
+
+  /* ── MODELO CONSULTA ── */
+  .modelo {
+    background:var(--ink); color:var(--bg);
+    border-radius:8px; padding:2rem; margin:2rem 0;
+  }
+  .modelo h3 { color:#ffe082; margin-top:0; }
+  .modelo p { color:#c8c0b0; font-size:.88rem; }
+  .modelo .q {
+    background:rgba(255,255,255,.06); border-left:3px solid var(--accent);
+    padding:.8rem 1rem; border-radius:0 3px 3px 0; margin:.6rem 0;
+    font-size:.88rem; color:#e8dfd0;
+  }
+  .modelo .q strong { color:#ffe082; display:block; font-size:.7rem; font-family:'DM Mono',monospace; letter-spacing:.1em; text-transform:uppercase; margin-bottom:.25rem; }
+
+  /* ── BTN ── */
+  .btn {
+    display:inline-block; background:var(--ink); color:var(--bg);
+    font-family:'DM Mono',monospace; font-size:.74rem;
+    letter-spacing:.1em; text-transform:uppercase;
+    padding:.6rem 1.4rem; border-radius:3px; border:none;
+    cursor:pointer; text-decoration:none; transition: background .2s;
+  }
+  .btn:hover { background:var(--accent); }
+
+  footer {
+    padding:3rem 4rem; border-top:1.5px solid var(--border);
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;
+    position:relative; z-index:1;
+  }
+  footer p { color:var(--muted); font-size:.8rem; margin:0; }
+
+  @media(max-width:700px){
+    .hero { padding:5rem 1.5rem 3rem; }
+    .container { padding:0 1.5rem; }
+    nav .nav-links { display:none; }
+    footer { padding:2rem 1.5rem; }
+    .connect-diagram { flex-direction:column; }
+  }
+
+  @media print {
+    nav, .hero-bg-text, footer .btn { display:none; }
+    body { background:#fff; color:#111; }
+    body::before { display:none; }
+    .code-block { background:#f0ede8; border-color:#ccc; }
+    pre, code { color:#222; }
+    .kw { color:#b45309; } .str { color:#16a34a; } .cmt { color:#9ca3af; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-brand">2° Año · I26 · Software</span>
+  <ul class="nav-links">
+    <li><a href="#teoria">Teoría</a></li>
+    <li><a href="#comparacion">Comparación</a></li>
+    <li><a href="#servidor">Servidor PHP</a></li>
+    <li><a href="#rn">React Native</a></li>
+    <li><a href="#conexion">Conexión 3°</a></li>
+    <li><a href="#actividad">Actividad</a></li>
+    <li><a href="#modelo">Modelo</a></li>
+    <li><a href="#refs">Refs</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg-text">MOBILE</div>
+  <div class="hero-eyebrow">Tecnicatura en Software · I26 · 2° Año</div>
+  <h1>Arrancamos con<br><em>React Native</em></h1>
+  <p class="hero-sub">Apps móviles reales · Servidor PHP · Comparativa de tecnologías · Conexión con la web app de 3° año</p>
+  <div class="tag-row">
+    <span class="tag tag-o">React Native</span>
+    <span class="tag tag-b">Expo</span>
+    <span class="tag tag-g">PHP + Apache</span>
+    <span class="tag tag-v">REST API</span>
+    <span class="tag tag-o">iOS & Android</span>
+    <span class="tag tag-g">Integración inter-año</span>
+  </div>
+  <div class="connection-badge">
+    <div class="dot"></div>
+    <span>📡 Esta app se conectará con la web app de 3° año</span>
+  </div>
+</div>
+
+<!-- ─── 1. TEORÍA ─── -->
+<section id="teoria">
+<div class="container">
+  <div class="sec-num">01 · Teoría</div>
+  <h2>¿Por qué <mark>desarrollo móvil</mark>?</h2>
+  <p>En 2° año ya construyeron backend en PHP y vieron los fundamentos del desarrollo web. Ahora damos el paso al mundo móvil. El objetivo de esta clase es entender <strong>qué es React Native</strong>, por qué lo elegimos y cómo se conecta con lo que ya saben.</p>
+
+  <div class="flow">
+    <div class="flow-step hi">PHP · Backend</div><div class="flow-arrow">→</div>
+    <div class="flow-step">Apache/XAMPP</div><div class="flow-arrow">→</div>
+    <div class="flow-step">API REST (JSON)</div><div class="flow-arrow">→</div>
+    <div class="flow-step hi2">React Native App</div><div class="flow-arrow">→</div>
+    <div class="flow-step hi2">📱 iOS / Android</div>
+  </div>
+
+  <h3>¿Qué es React Native?</h3>
+  <p>React Native es un framework de JavaScript creado por Meta (Facebook) que permite crear apps nativas para iOS y Android usando la misma base de código. No es una app web en un browser: genera componentes <strong>nativos reales</strong> del sistema operativo.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">⚛️</div>
+      <h4>Un código, dos plataformas</h4>
+      <p>El mismo archivo .jsx funciona en iOS y Android. Hay diferencias mínimas que se manejan con <code>Platform</code>.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🏎️</div>
+      <h4>Rendimiento nativo</h4>
+      <p>No es un WebView. React Native compila a componentes nativos: <code>View</code>, <code>Text</code>, <code>Image</code>.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">♻️</div>
+      <h4>Mismo paradigma que React</h4>
+      <p>Si aprendieron React (3° año), ya saben el 70% de React Native. Hooks, estado, componentes: todo igual.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📦</div>
+      <h4>Expo — la forma fácil</h4>
+      <p>Expo simplifica todo: no necesitan Xcode ni Android Studio para empezar. Un QR y la app corre en el celular.</p>
+    </div>
+  </div>
+
+  <div class="callout c-info">
+    <div class="callout-icon">📱</div>
+    <div class="callout-body">
+      <strong>Diferencia clave: React vs React Native</strong>
+      <p>En React web usamos <code>&lt;div&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;button&gt;</code>. En React Native usamos <code>&lt;View&gt;</code>, <code>&lt;Text&gt;</code>, <code>&lt;TouchableOpacity&gt;</code>. La lógica y los hooks son idénticos, solo cambian los componentes de UI.</p>
+    </div>
+  </div>
+
+  <h3>El rol del PHP en nuestra arquitectura</h3>
+  <p>Ya vieron PHP en la clase anterior. En este proyecto, el backend en PHP actúa como el <strong>servidor de datos</strong>: recibe pedidos de la app móvil (y de la web app de 3°) y responde con JSON. El PHP no sabe ni le importa si quien llama es una app React Native o un browser.</p>
+
+  <div class="callout c-tip">
+    <div class="callout-icon">✅</div>
+    <div class="callout-body">
+      <strong>Concepto clave: API agnóstica de cliente</strong>
+      <p>Una buena API REST responde JSON sin importar quién la consume. Eso nos permite que <strong>la misma API en PHP</strong> sirva tanto a la web app de 3° año (React) como a la app móvil de 2° (React Native).</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 2. COMPARACIÓN ─── -->
+<section id="comparacion">
+<div class="container">
+  <div class="sec-num">02 · Comparación</div>
+  <h2>Tecnologías de desarrollo <mark>móvil</mark></h2>
+  <p>Antes de codear, entendemos el panorama. ¿Por qué React Native y no otra cosa?</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Tecnología</th>
+          <th>Tipo</th>
+          <th>iOS + Android</th>
+          <th>Rendimiento</th>
+          <th>Curva de aprendizaje</th>
+          <th>Usa JS</th>
+          <th>¿Ideal para...?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>React Native</strong></td>
+          <td>Cross-platform nativo</td>
+          <td class="check">✓ Ambos</td>
+          <td class="check">Alto</td>
+          <td class="mid">Media</td>
+          <td class="check">✓</td>
+          <td>Apps de producción, startups, equipos web</td>
+        </tr>
+        <tr>
+          <td><strong>Expo</strong></td>
+          <td>Wrapper de RN</td>
+          <td class="check">✓ Ambos</td>
+          <td class="mid">Alto*</td>
+          <td class="check">Baja</td>
+          <td class="check">✓</td>
+          <td>Aprendizaje, MVPs, prototipos rápidos</td>
+        </tr>
+        <tr>
+          <td><strong>Flutter</strong></td>
+          <td>Cross-platform nativo</td>
+          <td class="check">✓ Ambos</td>
+          <td class="check">Muy alto</td>
+          <td class="mid">Media-Alta (Dart)</td>
+          <td class="cross">✗ (Dart)</td>
+          <td>Apps con UI muy customizada</td>
+        </tr>
+        <tr>
+          <td><strong>Ionic</strong></td>
+          <td>Híbrido (WebView)</td>
+          <td class="check">✓ Ambos</td>
+          <td class="cross">Medio</td>
+          <td class="check">Baja</td>
+          <td class="check">✓</td>
+          <td>Apps simples, web devs</td>
+        </tr>
+        <tr>
+          <td><strong>Swift (iOS)</strong></td>
+          <td>Nativo iOS</td>
+          <td class="cross">Solo iOS</td>
+          <td class="check">Muy alto</td>
+          <td class="cross">Alta</td>
+          <td class="cross">✗</td>
+          <td>Apps Apple-only de alta performance</td>
+        </tr>
+        <tr>
+          <td><strong>Kotlin (Android)</strong></td>
+          <td>Nativo Android</td>
+          <td class="cross">Solo Android</td>
+          <td class="check">Muy alto</td>
+          <td class="cross">Alta</td>
+          <td class="cross">✗</td>
+          <td>Apps Google-only</td>
+        </tr>
+        <tr>
+          <td><strong>PWA</strong></td>
+          <td>Web app instalable</td>
+          <td class="check">✓ Ambos</td>
+          <td class="cross">Bajo</td>
+          <td class="check">Muy baja</td>
+          <td class="check">✓</td>
+          <td>Apps offline simples, sin tienda</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout c-tip">
+    <div class="callout-icon">🎯</div>
+    <div class="callout-body">
+      <strong>¿Por qué elegimos React Native + Expo?</strong>
+      <p>Porque ya saben JavaScript, la curva de aprendizaje es la más baja partiendo de React (que aprenden en 3°), y Expo nos saca la complejidad de configurar Android Studio / Xcode. En el celular de cada uno podemos ver la app funcionando en 15 minutos.</p>
+    </div>
+  </div>
+
+  <h3>React vs React Native: diferencias en el código</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Concepto</th><th>React (Web)</th><th>React Native (Móvil)</th></tr></thead>
+      <tbody>
+        <tr><td>Contenedor genérico</td><td><code>&lt;div&gt;</code></td><td><code>&lt;View&gt;</code></td></tr>
+        <tr><td>Texto</td><td><code>&lt;p&gt;</code>, <code>&lt;span&gt;</code></td><td><code>&lt;Text&gt;</code></td></tr>
+        <tr><td>Input</td><td><code>&lt;input&gt;</code></td><td><code>&lt;TextInput&gt;</code></td></tr>
+        <tr><td>Imagen</td><td><code>&lt;img&gt;</code></td><td><code>&lt;Image source={...}&gt;</code></td></tr>
+        <tr><td>Botón</td><td><code>&lt;button&gt;</code></td><td><code>&lt;TouchableOpacity&gt;</code> / <code>&lt;Pressable&gt;</code></td></tr>
+        <tr><td>Lista</td><td><code>&lt;ul&gt;</code> / map()</td><td><code>&lt;FlatList&gt;</code></td></tr>
+        <tr><td>Estilos</td><td>CSS / className</td><td><code>StyleSheet.create({})</code></td></tr>
+        <tr><td>Navegación</td><td>React Router</td><td>React Navigation</td></tr>
+        <tr><td>Hooks</td><td>useState, useEffect…</td><td>Idénticos ✓</td></tr>
+        <tr><td>Fetch / API calls</td><td>fetch() / axios</td><td>Idénticos ✓</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- ─── 3. SERVIDOR PHP ─── -->
+<section id="servidor">
+<div class="container">
+  <div class="sec-num">03 · Servidor PHP</div>
+  <h2>Levantar el servidor con <mark>PHP + XAMPP</mark></h2>
+  <p>La app móvil necesita datos. Esos datos vienen del servidor PHP. Primero levantamos el servidor, después lo llamamos desde React Native.</p>
+
+  <h3>Instalación de XAMPP</h3>
+  <div class="callout c-info">
+    <div class="callout-icon">⬇️</div>
+    <div class="callout-body">
+      <strong>Descargar XAMPP</strong>
+      <p>Ir a <strong>apachefriends.org</strong> → descargar para su sistema operativo. Incluye Apache + MySQL + PHP. Al instalar, asegurarse de incluir Apache y MySQL.</p>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <span class="lang">bash · pasos</span>
+    <pre><span class="cmt"># 1. Abrir XAMPP Control Panel y hacer clic en START en:</span>
+<span class="cmt">#    → Apache   (servidor web, puerto 80)</span>
+<span class="cmt">#    → MySQL    (base de datos, puerto 3306)</span>
+
+<span class="cmt"># 2. La carpeta raíz del servidor es:</span>
+<span class="cmt">#    Windows:  C:\xampp\htdocs\</span>
+<span class="cmt">#    Mac/Linux: /Applications/XAMPP/htdocs/</span>
+
+<span class="cmt"># 3. Crear nuestra carpeta de proyecto ahí:</span>
+<span class="cmt">#    htdocs/mi-api/</span>
+
+<span class="cmt"># 4. Verificar que funciona:</span>
+<span class="cmt">#    Abrir browser → http://localhost/mi-api/</span></pre>
+  </div>
+
+  <h3>Estructura de la API en PHP</h3>
+  <div class="tree">
+    <div><span class="tf">📁 htdocs/mi-api/</span></div>
+    <div>&nbsp;&nbsp;<span class="tf">📁 config/</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="td">📄 database.php</span> &nbsp;<span class="tc">← Conexión a MySQL</span></div>
+    <div>&nbsp;&nbsp;<span class="tf">📁 api/</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="td">📄 usuarios.php</span> &nbsp;<span class="tc">← Endpoint de usuarios</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="td">📄 productos.php</span> &nbsp;<span class="tc">← Endpoint de productos</span></div>
+    <div>&nbsp;&nbsp;<span class="tf">📁 models/</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="td">📄 Usuario.php</span> &nbsp;<span class="tc">← Clase modelo</span></div>
+    <div>&nbsp;&nbsp;<span class="td">📄 .htaccess</span> &nbsp;<span class="tc">← Configuración Apache (CORS)</span></div>
+    <div>&nbsp;&nbsp;<span class="td">📄 index.php</span> &nbsp;<span class="tc">← Router principal</span></div>
+  </div>
+
+  <h3>config/database.php</h3>
+  <div class="code-block">
+    <span class="lang">php</span>
+    <pre><span class="cmt">&lt;?php
+// config/database.php — Conexión reutilizable a MySQL</span>
+
+<span class="kw">class</span> <span class="type">Database</span> {
+    <span class="kw">private</span> <span class="prop">$host</span>     = <span class="str">'localhost'</span>;
+    <span class="kw">private</span> <span class="prop">$db_name</span>  = <span class="str">'mi_app_db'</span>;
+    <span class="kw">private</span> <span class="prop">$username</span> = <span class="str">'root'</span>;
+    <span class="kw">private</span> <span class="prop">$password</span> = <span class="str">''</span>;
+    <span class="kw">public</span>  <span class="prop">$conn</span>;
+
+    <span class="kw">public function</span> <span class="fn">getConnection</span>() {
+        <span class="prop">$this</span>->conn = <span class="kw">null</span>;
+        <span class="kw">try</span> {
+            <span class="prop">$this</span>->conn = <span class="kw">new</span> <span class="type">PDO</span>(
+                <span class="str">"mysql:host={$this->host};dbname={$this->db_name}"</span>,
+                <span class="prop">$this</span>->username,
+                <span class="prop">$this</span>->password
+            );
+            <span class="prop">$this</span>->conn-><span class="fn">setAttribute</span>(<span class="type">PDO</span>::ATTR_ERRMODE, <span class="type">PDO</span>::ERRMODE_EXCEPTION);
+        } <span class="kw">catch</span> (<span class="type">PDOException</span> <span class="prop">$e</span>) {
+            <span class="fn">echo</span> <span class="str">"Error de conexión: "</span> . <span class="prop">$e</span>-><span class="fn">getMessage</span>();
+        }
+        <span class="kw">return</span> <span class="prop">$this</span>->conn;
+    }
+}</pre>
+  </div>
+
+  <h3>api/usuarios.php — Endpoint REST completo</h3>
+  <div class="code-block">
+    <span class="lang">php · api rest</span>
+    <pre><span class="cmt">&lt;?php
+// api/usuarios.php — Responde JSON para GET y POST</span>
+
+<span class="cmt">// ── CORS: permitir pedidos desde cualquier origen (app móvil)</span>
+<span class="fn">header</span>(<span class="str">"Access-Control-Allow-Origin: *"</span>);
+<span class="fn">header</span>(<span class="str">"Content-Type: application/json; charset=UTF-8"</span>);
+<span class="fn">header</span>(<span class="str">"Access-Control-Allow-Methods: GET, POST, PUT, DELETE"</span>);
+<span class="fn">header</span>(<span class="str">"Access-Control-Allow-Headers: Content-Type, Authorization"</span>);
+
+<span class="cmt">// Incluir conexión</span>
+<span class="fn">include_once</span> <span class="str">'../config/database.php'</span>;
+<span class="prop">$database</span> = <span class="kw">new</span> <span class="type">Database</span>();
+<span class="prop">$db</span> = <span class="prop">$database</span>-><span class="fn">getConnection</span>();
+
+<span class="prop">$method</span> = <span class="prop">$_SERVER</span>[<span class="str">'REQUEST_METHOD'</span>];
+
+<span class="kw">switch</span> (<span class="prop">$method</span>) {
+
+    <span class="kw">case</span> <span class="str">'GET'</span>:
+        <span class="cmt">// Devolver todos los usuarios</span>
+        <span class="prop">$query</span> = <span class="str">"SELECT id, nombre, email, created_at FROM usuarios"</span>;
+        <span class="prop">$stmt</span>  = <span class="prop">$db</span>-><span class="fn">prepare</span>(<span class="prop">$query</span>);
+        <span class="prop">$stmt</span>-><span class="fn">execute</span>();
+        <span class="prop">$usuarios</span> = <span class="prop">$stmt</span>-><span class="fn">fetchAll</span>(<span class="type">PDO</span>::FETCH_ASSOC);
+        <span class="fn">echo</span> <span class="fn">json_encode</span>([<span class="str">'data'</span> => <span class="prop">$usuarios</span>, <span class="str">'total'</span> => <span class="fn">count</span>(<span class="prop">$usuarios</span>)]);
+        <span class="kw">break</span>;
+
+    <span class="kw">case</span> <span class="str">'POST'</span>:
+        <span class="cmt">// Crear nuevo usuario</span>
+        <span class="prop">$body</span>  = <span class="fn">json_decode</span>(<span class="fn">file_get_contents</span>(<span class="str">"php://input"</span>));
+        <span class="prop">$query</span> = <span class="str">"INSERT INTO usuarios (nombre, email) VALUES (:nombre, :email)"</span>;
+        <span class="prop">$stmt</span>  = <span class="prop">$db</span>-><span class="fn">prepare</span>(<span class="prop">$query</span>);
+        <span class="prop">$stmt</span>-><span class="fn">bindParam</span>(<span class="str">':nombre'</span>, <span class="prop">$body</span>->nombre);
+        <span class="prop">$stmt</span>-><span class="fn">bindParam</span>(<span class="str">':email'</span>,  <span class="prop">$body</span>->email);
+
+        <span class="kw">if</span> (<span class="prop">$stmt</span>-><span class="fn">execute</span>()) {
+            <span class="fn">http_response_code</span>(<span class="num">201</span>);
+            <span class="fn">echo</span> <span class="fn">json_encode</span>([<span class="str">'mensaje'</span> => <span class="str">'Usuario creado'</span>, <span class="str">'id'</span> => <span class="prop">$db</span>-><span class="fn">lastInsertId</span>()]);
+        } <span class="kw">else</span> {
+            <span class="fn">http_response_code</span>(<span class="num">500</span>);
+            <span class="fn">echo</span> <span class="fn">json_encode</span>([<span class="str">'error'</span> => <span class="str">'No se pudo crear el usuario'</span>]);
+        }
+        <span class="kw">break</span>;
+}</pre>
+  </div>
+
+  <h3>Probar la API antes de conectar el móvil</h3>
+  <div class="callout c-warn">
+    <div class="callout-icon">🔧</div>
+    <div class="callout-body">
+      <strong>Usar Postman o Thunder Client (VS Code)</strong>
+      <p>Antes de tocar React Native, verificar que el endpoint funciona: abrir Postman → GET <code>http://localhost/mi-api/api/usuarios.php</code> → tiene que devolver JSON. Si hay error de CORS o de PHP, arreglarlo acá antes de seguir.</p>
+    </div>
+  </div>
+
+  <div class="code-block green">
+    <span class="lang">json · respuesta esperada</span>
+    <pre>{
+  <span class="str">"data"</span>: [
+    {
+      <span class="str">"id"</span>: <span class="num">1</span>,
+      <span class="str">"nombre"</span>: <span class="str">"Ana García"</span>,
+      <span class="str">"email"</span>: <span class="str">"ana@ejemplo.com"</span>,
+      <span class="str">"created_at"</span>: <span class="str">"2025-04-20 10:30:00"</span>
+    }
+  ],
+  <span class="str">"total"</span>: <span class="num">1</span>
+}</pre>
+  </div>
+</div>
+</section>
+
+<!-- ─── 4. REACT NATIVE ─── -->
+<section id="rn">
+<div class="container">
+  <div class="sec-num">04 · React Native</div>
+  <h2>Primer proyecto en <mark>React Native</mark></h2>
+
+  <h3>Instalación con Expo</h3>
+  <div class="code-block">
+    <span class="lang">bash · terminal</span>
+    <pre><span class="cmt"># 1. Instalar Node.js (si no lo tienen): nodejs.org</span>
+<span class="cmt"># 2. Instalar Expo CLI globalmente</span>
+npm install -g expo-cli
+
+<span class="cmt"># 3. Crear el proyecto</span>
+npx create-expo-app MiAppMovil
+cd MiAppMovil
+
+<span class="cmt"># 4. Correr el proyecto</span>
+npx expo start
+
+<span class="cmt"># 5. En el celular: descargar "Expo Go" desde la tienda</span>
+<span class="cmt">#    Escanear el QR que aparece en la terminal</span>
+<span class="cmt">#    ¡La app corre en tu celular en tiempo real!</span></pre>
+  </div>
+
+  <div class="callout c-tip">
+    <div class="callout-icon">📱</div>
+    <div class="callout-body">
+      <strong>Expo Go — la herramienta más importante de hoy</strong>
+      <p>Descárguen <strong>Expo Go</strong> desde App Store o Google Play. Cada vez que guarden un archivo, la app se actualiza automáticamente en el celular (hot reload). No necesitan emulador.</p>
+    </div>
+  </div>
+
+  <h3>Estructura del proyecto Expo</h3>
+  <div class="tree">
+    <div><span class="tf">📁 MiAppMovil/</span></div>
+    <div>&nbsp;&nbsp;<span class="tf">📁 app/</span> &nbsp;<span class="tc">← Rutas y pantallas (Expo Router)</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="td">📄 _layout.jsx</span> &nbsp;<span class="tc">← Navegación raíz</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="td">📄 index.jsx</span> &nbsp;<span class="tc">← Pantalla principal (home)</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tf">📁 (tabs)/</span> &nbsp;<span class="tc">← Grupo con tab navigation</span></div>
+    <div>&nbsp;&nbsp;<span class="tf">📁 components/</span> &nbsp;<span class="tc">← Componentes reutilizables</span></div>
+    <div>&nbsp;&nbsp;<span class="tf">📁 services/</span> &nbsp;<span class="tc">← Llamadas a la API (fetch)</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="td">📄 api.js</span> &nbsp;<span class="tc">← URL base y helpers</span></div>
+    <div>&nbsp;&nbsp;<span class="tf">📁 assets/</span> &nbsp;<span class="tc">← Imágenes, íconos, splash</span></div>
+    <div>&nbsp;&nbsp;<span class="td">📄 app.json</span> &nbsp;<span class="tc">← Config de la app (nombre, ícono, etc.)</span></div>
+    <div>&nbsp;&nbsp;<span class="td">📄 package.json</span></div>
+  </div>
+
+  <h3>Primer componente — Hola Mundo</h3>
+  <div class="code-block">
+    <span class="lang">jsx · react native</span>
+    <pre><span class="cmt">// app/index.jsx — Pantalla de inicio</span>
+<span class="kw">import</span> { <span class="type">View</span>, <span class="type">Text</span>, <span class="type">StyleSheet</span> } <span class="kw">from</span> <span class="str">'react-native'</span>;
+
+<span class="kw">export default function</span> <span class="fn">HomeScreen</span>() {
+  <span class="kw">return</span> (
+    &lt;<span class="tag-jsx">View</span> <span class="prop">style</span>={styles.container}&gt;
+      &lt;<span class="tag-jsx">Text</span> <span class="prop">style</span>={styles.titulo}&gt;¡Bienvenidos a React Native!&lt;/<span class="tag-jsx">Text</span>&gt;
+      &lt;<span class="tag-jsx">Text</span> <span class="prop">style</span>={styles.sub}&gt;2° Año · I26 · Software&lt;/<span class="tag-jsx">Text</span>&gt;
+    &lt;/<span class="tag-jsx">View</span>&gt;
+  );
+}
+
+<span class="kw">const</span> styles = <span class="type">StyleSheet</span>.<span class="fn">create</span>({
+  container: {
+    flex: <span class="num">1</span>,
+    justifyContent: <span class="str">'center'</span>,
+    alignItems: <span class="str">'center'</span>,
+    backgroundColor: <span class="str">'#f5f5f5'</span>,
+    padding: <span class="num">20</span>,
+  },
+  titulo: {
+    fontSize: <span class="num">24</span>,
+    fontWeight: <span class="str">'bold'</span>,
+    color: <span class="str">'#1a1612'</span>,
+    textAlign: <span class="str">'center'</span>,
+    marginBottom: <span class="num">8</span>,
+  },
+  sub: {
+    fontSize: <span class="num">14</span>,
+    color: <span class="str">'#7a7060'</span>,
+  }
+});</pre>
+  </div>
+
+  <h3>Componente con fetch a la API PHP</h3>
+  <div class="code-block blue">
+    <span class="lang">jsx · fetch + api php</span>
+    <pre><span class="cmt">// app/usuarios.jsx — Lista de usuarios desde la API</span>
+<span class="kw">import</span> { useState, useEffect } <span class="kw">from</span> <span class="str">'react'</span>;
+<span class="kw">import</span> { <span class="type">View</span>, <span class="type">Text</span>, <span class="type">FlatList</span>, <span class="type">ActivityIndicator</span>, <span class="type">StyleSheet</span> } <span class="kw">from</span> <span class="str">'react-native'</span>;
+
+<span class="cmt">// ⚠️ Cambiar por la IP de tu computadora en la red local</span>
+<span class="cmt">// No usar "localhost" en el celular: el celular no conoce tu localhost</span>
+<span class="kw">const</span> API_URL = <span class="str">'http://192.168.1.50/mi-api/api/usuarios.php'</span>;
+
+<span class="kw">export default function</span> <span class="fn">UsuariosScreen</span>() {
+  <span class="kw">const</span> [usuarios, setUsuarios] = <span class="fn">useState</span>([]);
+  <span class="kw">const</span> [loading, setLoading]  = <span class="fn">useState</span>(<span class="kw">true</span>);
+  <span class="kw">const</span> [error, setError]      = <span class="fn">useState</span>(<span class="kw">null</span>);
+
+  <span class="fn">useEffect</span>(() => {
+    <span class="fn">fetchUsuarios</span>();
+  }, []);
+
+  <span class="kw">const</span> fetchUsuarios = <span class="kw">async</span> () => {
+    <span class="kw">try</span> {
+      <span class="kw">const</span> res  = <span class="kw">await</span> <span class="fn">fetch</span>(API_URL);
+      <span class="kw">const</span> json = <span class="kw">await</span> res.<span class="fn">json</span>();
+      <span class="fn">setUsuarios</span>(json.data);
+    } <span class="kw">catch</span> (e) {
+      <span class="fn">setError</span>(<span class="str">'No se pudo conectar al servidor'</span>);
+    } <span class="kw">finally</span> {
+      <span class="fn">setLoading</span>(<span class="kw">false</span>);
+    }
+  };
+
+  <span class="kw">if</span> (loading) <span class="kw">return</span> &lt;<span class="type">ActivityIndicator</span> <span class="prop">size</span>=<span class="str">"large"</span> /&gt;;
+  <span class="kw">if</span> (error)   <span class="kw">return</span> &lt;<span class="tag-jsx">Text</span> <span class="prop">style</span>={styles.error}&gt;{error}&lt;/<span class="tag-jsx">Text</span>&gt;;
+
+  <span class="kw">return</span> (
+    &lt;<span class="tag-jsx">View</span> <span class="prop">style</span>={styles.container}&gt;
+      &lt;<span class="tag-jsx">Text</span> <span class="prop">style</span>={styles.titulo}&gt;Usuarios&lt;/<span class="tag-jsx">Text</span>&gt;
+      &lt;<span class="tag-jsx">FlatList</span>
+        <span class="prop">data</span>={usuarios}
+        <span class="prop">keyExtractor</span>={(item) => item.id.<span class="fn">toString</span>()}
+        <span class="prop">renderItem</span>={({ item }) => (
+          &lt;<span class="tag-jsx">View</span> <span class="prop">style</span>={styles.card}&gt;
+            &lt;<span class="tag-jsx">Text</span> <span class="prop">style</span>={styles.nombre}&gt;{item.nombre}&lt;/<span class="tag-jsx">Text</span>&gt;
+            &lt;<span class="tag-jsx">Text</span> <span class="prop">style</span>={styles.email}&gt;{item.email}&lt;/<span class="tag-jsx">Text</span>&gt;
+          &lt;/<span class="tag-jsx">View</span>&gt;
+        )}
+      /&gt;
+    &lt;/<span class="tag-jsx">View</span>&gt;
+  );
+}
+
+<span class="kw">const</span> styles = <span class="type">StyleSheet</span>.<span class="fn">create</span>({
+  container: { flex: <span class="num">1</span>, padding: <span class="num">16</span>, backgroundColor: <span class="str">'#f5f2ec'</span> },
+  titulo:    { fontSize: <span class="num">22</span>, fontWeight: <span class="str">'bold'</span>, marginBottom: <span class="num">16</span> },
+  card:      { backgroundColor: <span class="str">'#fff'</span>, padding: <span class="num">14</span>, borderRadius: <span class="num">8</span>, marginBottom: <span class="num">10</span> },
+  nombre:    { fontSize: <span class="num">16</span>, fontWeight: <span class="str">'600'</span> },
+  email:     { fontSize: <span class="num">13</span>, color: <span class="str">'#7a7060'</span>, marginTop: <span class="num">2</span> },
+  error:     { color: <span class="str">'red'</span>, padding: <span class="num">20</span>, textAlign: <span class="str">'center'</span> },
+});</pre>
+  </div>
+
+  <div class="callout c-warn">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-body">
+      <strong>IP local vs localhost</strong>
+      <p>Cuando la app corre en el celular físico, <code>localhost</code> apunta al celular, no a tu PC. Necesitan usar la <strong>IP local de la computadora</strong> (ej: <code>192.168.1.50</code>). Para encontrarla: Windows → <code>ipconfig</code> en cmd · Mac/Linux → <code>ifconfig</code> en terminal. El celular y la PC deben estar en la misma red WiFi.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 5. CONEXIÓN CON 3° AÑO ─── -->
+<section id="conexion">
+<div class="container">
+  <div class="sec-num">05 · Integración</div>
+  <h2>Conectando con la <mark>web app de 3° año</mark></h2>
+  <p>Esta es la parte más importante y más interesante del año: la app móvil de 2° y la web app de 3° van a compartir datos reales a través de la misma API.</p>
+
+  <div class="connect-diagram">
+    <div class="conn-box hi">
+      <div class="cb-icon">📱</div>
+      <div class="cb-label">2° Año</div>
+      <div class="cb-tech">React Native</div>
+    </div>
+    <div class="conn-arrow">⟷</div>
+    <div class="conn-box hi3">
+      <div class="cb-icon">🖥️</div>
+      <div class="cb-label">Servidor compartido</div>
+      <div class="cb-tech">PHP + MySQL</div>
+    </div>
+    <div class="conn-arrow">⟷</div>
+    <div class="conn-box hi2">
+      <div class="cb-icon">💻</div>
+      <div class="cb-label">3° Año</div>
+      <div class="cb-tech">React Web App</div>
+    </div>
+  </div>
+
+  <div class="callout c-link">
+    <div class="callout-icon">🔗</div>
+    <div class="callout-body">
+      <strong>Misma API, múltiples clientes</strong>
+      <p>Los alumnos de 3° armaron una API REST (Node o PHP) para su web app. La app móvil de 2° va a consumir <strong>esa misma API</strong>. Los datos que crea un usuario en la web aparecen en el móvil, y viceversa. Eso es integración real.</p>
+    </div>
+  </div>
+
+  <h3>¿Cómo coordinar con el equipo de 3°?</h3>
+  <p>Para que la integración funcione, ambos equipos necesitan ponerse de acuerdo en el <strong>contrato de la API</strong>: qué endpoints existen, qué datos devuelven, qué formato tienen.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Lo que necesita 2°</th><th>Lo que debe proveer 3°</th></tr></thead>
+      <tbody>
+        <tr><td>URL base de la API</td><td><code>http://[IP]/api/</code> o URL pública</td></tr>
+        <tr><td>Listado de endpoints disponibles</td><td>Documentación en <code>docs/api.md</code></td></tr>
+        <tr><td>Formato de cada respuesta JSON</td><td>Ejemplo de response para cada endpoint</td></tr>
+        <tr><td>Cómo autenticarse (si hay token)</td><td>Header <code>Authorization: Bearer [token]</code></td></tr>
+        <tr><td>Cómo enviar datos (POST body)</td><td>Estructura del JSON esperado</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Ejemplo de integración práctica</h3>
+  <p>Supongamos que 3° hizo un sistema de <strong>gestión de tareas</strong>. La app de 2° muestra esas mismas tareas en móvil.</p>
+
+  <div class="code-block">
+    <span class="lang">jsx · consumir api de 3°</span>
+    <pre><span class="cmt">// services/api.js — Configuración central de la API de 3°</span>
+
+<span class="cmt">// URL del backend de 3° año (cambiar por la real)</span>
+<span class="kw">export const</span> API_BASE = <span class="str">'http://192.168.1.100:3001/api'</span>;
+
+<span class="kw">export const</span> getTareas = <span class="kw">async</span> () => {
+  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">`${API_BASE}/tareas`</span>);
+  <span class="kw">if</span> (!res.ok) <span class="kw">throw new</span> <span class="type">Error</span>(<span class="str">'Error al obtener tareas'</span>);
+  <span class="kw">return</span> res.<span class="fn">json</span>();
+};
+
+<span class="kw">export const</span> crearTarea = <span class="kw">async</span> (titulo) => {
+  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">`${API_BASE}/tareas`</span>, {
+    method: <span class="str">'POST'</span>,
+    headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
+    body: <span class="type">JSON</span>.<span class="fn">stringify</span>({ titulo })
+  });
+  <span class="kw">return</span> res.<span class="fn">json</span>();
+};</pre>
+  </div>
+
+  <h3>Preguntas que hay que hacerle al equipo de 3°</h3>
+  <div class="modelo">
+    <h3>📋 Modelo de consulta a 3° año</h3>
+    <p>Cuando se junten con el equipo de 3°, llevar estas preguntas:</p>
+    <div class="q"><strong>01</strong> ¿Cuál es la URL base de su API y en qué puerto corre?</div>
+    <div class="q"><strong>02</strong> ¿Qué endpoints tienen disponibles? (listar: GET /..., POST /..., etc.)</div>
+    <div class="q"><strong>03</strong> ¿La API tiene autenticación? ¿Cómo se consigue el token?</div>
+    <div class="q"><strong>04</strong> ¿Qué campos devuelve cada endpoint? (necesitamos el JSON de ejemplo)</div>
+    <div class="q"><strong>05</strong> ¿Tienen habilitado CORS para que el celular pueda hacer peticiones?</div>
+    <div class="q"><strong>06</strong> ¿Cómo puedo probar la API sin la app? ¿Tienen Postman collection?</div>
+    <div class="q"><strong>07</strong> ¿Qué pasa si mando datos incorrectos? ¿Qué código HTTP devuelve?</div>
+    <div class="q"><strong>08</strong> ¿Cómo se crea un usuario nuevo desde la app móvil?</div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 6. ACTIVIDAD ─── -->
+<section id="actividad">
+<div class="container">
+  <div class="sec-num">06 · Actividad</div>
+  <h2>Trabajo en equipo</h2>
+  <p>Hoy el objetivo es tener: <strong>servidor PHP corriendo + primera pantalla en React Native + un fetch real a la API</strong>.</p>
+
+  <div class="activity">
+    <div class="activity-header">
+      <span class="act-badge">Parte 1</span>
+      <h3>Levantamos el servidor PHP</h3>
+    </div>
+
+    <div class="fill">
+      <div class="fill-label">¿Dónde instalaron XAMPP? (ruta de htdocs)</div>
+      <input class="fill-input" type="text" placeholder="ej: C:\xampp\htdocs\  o  /Applications/XAMPP/htdocs/">
+    </div>
+    <div class="fill">
+      <div class="fill-label">IP local de la computadora del servidor (van a necesitarla)</div>
+      <input class="fill-input" type="text" placeholder="ej: 192.168.1.50  (correr ipconfig o ifconfig en terminal)">
+    </div>
+    <div class="fill">
+      <div class="fill-label">Nombre de la carpeta del proyecto en htdocs</div>
+      <input class="fill-input" type="text" placeholder="ej: mi-api-2do">
+    </div>
+    <div class="fill">
+      <div class="fill-label">URL de prueba del primer endpoint (verificar en browser/Postman)</div>
+      <input class="fill-input" type="text" placeholder="ej: http://localhost/mi-api-2do/api/usuarios.php">
+    </div>
+    <div class="callout c-tip" style="margin-top:1rem">
+      <div class="callout-icon">✅</div>
+      <div class="callout-body">
+        <strong>Checkpoint: ¿devuelve JSON?</strong>
+        <p>Si en el browser o Postman ven un objeto JSON (aunque sea vacío <code>{"data":[]}</code>), el servidor está bien. Recién ahí pasan a React Native.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="activity-header">
+      <span class="act-badge">Parte 2</span>
+      <h3>Primera pantalla en React Native</h3>
+    </div>
+
+    <div class="fill">
+      <div class="fill-label">Nombre de la app (será el nombre en app.json)</div>
+      <input class="fill-input" type="text" placeholder="ej: ConectaApp, GestorMovil, etc.">
+    </div>
+    <div class="fill">
+      <div class="fill-label">¿Qué va a mostrar la pantalla principal?</div>
+      <textarea class="fill-input" placeholder="ej: Un listado de las tareas que vienen de la API de 3° año, con el nombre de la tarea y un ícono de estado (completada/pendiente)"></textarea>
+    </div>
+    <div class="fill">
+      <div class="fill-label">Componentes de React Native que van a usar en esa pantalla</div>
+      <input class="fill-input" type="text" placeholder="ej: View, Text, FlatList, TouchableOpacity, ActivityIndicator">
+    </div>
+    <div class="fill">
+      <div class="fill-label">URL del endpoint que van a consumir</div>
+      <input class="fill-input" type="text" placeholder="ej: http://192.168.1.50/mi-api/api/tareas.php">
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="activity-header">
+      <span class="act-badge">Parte 3</span>
+      <h3>Conexión con el equipo de 3° año</h3>
+    </div>
+    <p style="color:var(--muted); font-size:.88rem; margin-bottom:1rem">Completen esto después de hablar con el equipo de 3°:</p>
+
+    <div class="fill">
+      <div class="fill-label">URL base de la API de 3° que van a consumir</div>
+      <input class="fill-input" type="text" placeholder="ej: http://192.168.1.100:3001/api">
+    </div>
+    <div class="fill">
+      <div class="fill-label">Endpoint que van a usar primero y qué devuelve</div>
+      <textarea class="fill-input" placeholder="ej: GET /tareas → devuelve array de objetos con: id, titulo, descripcion, completada, created_at"></textarea>
+    </div>
+    <div class="fill">
+      <div class="fill-label">¿Necesitan autenticación? ¿Cómo se maneja?</div>
+      <input class="fill-input" type="text" placeholder="ej: No / Sí, con JWT en header Authorization: Bearer TOKEN">
+    </div>
+    <div class="fill">
+      <div class="fill-label">¿Hay CORS habilitado en el backend de 3°? ¿Lo verificaron?</div>
+      <input class="fill-input" type="text" placeholder="Sí/No. Si no: pedirle al equipo de 3° que agregue header Access-Control-Allow-Origin: *">
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="activity-header">
+      <span class="act-badge">Parte 4</span>
+      <h3>Definición de la app móvil del equipo</h3>
+    </div>
+
+    <div class="fill">
+      <div class="fill-label">¿Qué hace su app móvil que la web app de 3° no hace o hace diferente?</div>
+      <textarea class="fill-input" placeholder="ej: La app móvil permite recibir notificaciones push cuando se crea una nueva tarea, y tiene acceso a la cámara para adjuntar fotos a las tareas"></textarea>
+    </div>
+    <div class="fill">
+      <div class="fill-label">Ventaja específica del móvil que van a aprovechar</div>
+      <input class="fill-input" type="text" placeholder="ej: Notificaciones push / GPS / Cámara / Biometría (huella/face id) / Sin conexión (offline)">
+    </div>
+    <div class="fill">
+      <div class="fill-label">2 pantallas que va a tener su app (además del home)</div>
+      <textarea class="fill-input" placeholder="ej: Pantalla 1: Detalle de una tarea (foto, descripción, estado)&#10;Pantalla 2: Formulario para crear nueva tarea desde el celular"></textarea>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 7. MODELO DE CONSULTA ─── -->
+<section id="modelo">
+<div class="container">
+  <div class="sec-num">07 · Modelo</div>
+  <h2>Modelo de consulta para <mark>los alumnos</mark></h2>
+  <p>Usen este modelo como guía para investigar, organizar lo que aprendieron y prepararse para la siguiente clase.</p>
+
+  <div class="modelo">
+    <h3>🔍 Guía de investigación — React Native</h3>
+    <p>Buscar respuestas en la documentación oficial y completar:</p>
+
+    <div class="q">
+      <strong>Pregunta 1 — Conceptual</strong>
+      ¿Qué diferencia hay entre una app nativa, una app híbrida y una app cross-platform? Dar un ejemplo de tecnología para cada caso y explicar cuándo usaría cada una.
+    </div>
+    <div class="q">
+      <strong>Pregunta 2 — Técnica · React Native</strong>
+      En React Native, ¿qué componente se usa para mostrar listas largas de datos? ¿Por qué no se recomienda usar <code>map()</code> con <code>ScrollView</code> para listas grandes? Buscar en la doc oficial y explicar.
+    </div>
+    <div class="q">
+      <strong>Pregunta 3 — Técnica · PHP</strong>
+      ¿Por qué es necesario agregar el header <code>Access-Control-Allow-Origin</code> en PHP para que React Native pueda consumir la API? Explicar qué es CORS y cómo afecta a nuestra app.
+    </div>
+    <div class="q">
+      <strong>Pregunta 4 — Comparación</strong>
+      Comparar React Native con Flutter: elegir una app real (Instagram, Spotify, etc.) que use cada tecnología y explicar por qué creen que eligieron esa tecnología para ese producto.
+    </div>
+    <div class="q">
+      <strong>Pregunta 5 — Integración</strong>
+      Si la app de 3° usa autenticación con JWT, ¿cómo harían para que la app móvil de 2° guarde el token y lo envíe en cada request? Investigar <code>AsyncStorage</code> en React Native.
+    </div>
+    <div class="q">
+      <strong>Pregunta 6 — Diseño de pantallas</strong>
+      En React Native no existe CSS. ¿Cómo se aplican estilos? ¿Qué es <code>StyleSheet.create()</code> y para qué sirve? ¿Flexbox funciona igual que en CSS?
+    </div>
+    <div class="q">
+      <strong>Pregunta 7 — Entrega práctica</strong>
+      Crear una pantalla en React Native que: (a) consuma el endpoint GET de la API PHP, (b) muestre los datos en una FlatList, (c) tenga un botón "Actualizar" que recargue los datos. Subir el código al repositorio del equipo.
+    </div>
+    <div class="q">
+      <strong>Pregunta 8 — Reflexión</strong>
+      ¿Qué ventaja tiene el usuario de tener tanto la app web (de 3°) como la app móvil (de 2°) conectadas a la misma base de datos? Dar un ejemplo concreto de un caso de uso donde eso agrega valor real.
+    </div>
+  </div>
+
+  <h3>Plan de trabajo · 3 sprints</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Sprint</th>
+          <th>Objetivo</th>
+          <th>Entregable</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Sprint 1</strong><br><small>Esta semana</small></td>
+          <td>Servidor PHP corriendo · Expo instalado · Primera pantalla con fetch a la API</td>
+          <td>Screenshot de la app corriendo en el celular con datos de la API</td>
+        </tr>
+        <tr>
+          <td><strong>Sprint 2</strong></td>
+          <td>Navegación entre pantallas · Formulario para crear datos · Conexión con API de 3°</td>
+          <td>App con 3 pantallas navegables, POST funcionando</td>
+        </tr>
+        <tr>
+          <td><strong>Sprint 3</strong></td>
+          <td>Demo conjunta con 3° · Integración completa · Presentación</td>
+          <td>Video de 3 minutos mostrando dato creado en web que aparece en móvil</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout c-tip" style="margin-top:1.5rem">
+    <div class="callout-icon">🎯</div>
+    <div class="callout-body">
+      <strong>Meta final del año</strong>
+      <p>Al final del año, el equipo de 2° y el de 3° hacen una <strong>demo conjunta</strong>: crean un dato en la web app → lo ven aparecer en la app móvil en tiempo real. Ese momento es la integración inter-año funcionando.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 8. REFERENCIAS ─── -->
+<section id="refs">
+<div class="container">
+  <div class="sec-num">08 · Referencias</div>
+  <h2>Documentación y recursos</h2>
+  <p>Material oficial para 2° año · Tecnicatura en Software · I26.</p>
+
+  <h3>React Native & Expo</h3>
+  <div class="ref-grid">
+    <a class="ref-card" href="https://reactnative.dev/docs/getting-started" target="_blank" rel="noopener">
+      <div class="ref-cat">React Native</div>
+      <div class="ref-title">Docs oficiales RN</div>
+      <div class="ref-url">reactnative.dev</div>
+    </a>
+    <a class="ref-card" href="https://docs.expo.dev/" target="_blank" rel="noopener">
+      <div class="ref-cat">Expo</div>
+      <div class="ref-title">Expo Docs</div>
+      <div class="ref-url">docs.expo.dev</div>
+    </a>
+    <a class="ref-card" href="https://reactnavigation.org/docs/getting-started" target="_blank" rel="noopener">
+      <div class="ref-cat">Navegación</div>
+      <div class="ref-title">React Navigation</div>
+      <div class="ref-url">reactnavigation.org</div>
+    </a>
+    <a class="ref-card" href="https://reactnative.dev/docs/flatlist" target="_blank" rel="noopener">
+      <div class="ref-cat">Componente</div>
+      <div class="ref-title">FlatList — RN Docs</div>
+      <div class="ref-url">reactnative.dev/docs/flatlist</div>
+    </a>
+    <a class="ref-card" href="https://reactnative.dev/docs/stylesheet" target="_blank" rel="noopener">
+      <div class="ref-cat">Estilos</div>
+      <div class="ref-title">StyleSheet API</div>
+      <div class="ref-url">reactnative.dev</div>
+    </a>
+    <a class="ref-card" href="https://react-native-async-storage.github.io/async-storage/" target="_blank" rel="noopener">
+      <div class="ref-cat">Almacenamiento</div>
+      <div class="ref-title">AsyncStorage</div>
+      <div class="ref-url">async-storage docs</div>
+    </a>
+  </div>
+
+  <h3>PHP y Servidor</h3>
+  <div class="ref-grid">
+    <a class="ref-card" href="https://www.apachefriends.org/es/index.html" target="_blank" rel="noopener">
+      <div class="ref-cat">Servidor</div>
+      <div class="ref-title">XAMPP — Apache Friends</div>
+      <div class="ref-url">apachefriends.org</div>
+    </a>
+    <a class="ref-card" href="https://www.php.net/manual/es/" target="_blank" rel="noopener">
+      <div class="ref-cat">Backend</div>
+      <div class="ref-title">PHP Manual (Español)</div>
+      <div class="ref-url">php.net/manual/es</div>
+    </a>
+    <a class="ref-card" href="https://www.php.net/manual/es/book.pdo.php" target="_blank" rel="noopener">
+      <div class="ref-cat">Base de Datos</div>
+      <div class="ref-title">PHP PDO — MySQL</div>
+      <div class="ref-url">php.net/pdo</div>
+    </a>
+    <a class="ref-card" href="https://developer.mozilla.org/es/docs/Web/HTTP/CORS" target="_blank" rel="noopener">
+      <div class="ref-cat">Conceptos</div>
+      <div class="ref-title">CORS — MDN</div>
+      <div class="ref-url">developer.mozilla.org</div>
+    </a>
+  </div>
+
+  <h3>Comparativa y herramientas</h3>
+  <div class="ref-grid">
+    <a class="ref-card" href="https://flutter.dev/docs" target="_blank" rel="noopener">
+      <div class="ref-cat">Comparativa</div>
+      <div class="ref-title">Flutter Docs</div>
+      <div class="ref-url">flutter.dev</div>
+    </a>
+    <a class="ref-card" href="https://ionicframework.com/docs" target="_blank" rel="noopener">
+      <div class="ref-cat">Comparativa</div>
+      <div class="ref-title">Ionic Framework</div>
+      <div class="ref-url">ionicframework.com</div>
+    </a>
+    <a class="ref-card" href="https://www.postman.com/" target="_blank" rel="noopener">
+      <div class="ref-cat">Testing API</div>
+      <div class="ref-title">Postman</div>
+      <div class="ref-url">postman.com</div>
+    </a>
+    <a class="ref-card" href="https://restfulapi.net/" target="_blank" rel="noopener">
+      <div class="ref-cat">Conceptos</div>
+      <div class="ref-title">REST API Guide</div>
+      <div class="ref-url">restfulapi.net</div>
+    </a>
+  </div>
+
+  <h3>Apps conocidas que usan React Native</h3>
+  <div class="card-grid" style="margin-top:1rem">
+    <div class="card">
+      <div class="card-icon">👾</div>
+      <h4>Discord</h4>
+      <p>Migró parte de su app a RN. Millones de usuarios en móvil.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🛍️</div>
+      <h4>Shopify</h4>
+      <p>La app de merchants de Shopify está hecha en React Native.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🏷️</div>
+      <h4>Pinterest</h4>
+      <p>Rediseñaron su app con React Native manteniendo el look nativo.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🤝</div>
+      <h4>LinkedIn</h4>
+      <p>Usa React Native para varias partes de su app móvil.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<footer>
+  <div>
+    <p><strong>Tecnicatura Superior en Software · I26 · 2° Año</strong></p>
+    <p>Desarrollo de Aplicaciones · React Native · Conexión con 3° año</p>
+  </div>
+  <button class="btn" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+</footer>
+
+</body>
+</html>

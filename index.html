@@ -417,18 +417,22 @@
         .neuro-panel {
             position: fixed;
             top: 0;
-            right: -400px;
-            width: 400px;
+            right: -100%;
+            width: min(400px, 100vw);
             height: 100vh;
-            background: rgba(15, 15, 23, 0.95);
+            height: 100dvh;
+            background: rgba(10, 10, 18, 0.98);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-left: 1px solid var(--border);
             z-index: 1001;
-            padding: 3rem 2rem;
-            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            padding: 4rem 2rem 2rem;
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
             display: flex;
             flex-direction: column;
+            gap: 1.5rem;
             box-shadow: -20px 0 50px rgba(0,0,0,0.5);
+            overflow-y: auto;
         }
         .neuro-panel.active {
             right: 0;
@@ -475,7 +479,6 @@
             background: rgba(255,255,255,0.03);
             border-radius: 12px;
             padding: 1.5rem;
-            margin-top: auto;
             border: 1px dashed var(--border);
         }
         .neuro-brain-tip h5 { font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--accent-p); }
@@ -484,11 +487,15 @@
         .overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.65);
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.5s;
+            transition: opacity 0.4s;
             z-index: 1000;
+        }
+        .overlay.active {
+            opacity: 1;
+            pointer-events: all;
         }
         /* ─── GLOSARIO & FUN ─── */
         .glossary-grid {
@@ -962,14 +969,24 @@
         const btt = document.getElementById('backToTop');
 
         // Toggle Panel
+        const openPanel = () => {
+            panel.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        };
+        const closePanel = () => {
+            panel.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        };
         const togglePanel = () => {
-            panel.classList.toggle('active');
-            overlay.classList.toggle('active');
+            panel.classList.contains('active') ? closePanel() : openPanel();
         };
 
         trigger.addEventListener('click', togglePanel);
-        close.addEventListener('click', togglePanel);
-        overlay.addEventListener('click', togglePanel);
+        close.addEventListener('click', closePanel);
+        overlay.addEventListener('click', closePanel);
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePanel(); });
 
         // Back to top logic
         window.addEventListener('scroll', () => {

@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase · De la Idea al Sistema Real · 3° Año Software I26</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #7c3aed;
+    --accent2: #06b6d4;
+    --accent3: #f59e0b;
+    --accent4: #10b981;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+    --code-bg: #0d0d16;
+    --tag-purple: rgba(124,58,237,0.15);
+    --tag-cyan: rgba(6,182,212,0.15);
+    --tag-amber: rgba(245,158,11,0.15);
+    --tag-green: rgba(16,185,129,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+  }
+  .nav-brand {
+    font-weight: 800; font-size: .85rem; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--accent2);
+  }
+  .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+  .nav-links a {
+    color: var(--muted); text-decoration: none; font-size: .78rem;
+    letter-spacing: .08em; text-transform: uppercase;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: flex-start;
+    padding: 6rem 4rem 4rem;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 80% 20%, rgba(124,58,237,.18) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 10% 80%, rgba(6,182,212,.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: .75rem; letter-spacing: .2em;
+    color: var(--accent2); text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(6,182,212,.3);
+    padding: .3rem .8rem; border-radius: 2px;
+    display: inline-block;
+  }
+  .hero h1 {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 800; line-height: 1.05;
+    max-width: 800px; margin-bottom: 1.5rem;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero-sub {
+    font-size: 1.1rem; color: var(--muted);
+    max-width: 560px; margin-bottom: 2.5rem;
+  }
+  .hero-tags { display: flex; flex-wrap: wrap; gap: .6rem; }
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: .7rem; padding: .25rem .7rem;
+    border-radius: 2px; letter-spacing: .06em;
+  }
+  .tag-p { background: var(--tag-purple); color: var(--accent); border: 1px solid rgba(124,58,237,.3); }
+  .tag-c { background: var(--tag-cyan); color: var(--accent2); border: 1px solid rgba(6,182,212,.3); }
+  .tag-a { background: var(--tag-amber); color: var(--accent3); border: 1px solid rgba(245,158,11,.3); }
+  .tag-g { background: var(--tag-green); color: var(--accent4); border: 1px solid rgba(16,185,129,.3); }
+
+  .scroll-hint {
+    position: absolute; bottom: 2rem; left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center;
+    gap: .4rem; color: var(--muted); font-size: .7rem;
+    letter-spacing: .12em; text-transform: uppercase;
+    font-family: 'Space Mono', monospace;
+    animation: bounce 2s infinite;
+  }
+  .scroll-hint::after {
+    content: '↓';
+    font-size: 1.2rem; color: var(--accent);
+  }
+  @keyframes bounce {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ─── LAYOUT ─── */
+  .container { max-width: 960px; margin: 0 auto; padding: 0 2rem; }
+  section { padding: 5rem 0; }
+  section + section { border-top: 1px solid var(--border); }
+
+  /* ─── SECTION HEADERS ─── */
+  .section-num {
+    font-family: 'Space Mono', monospace;
+    font-size: .7rem; letter-spacing: .2em; color: var(--accent);
+    text-transform: uppercase; margin-bottom: .8rem;
+  }
+  h2 {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 800; margin-bottom: 1.2rem;
+    line-height: 1.15;
+  }
+  h3 {
+    font-size: 1.15rem; font-weight: 700;
+    color: var(--accent2); margin: 2rem 0 .8rem;
+  }
+  h4 {
+    font-size: .95rem; font-weight: 700;
+    color: var(--accent3); margin: 1.2rem 0 .4rem;
+  }
+  p { color: #c8c8d8; margin-bottom: .9rem; }
+  ul, ol { color: #c8c8d8; padding-left: 1.4rem; }
+  li { margin-bottom: .4rem; }
+  strong { color: var(--text); }
+
+  /* ─── CARDS ─── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem; margin: 1.5rem 0;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.4rem;
+    position: relative; overflow: hidden;
+    transition: border-color .2s, transform .2s;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card::before {
+    content: attr(data-icon);
+    font-size: 1.8rem;
+    display: block; margin-bottom: .6rem;
+  }
+  .card h4 { margin-top: 0; }
+  .card p { font-size: .88rem; margin: 0; }
+
+  /* ─── FLOW DIAGRAM ─── */
+  .flow {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: .5rem; margin: 1.5rem 0;
+  }
+  .flow-step {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 4px; padding: .5rem 1rem;
+    font-family: 'Space Mono', monospace; font-size: .78rem;
+    color: var(--text);
+  }
+  .flow-arrow { color: var(--accent); font-size: 1.1rem; }
+
+  /* ─── CODE BLOCKS ─── */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 1.4rem 1.6rem;
+    margin: 1.2rem 0;
+    overflow-x: auto;
+    position: relative;
+  }
+  .code-block .code-lang {
+    position: absolute; top: .6rem; right: .8rem;
+    font-family: 'Space Mono', monospace;
+    font-size: .65rem; color: var(--muted);
+    letter-spacing: .1em; text-transform: uppercase;
+  }
+  .code-block pre {
+    font-family: 'Space Mono', monospace;
+    font-size: .78rem; line-height: 1.7;
+    color: #c8d3e8; white-space: pre; tab-size: 2;
+  }
+  .kw { color: #c678dd; }
+  .fn { color: #61afef; }
+  .str { color: #98c379; }
+  .cmt { color: #5c6370; font-style: italic; }
+  .num { color: #d19a66; }
+  .type { color: #e5c07b; }
+
+  /* ─── FILE TREE ─── */
+  .tree {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.4rem 1.6rem;
+    font-family: 'Space Mono', monospace;
+    font-size: .78rem; line-height: 2;
+    margin: 1.2rem 0;
+  }
+  .tree-folder { color: var(--accent3); }
+  .tree-file { color: #c8d3e8; }
+  .tree-desc { color: var(--muted); font-size: .7rem; }
+
+  /* ─── CALLOUTS ─── */
+  .callout {
+    border-radius: 4px; padding: 1.2rem 1.4rem;
+    margin: 1.4rem 0;
+    display: flex; gap: 1rem; align-items: flex-start;
+  }
+  .callout-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .callout-body { flex: 1; }
+  .callout-body strong { display: block; margin-bottom: .3rem; font-size: .9rem; }
+  .callout-body p { font-size: .88rem; margin: 0; }
+  .callout-tip { background: var(--tag-green); border: 1px solid rgba(16,185,129,.3); }
+  .callout-warn { background: var(--tag-amber); border: 1px solid rgba(245,158,11,.3); }
+  .callout-info { background: var(--tag-cyan); border: 1px solid rgba(6,182,212,.3); }
+  .callout-ai { background: var(--tag-purple); border: 1px solid rgba(124,58,237,.3); }
+
+  /* ─── TABLES ─── */
+  .table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+  table { width: 100%; border-collapse: collapse; font-size: .87rem; }
+  th {
+    background: var(--surface2);
+    color: var(--accent2); font-family: 'Space Mono', monospace;
+    font-size: .72rem; letter-spacing: .08em; text-transform: uppercase;
+    padding: .7rem 1rem; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td { padding: .7rem 1rem; border-bottom: 1px solid rgba(42,42,58,.5); color: #c8c8d8; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,.02); }
+
+  /* ─── ACTIVITY BOX ─── */
+  .activity {
+    background: linear-gradient(135deg, rgba(124,58,237,.08), rgba(6,182,212,.06));
+    border: 1px solid rgba(124,58,237,.35);
+    border-radius: 8px; padding: 2rem;
+    margin: 2rem 0;
+  }
+  .activity-header {
+    display: flex; align-items: center; gap: .8rem;
+    margin-bottom: 1.4rem;
+  }
+  .activity-badge {
+    background: var(--accent);
+    color: #fff; font-family: 'Space Mono', monospace;
+    font-size: .68rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: .25rem .7rem; border-radius: 2px;
+  }
+  .activity h3 { margin: 0; color: var(--text); font-size: 1.05rem; }
+
+  /* ─── FILL-IN BOXES ─── */
+  .fill-section {
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 4px; padding: 1.2rem;
+    margin: .8rem 0;
+  }
+  .fill-label {
+    font-family: 'Space Mono', monospace;
+    font-size: .7rem; color: var(--muted);
+    letter-spacing: .12em; text-transform: uppercase;
+    margin-bottom: .5rem;
+  }
+  .fill-input {
+    width: 100%; background: transparent;
+    border: none; border-bottom: 1px solid var(--border);
+    color: var(--text); font-family: 'Syne', sans-serif;
+    font-size: .9rem; padding: .4rem 0;
+    outline: none; transition: border-color .2s;
+    margin-bottom: .5rem;
+  }
+  .fill-input:focus { border-color: var(--accent2); }
+  textarea.fill-input {
+    border: 1px solid var(--border); border-radius: 3px;
+    padding: .6rem; resize: vertical; min-height: 70px;
+  }
+  textarea.fill-input:focus { border-color: var(--accent2); }
+
+  /* ─── AI SECTION ─── */
+  .ai-rule {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px; padding: 1rem 1.2rem;
+    margin: .6rem 0;
+    display: flex; align-items: flex-start; gap: .8rem;
+  }
+  .ai-rule-icon { color: var(--accent); font-size: 1rem; flex-shrink: 0; margin-top: .1rem; }
+  .ai-rule p { margin: 0; font-size: .87rem; }
+
+  /* ─── SPRINT CARDS ─── */
+  .sprint-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin: 1.2rem 0; }
+  .sprint-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px; padding: 1.2rem;
+  }
+  .sprint-card .sprint-num {
+    font-family: 'Space Mono', monospace; font-size: .65rem;
+    color: var(--accent); letter-spacing: .15em; text-transform: uppercase;
+    margin-bottom: .4rem;
+  }
+  .sprint-card h4 { margin: 0 0 .6rem; color: var(--text); font-size: .9rem; }
+  .sprint-card ul { font-size: .82rem; }
+
+  /* ─── REFS ─── */
+  .ref-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: .8rem; margin: 1.2rem 0; }
+  .ref-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px; padding: 1rem;
+    text-decoration: none;
+    transition: border-color .2s, transform .2s;
+    display: block;
+  }
+  .ref-card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+  .ref-card .ref-cat {
+    font-family: 'Space Mono', monospace; font-size: .65rem;
+    color: var(--muted); text-transform: uppercase; letter-spacing: .1em;
+    margin-bottom: .3rem;
+  }
+  .ref-card .ref-title { color: var(--accent2); font-size: .88rem; font-weight: 700; }
+  .ref-card .ref-url { color: var(--muted); font-size: .72rem; font-family: 'Space Mono', monospace; margin-top: .2rem; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    padding: 3rem 4rem;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1rem;
+  }
+  footer p { color: var(--muted); font-size: .8rem; margin: 0; }
+
+  /* ─── RESPONSIVE ─── */
+  @media(max-width:700px) {
+    .hero { padding: 5rem 1.5rem 3rem; }
+    .container { padding: 0 1.5rem; }
+    .sprint-grid { grid-template-columns: 1fr; }
+    nav .nav-links { display: none; }
+    footer { padding: 2rem 1.5rem; }
+  }
+
+  /* ─── PRINT BUTTON ─── */
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff; font-family: 'Space Mono', monospace;
+    font-size: .75rem; letter-spacing: .1em;
+    text-transform: uppercase; padding: .6rem 1.4rem;
+    border-radius: 3px; border: none; cursor: pointer;
+    text-decoration: none;
+    transition: opacity .2s;
+  }
+  .btn:hover { opacity: .85; }
+  .btn-outline {
+    background: transparent; color: var(--accent2);
+    border: 1px solid var(--accent2);
+  }
+
+  @media print {
+    nav, .scroll-hint, footer .btn { display: none; }
+    body { background: #fff; color: #111; }
+    h2, h3 { color: #3a0ca3; }
+    .code-block, .tree { border-color: #ccc; background: #f9f9f9; }
+    pre { color: #222; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-brand">3° Año · I26 · Software</span>
+  <ul class="nav-links">
+    <li><a href="#teoria">Teoría</a></li>
+    <li><a href="#estructura">Estructura</a></li>
+    <li><a href="#codigo">Código</a></li>
+    <li><a href="#actividad">Actividad</a></li>
+    <li><a href="#ia">IA</a></li>
+    <li><a href="#refs">Refs</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Tecnicatura en Software · I26 · 3° Año</div>
+  <h1>De la <span>idea</span><br>al sistema real</h1>
+  <p class="hero-sub">Clase de consolidación · Desarrollo de Aplicaciones Web · MVP + Arquitectura + Código + IA</p>
+  <div class="hero-tags">
+    <span class="tag tag-p">MVP</span>
+    <span class="tag tag-c">React</span>
+    <span class="tag tag-c">Node.js</span>
+    <span class="tag tag-a">Épicas</span>
+    <span class="tag tag-a">User Stories</span>
+    <span class="tag tag-g">Arquitectura Monolítica</span>
+    <span class="tag tag-p">IA Responsable</span>
+  </div>
+  <div class="scroll-hint">Comenzar</div>
+</div>
+
+<!-- ─── 1. TEORÍA ─── -->
+<section id="teoria">
+<div class="container">
+  <div class="section-num">01 · Teoría</div>
+  <h2>De la idea al sistema real</h2>
+  <p>En las clases anteriores definieron la <strong>visión de producto</strong>, el <strong>core del sistema</strong> y el <strong>MVP</strong>. Hoy conectamos eso con estructura de proyecto concreta y código funcionando.</p>
+
+  <div class="flow">
+    <div class="flow-step">💡 Idea</div><div class="flow-arrow">→</div>
+    <div class="flow-step">🎯 Visión</div><div class="flow-arrow">→</div>
+    <div class="flow-step">⚙️ Core</div><div class="flow-arrow">→</div>
+    <div class="flow-step">🚀 MVP</div><div class="flow-arrow">→</div>
+    <div class="flow-step">📐 Arquitectura</div><div class="flow-arrow">→</div>
+    <div class="flow-step">🧩 Épicas</div><div class="flow-arrow">→</div>
+    <div class="flow-step">💻 Código</div>
+  </div>
+
+  <h3>¿Qué es el MVP en términos de sistema?</h3>
+  <p>El MVP no es solo "la versión más chica". Es la intersección entre <strong>lo más valioso para el usuario</strong> y <strong>lo más fácil de construir primero</strong>. Todo lo que no pertenece a esa intersección va al backlog.</p>
+
+  <div class="callout callout-tip">
+    <div class="callout-icon">✅</div>
+    <div class="callout-body">
+      <strong>Regla de oro del MVP</strong>
+      <p>Si dudás si algo va en el MVP preguntate: ¿el sistema funciona sin esto? Si la respuesta es sí, no va en el MVP.</p>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card" data-icon="🎯">
+      <h4>Visión de Producto</h4>
+      <p>El "para qué" del sistema. Define el problema que resuelve y a quién le resuelve.</p>
+    </div>
+    <div class="card" data-icon="⚙️">
+      <h4>Core del Sistema</h4>
+      <p>El motor central: la funcionalidad sin la cual el sistema no tiene sentido de existir.</p>
+    </div>
+    <div class="card" data-icon="🚀">
+      <h4>MVP</h4>
+      <p>La versión mínima que entrega valor real. No un prototipo, no un mockup: algo que funciona.</p>
+    </div>
+    <div class="card" data-icon="🏗️">
+      <h4>Arquitectura Monolítica</h4>
+      <p>Todo en un solo deployment. Ideal para MVPs: simple de entender, desplegar y mantener.</p>
+    </div>
+  </div>
+
+  <h3>¿Por qué empezamos con arquitectura monolítica?</h3>
+  <p>Muchos sistemas que hoy son microservicios empezaron siendo monolitos: GitHub, Shopify, Airbnb. La arquitectura monolítica es la base correcta cuando el equipo es pequeño, el dominio no está bien definido y necesitamos velocidad de desarrollo.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Criterio</th><th>Monolito</th><th>Microservicios</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Complejidad inicial</td><td>🟢 Baja</td><td>🔴 Alta</td></tr>
+        <tr><td>Velocidad de desarrollo</td><td>🟢 Alta</td><td>🟡 Media</td></tr>
+        <tr><td>Equipo pequeño</td><td>🟢 Ideal</td><td>🔴 Problemático</td></tr>
+        <tr><td>Escalabilidad futura</td><td>🟡 Posible</td><td>🟢 Alta</td></tr>
+        <tr><td>Adecuado para MVP</td><td>🟢 Sí</td><td>🔴 No recomendado</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Épicas, Historias de Usuario y Sprints</h3>
+  <p>La forma de organizar el trabajo en un sistema real:</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Nivel</th><th>Definición</th><th>Ejemplo</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Épica</strong></td><td>Gran área funcional del sistema</td><td>"Gestión de usuarios"</td></tr>
+        <tr><td><strong>Historia de Usuario</strong></td><td>Funcionalidad desde la perspectiva del usuario</td><td>"Como usuario quiero poder registrarme con email"</td></tr>
+        <tr><td><strong>Tarea</strong></td><td>Trabajo técnico concreto</td><td>"Crear endpoint POST /api/auth/register"</td></tr>
+        <tr><td><strong>Sprint</strong></td><td>Ciclo de trabajo (1-2 semanas)</td><td>Sprint 1: autenticación básica</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Formato de Historia de Usuario</h4>
+  <div class="code-block">
+    <span class="code-lang">template</span>
+    <pre>Como [tipo de usuario]
+quiero [realizar una acción]
+para [obtener un beneficio / resolver un problema]
+
+Criterios de aceptación:
+- [ ] El usuario puede ingresar su email y contraseña
+- [ ] El sistema valida el formato del email
+- [ ] Se muestra un mensaje de error si los datos son incorrectos
+- [ ] Si el login es exitoso, redirige al dashboard</pre>
+  </div>
+
+  <div class="sprint-grid">
+    <div class="sprint-card">
+      <div class="sprint-num">Sprint 1</div>
+      <h4>Base</h4>
+      <ul>
+        <li>Setup del proyecto</li>
+        <li>Autenticación</li>
+        <li>Estructura DB</li>
+      </ul>
+    </div>
+    <div class="sprint-card">
+      <div class="sprint-num">Sprint 2</div>
+      <h4>Core funcional</h4>
+      <ul>
+        <li>CRUD principal</li>
+        <li>UI básica</li>
+        <li>Integración API</li>
+      </ul>
+    </div>
+    <div class="sprint-card">
+      <div class="sprint-num">Sprint 3</div>
+      <h4>MVP entregable</h4>
+      <ul>
+        <li>Testing básico</li>
+        <li>Despliegue</li>
+        <li>Documentación</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 2. ESTRUCTURA ─── -->
+<section id="estructura">
+<div class="container">
+  <div class="section-num">02 · Estructura</div>
+  <h2>Estructura del proyecto</h2>
+  <p>Toda aplicación web real necesita una estructura de carpetas consistente. No es capricho: es la diferencia entre un proyecto que escala y uno que se convierte en caos a la semana 3.</p>
+
+  <div class="tree">
+    <div><span class="tree-folder">📁 mi-proyecto/</span></div>
+    <div>&nbsp;&nbsp;<span class="tree-folder">📁 frontend/</span> &nbsp;<span class="tree-desc">← Todo lo que ve el usuario</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-folder">📁 src/</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-folder">📁 components/</span> &nbsp;<span class="tree-desc">← Componentes React reutilizables</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-folder">📁 pages/</span> &nbsp;<span class="tree-desc">← Vistas / páginas completas</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-folder">📁 services/</span> &nbsp;<span class="tree-desc">← Llamadas al backend (fetch/axios)</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-file">📄 App.jsx</span> &nbsp;<span class="tree-desc">← Componente raíz + rutas</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-file">📄 package.json</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-file">📄 vite.config.js</span></div>
+    <br>
+    <div>&nbsp;&nbsp;<span class="tree-folder">📁 backend/</span> &nbsp;<span class="tree-desc">← Lógica de negocio y API</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-folder">📁 routes/</span> &nbsp;<span class="tree-desc">← Definición de endpoints</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-folder">📁 controllers/</span> &nbsp;<span class="tree-desc">← Lógica de cada endpoint</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-folder">📁 models/</span> &nbsp;<span class="tree-desc">← Modelos de datos / acceso a DB</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-folder">📁 middleware/</span> &nbsp;<span class="tree-desc">← Auth, validaciones, logs</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-file">📄 index.js</span> &nbsp;<span class="tree-desc">← Punto de entrada del servidor</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-file">📄 package.json</span></div>
+    <br>
+    <div>&nbsp;&nbsp;<span class="tree-folder">📁 database/</span> &nbsp;<span class="tree-desc">← Modelo de datos</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-file">📄 schema.sql</span> &nbsp;<span class="tree-desc">← Estructura de tablas</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-file">📄 seed.sql</span> &nbsp;<span class="tree-desc">← Datos iniciales para pruebas</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-file">📄 diagrama_ER.png</span> &nbsp;<span class="tree-desc">← Diagrama entidad-relación</span></div>
+    <br>
+    <div>&nbsp;&nbsp;<span class="tree-folder">📁 docs/</span> &nbsp;<span class="tree-desc">← Documentación del proyecto</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-file">📄 vision.md</span> &nbsp;<span class="tree-desc">← Visión, core, MVP</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-file">📄 epicas.md</span> &nbsp;<span class="tree-desc">← Épicas e historias de usuario</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-file">📄 api.md</span> &nbsp;<span class="tree-desc">← Documentación de endpoints</span></div>
+    <br>
+    <div>&nbsp;&nbsp;<span class="tree-file">📄 README.md</span> &nbsp;<span class="tree-desc">← Descripción general + cómo levantar</span></div>
+    <div>&nbsp;&nbsp;<span class="tree-file">📄 .gitignore</span></div>
+  </div>
+
+  <div class="callout callout-warn">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-body">
+      <strong>Nunca commiteen node_modules, .env ni archivos de contraseñas</strong>
+      <p>El archivo .gitignore debe incluir: <code>node_modules/</code>, <code>.env</code>, <code>*.log</code>, <code>dist/</code></p>
+    </div>
+  </div>
+
+  <h3>¿Qué va en cada capa?</h3>
+  <div class="card-grid">
+    <div class="card" data-icon="🖥️">
+      <h4>Frontend (React)</h4>
+      <p>Interfaz de usuario. Consume la API del backend. No tiene lógica de negocio ni acceso directo a la DB.</p>
+    </div>
+    <div class="card" data-icon="⚙️">
+      <h4>Backend (Node/Express)</h4>
+      <p>API REST. Contiene la lógica de negocio. Es el único que habla con la base de datos.</p>
+    </div>
+    <div class="card" data-icon="🗄️">
+      <h4>Database (MySQL/PostgreSQL)</h4>
+      <p>Almacena los datos de forma persistente. El schema define la estructura del sistema.</p>
+    </div>
+    <div class="card" data-icon="📄">
+      <h4>Docs</h4>
+      <p>Documentación viva del proyecto: visión, épicas, endpoints. Tan importante como el código.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 3. CÓDIGO ─── -->
+<section id="codigo">
+<div class="container">
+  <div class="section-num">03 · Código</div>
+  <h2>Ejemplo base funcionando</h2>
+  <p>Un sistema simple de <strong>Lista de Tareas</strong> (todos) con React + Node + MySQL. El ejemplo más simple que demuestra el flujo completo.</p>
+
+  <div class="callout callout-info">
+    <div class="callout-icon">ℹ️</div>
+    <div class="callout-body">
+      <strong>Stack elegido para el ejemplo</strong>
+      <p>Frontend: React + Vite · Backend: Node.js + Express · Base de datos: MySQL · Comunicación: REST API + JSON</p>
+    </div>
+  </div>
+
+  <h3>📦 Backend — index.js</h3>
+  <div class="code-block">
+    <span class="code-lang">javascript · node.js</span>
+    <pre><span class="cmt">// backend/index.js — Punto de entrada del servidor</span>
+<span class="kw">const</span> express = <span class="fn">require</span>(<span class="str">'express'</span>);
+<span class="kw">const</span> cors    = <span class="fn">require</span>(<span class="str">'cors'</span>);
+<span class="kw">const</span> app     = <span class="fn">express</span>();
+
+app.<span class="fn">use</span>(<span class="fn">cors</span>());
+app.<span class="fn">use</span>(express.<span class="fn">json</span>());
+
+<span class="cmt">// Importar rutas</span>
+<span class="kw">const</span> tareasRoutes = <span class="fn">require</span>(<span class="str">'./routes/tareas'</span>);
+app.<span class="fn">use</span>(<span class="str">'/api/tareas'</span>, tareasRoutes);
+
+<span class="cmt">// Levantamos el servidor</span>
+<span class="kw">const</span> PORT = process.env.PORT || <span class="num">3001</span>;
+app.<span class="fn">listen</span>(PORT, () => {
+  console.<span class="fn">log</span>(<span class="str">`Servidor corriendo en http://localhost:${PORT}`</span>);
+});</pre>
+  </div>
+
+  <h3>🛣️ Backend — routes/tareas.js</h3>
+  <div class="code-block">
+    <span class="code-lang">javascript · express router</span>
+    <pre><span class="cmt">// backend/routes/tareas.js</span>
+<span class="kw">const</span> express    = <span class="fn">require</span>(<span class="str">'express'</span>);
+<span class="kw">const</span> router     = express.<span class="fn">Router</span>();
+<span class="kw">const</span> controller = <span class="fn">require</span>(<span class="str">'../controllers/tareasController'</span>);
+
+<span class="cmt">// GET  /api/tareas        → listar todas</span>
+router.<span class="fn">get</span>(<span class="str">'/'</span>,       controller.getAll);
+
+<span class="cmt">// GET  /api/tareas/:id    → obtener una</span>
+router.<span class="fn">get</span>(<span class="str">'/:id'</span>,    controller.getOne);
+
+<span class="cmt">// POST /api/tareas        → crear</span>
+router.<span class="fn">post</span>(<span class="str">'/'</span>,      controller.create);
+
+<span class="cmt">// PUT  /api/tareas/:id    → actualizar</span>
+router.<span class="fn">put</span>(<span class="str">'/:id'</span>,    controller.update);
+
+<span class="cmt">// DELETE /api/tareas/:id  → eliminar</span>
+router.<span class="fn">delete</span>(<span class="str">'/:id'</span>, controller.remove);
+
+module.exports = router;</pre>
+  </div>
+
+  <h3>🎮 Backend — controllers/tareasController.js</h3>
+  <div class="code-block">
+    <span class="code-lang">javascript · controller</span>
+    <pre><span class="cmt">// backend/controllers/tareasController.js</span>
+<span class="kw">const</span> db = <span class="fn">require</span>(<span class="str">'../models/db'</span>);
+
+exports.getAll = <span class="kw">async</span> (req, res) => {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> [rows] = <span class="kw">await</span> db.<span class="fn">query</span>(<span class="str">'SELECT * FROM tareas ORDER BY created_at DESC'</span>);
+    res.<span class="fn">json</span>(rows);
+  } <span class="kw">catch</span> (err) {
+    res.<span class="fn">status</span>(<span class="num">500</span>).<span class="fn">json</span>({ error: <span class="str">'Error al obtener tareas'</span> });
+  }
+};
+
+exports.create = <span class="kw">async</span> (req, res) => {
+  <span class="kw">const</span> { titulo, descripcion } = req.body;
+
+  <span class="cmt">// Validación básica</span>
+  <span class="kw">if</span> (!titulo) {
+    <span class="kw">return</span> res.<span class="fn">status</span>(<span class="num">400</span>).<span class="fn">json</span>({ error: <span class="str">'El título es obligatorio'</span> });
+  }
+
+  <span class="kw">try</span> {
+    <span class="kw">const</span> [result] = <span class="kw">await</span> db.<span class="fn">query</span>(
+      <span class="str">'INSERT INTO tareas (titulo, descripcion) VALUES (?, ?)'</span>,
+      [titulo, descripcion]
+    );
+    res.<span class="fn">status</span>(<span class="num">201</span>).<span class="fn">json</span>({ id: result.insertId, titulo, descripcion });
+  } <span class="kw">catch</span> (err) {
+    res.<span class="fn">status</span>(<span class="num">500</span>).<span class="fn">json</span>({ error: <span class="str">'Error al crear tarea'</span> });
+  }
+};</pre>
+  </div>
+
+  <h3>🗄️ Database — schema.sql</h3>
+  <div class="code-block">
+    <span class="code-lang">sql · mysql</span>
+    <pre><span class="cmt">-- database/schema.sql</span>
+<span class="kw">CREATE DATABASE IF NOT EXISTS</span> mi_app_db;
+<span class="kw">USE</span> mi_app_db;
+
+<span class="kw">CREATE TABLE</span> usuarios (
+  id          <span class="type">INT</span> <span class="kw">AUTO_INCREMENT PRIMARY KEY</span>,
+  nombre      <span class="type">VARCHAR(100)</span> <span class="kw">NOT NULL</span>,
+  email       <span class="type">VARCHAR(150)</span> <span class="kw">UNIQUE NOT NULL</span>,
+  password    <span class="type">VARCHAR(255)</span> <span class="kw">NOT NULL</span>,
+  created_at  <span class="type">TIMESTAMP</span> <span class="kw">DEFAULT</span> CURRENT_TIMESTAMP
+);
+
+<span class="kw">CREATE TABLE</span> tareas (
+  id           <span class="type">INT</span> <span class="kw">AUTO_INCREMENT PRIMARY KEY</span>,
+  usuario_id   <span class="type">INT</span>,
+  titulo       <span class="type">VARCHAR(200)</span> <span class="kw">NOT NULL</span>,
+  descripcion  <span class="type">TEXT</span>,
+  completada   <span class="type">BOOLEAN</span> <span class="kw">DEFAULT</span> <span class="num">FALSE</span>,
+  created_at   <span class="type">TIMESTAMP</span> <span class="kw">DEFAULT</span> CURRENT_TIMESTAMP,
+  <span class="kw">FOREIGN KEY</span> (usuario_id) <span class="kw">REFERENCES</span> usuarios(id) <span class="kw">ON DELETE CASCADE</span>
+);</pre>
+  </div>
+
+  <h3>⚛️ Frontend — App.jsx</h3>
+  <div class="code-block">
+    <span class="code-lang">jsx · react</span>
+    <pre><span class="cmt">// frontend/src/App.jsx</span>
+<span class="kw">import</span> { useState, useEffect } <span class="kw">from</span> <span class="str">'react'</span>;
+<span class="kw">import</span> { getTareas, createTarea } <span class="kw">from</span> <span class="str">'./services/tareaService'</span>;
+
+<span class="kw">export default function</span> <span class="fn">App</span>() {
+  <span class="kw">const</span> [tareas, setTareas]   = <span class="fn">useState</span>([]);
+  <span class="kw">const</span> [titulo, setTitulo]   = <span class="fn">useState</span>(<span class="str">''</span>);
+  <span class="kw">const</span> [loading, setLoading] = <span class="fn">useState</span>(<span class="kw">true</span>);
+
+  <span class="cmt">// Cargar tareas al montar el componente</span>
+  <span class="fn">useEffect</span>(() => {
+    <span class="fn">fetchTareas</span>();
+  }, []);
+
+  <span class="kw">const</span> fetchTareas = <span class="kw">async</span> () => {
+    <span class="kw">const</span> data = <span class="kw">await</span> <span class="fn">getTareas</span>();
+    <span class="fn">setTareas</span>(data);
+    <span class="fn">setLoading</span>(<span class="kw">false</span>);
+  };
+
+  <span class="kw">const</span> handleSubmit = <span class="kw">async</span> (e) => {
+    e.<span class="fn">preventDefault</span>();
+    <span class="kw">if</span> (!titulo.trim()) <span class="kw">return</span>;
+    <span class="kw">await</span> <span class="fn">createTarea</span>({ titulo });
+    <span class="fn">setTitulo</span>(<span class="str">''</span>);
+    <span class="fn">fetchTareas</span>();
+  };
+
+  <span class="kw">return</span> (
+    &lt;<span class="type">div</span> className=<span class="str">"app"</span>&gt;
+      &lt;<span class="type">h1</span>&gt;Mis Tareas&lt;/<span class="type">h1</span>&gt;
+
+      &lt;<span class="type">form</span> onSubmit={handleSubmit}&gt;
+        &lt;<span class="type">input</span>
+          value={titulo}
+          onChange={(e) =&gt; <span class="fn">setTitulo</span>(e.target.value)}
+          placeholder=<span class="str">"Nueva tarea..."</span>
+        /&gt;
+        &lt;<span class="type">button</span> type=<span class="str">"submit"</span>&gt;Agregar&lt;/<span class="type">button</span>&gt;
+      &lt;/<span class="type">form</span>&gt;
+
+      {loading ? &lt;<span class="type">p</span>&gt;Cargando...&lt;/<span class="type">p</span>&gt; : (
+        &lt;<span class="type">ul</span>&gt;
+          {tareas.<span class="fn">map</span>(t =&gt; (
+            &lt;<span class="type">li</span> key={t.id}&gt;{t.titulo}&lt;/<span class="type">li</span>&gt;
+          ))}
+        &lt;/<span class="type">ul</span>&gt;
+      )}
+    &lt;/<span class="type">div</span>&gt;
+  );
+}</pre>
+  </div>
+
+  <h3>🔌 Frontend — services/tareaService.js</h3>
+  <div class="code-block">
+    <span class="code-lang">javascript · fetch api</span>
+    <pre><span class="cmt">// frontend/src/services/tareaService.js</span>
+<span class="kw">const</span> BASE_URL = <span class="str">'http://localhost:3001/api'</span>;
+
+<span class="kw">export const</span> getTareas = <span class="kw">async</span> () => {
+  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">`${BASE_URL}/tareas`</span>);
+  <span class="kw">return</span> res.<span class="fn">json</span>();
+};
+
+<span class="kw">export const</span> createTarea = <span class="kw">async</span> (data) => {
+  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">`${BASE_URL}/tareas`</span>, {
+    method: <span class="str">'POST'</span>,
+    headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
+    body: <span class="type">JSON</span>.<span class="fn">stringify</span>(data)
+  });
+  <span class="kw">return</span> res.<span class="fn">json</span>();
+};</pre>
+  </div>
+
+  <div class="callout callout-tip">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <strong>Flujo de una request completa</strong>
+      <p>Usuario llena el form → React llama a <code>createTarea()</code> → fetch hace POST a <code>/api/tareas</code> → Express recibe la request → el controller valida y ejecuta el INSERT → MySQL guarda el dato → el controller responde JSON → React actualiza la lista.</p>
+    </div>
+  </div>
+
+  <h3>📦 Instalación rápida del backend</h3>
+  <div class="code-block">
+    <span class="code-lang">bash · terminal</span>
+    <pre><span class="cmt"># En la carpeta backend/</span>
+npm init -y
+npm install express cors mysql2 dotenv
+
+<span class="cmt"># En la carpeta frontend/</span>
+npm create vite@latest . -- --template react
+npm install
+
+<span class="cmt"># Para correr ambos en desarrollo</span>
+<span class="cmt"># Terminal 1 (backend):</span>
+node index.js
+
+<span class="cmt"># Terminal 2 (frontend):</span>
+npm run dev</pre>
+  </div>
+</div>
+</section>
+
+<!-- ─── 4. ACTIVIDAD ─── -->
+<section id="actividad">
+<div class="container">
+  <div class="section-num">04 · Actividad Práctica</div>
+  <h2>Trabajo en equipo</h2>
+  <p>Usen su propia idea de app web. Esta actividad integra todo lo que trabajaron: visión, MVP, épicas y código.</p>
+
+  <div class="activity">
+    <div class="activity-header">
+      <span class="activity-badge">Parte 1</span>
+      <h3>Definición del MVP final del equipo</h3>
+    </div>
+    <p style="color:var(--muted); font-size:.88rem; margin-bottom:1.2rem">Completen los siguientes campos para su proyecto:</p>
+
+    <div class="fill-section">
+      <div class="fill-label">Nombre del proyecto</div>
+      <input class="fill-input" type="text" placeholder="ej: MedAlert — sistema de recordatorio de medicamentos">
+    </div>
+
+    <div class="fill-section">
+      <div class="fill-label">Visión de producto (1 oración)</div>
+      <input class="fill-input" type="text" placeholder="ej: Ayudar a adultos mayores a no olvidar sus medicamentos diarios">
+    </div>
+
+    <div class="fill-section">
+      <div class="fill-label">Core del sistema (qué es lo indispensable)</div>
+      <textarea class="fill-input" placeholder="ej: El core es el sistema de recordatorios con alertas. Sin esto, la app no tiene sentido."></textarea>
+    </div>
+
+    <div class="fill-section">
+      <div class="fill-label">MVP: ¿Qué va a poder hacer un usuario en la versión mínima?</div>
+      <textarea class="fill-input" placeholder="ej: Registrarse, agregar un medicamento con dosis y horario, y recibir una notificación visual en pantalla"></textarea>
+    </div>
+
+    <div class="fill-section">
+      <div class="fill-label">¿Qué NO va en el MVP? (funcionalidades para más adelante)</div>
+      <textarea class="fill-input" placeholder="ej: App móvil, notificaciones push, historial médico, integración con médicos"></textarea>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="activity-header">
+      <span class="activity-badge">Parte 2</span>
+      <h3>2 Épicas y 3 Historias de Usuario</h3>
+    </div>
+
+    <div class="fill-section">
+      <div class="fill-label">Épica 1 — Nombre</div>
+      <input class="fill-input" type="text" placeholder="ej: Gestión de usuarios">
+      <div class="fill-label" style="margin-top:.8rem">Historia 1.1</div>
+      <textarea class="fill-input" placeholder="Como [usuario], quiero [acción], para [beneficio]. Criterios de aceptación: ..."></textarea>
+      <div class="fill-label" style="margin-top:.8rem">Historia 1.2</div>
+      <textarea class="fill-input" placeholder="Como [usuario], quiero [acción], para [beneficio]. Criterios de aceptación: ..."></textarea>
+    </div>
+
+    <div class="fill-section">
+      <div class="fill-label">Épica 2 — Nombre</div>
+      <input class="fill-input" type="text" placeholder="ej: Sistema de recordatorios">
+      <div class="fill-label" style="margin-top:.8rem">Historia 2.1</div>
+      <textarea class="fill-input" placeholder="Como [usuario], quiero [acción], para [beneficio]. Criterios de aceptación: ..."></textarea>
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="activity-header">
+      <span class="activity-badge">Parte 3</span>
+      <h3>Modelo de base de datos básico</h3>
+    </div>
+    <p style="color:var(--muted); font-size:.88rem; margin-bottom:1rem">Definan al menos 2 tablas relacionadas. Especifiquen campos y tipos de datos.</p>
+
+    <div class="fill-section">
+      <div class="fill-label">Tabla 1 — Nombre y campos</div>
+      <textarea class="fill-input" placeholder="ej: usuarios (id INT PK, nombre VARCHAR(100), email VARCHAR(150) UNIQUE, password VARCHAR(255), created_at TIMESTAMP)"></textarea>
+    </div>
+    <div class="fill-section">
+      <div class="fill-label">Tabla 2 — Nombre y campos (con FK)</div>
+      <textarea class="fill-input" placeholder="ej: medicamentos (id INT PK, usuario_id INT FK, nombre VARCHAR(100), dosis VARCHAR(50), hora_recordatorio TIME, created_at TIMESTAMP)"></textarea>
+    </div>
+    <div class="fill-section">
+      <div class="fill-label">Relación entre tablas</div>
+      <input class="fill-input" type="text" placeholder="ej: Un usuario puede tener muchos medicamentos (1:N)">
+    </div>
+  </div>
+
+  <div class="activity">
+    <div class="activity-header">
+      <span class="activity-badge">Parte 4</span>
+      <h3>Código base del equipo</h3>
+    </div>
+    <p style="color:var(--muted); font-size:.88rem; margin-bottom:1rem">Cada equipo debe crear al menos:</p>
+
+    <div class="fill-section">
+      <div class="fill-label">1 Pantalla en React — ¿Cuál pantalla van a crear y qué muestra?</div>
+      <textarea class="fill-input" placeholder="ej: Pantalla de listado de medicamentos. Muestra los medicamentos del usuario logueado con nombre, dosis y horario. Tiene botón para agregar nuevo."></textarea>
+    </div>
+
+    <div class="fill-section">
+      <div class="fill-label">1 Endpoint en backend — Ruta, método HTTP y qué hace</div>
+      <textarea class="fill-input" placeholder="ej: GET /api/medicamentos — Devuelve todos los medicamentos del usuario autenticado en formato JSON con campos: id, nombre, dosis, hora_recordatorio"></textarea>
+    </div>
+
+    <div class="callout callout-tip" style="margin-top:1rem">
+      <div class="callout-icon">🎯</div>
+      <div class="callout-body">
+        <strong>Resultado esperado al final de la clase</strong>
+        <p>Una pantalla de React que hace un fetch al endpoint del backend y muestra datos reales (o datos simulados). El circuito frontend → backend → base de datos debe estar trazado aunque no esté 100% implementado.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 5. IA ─── -->
+<section id="ia">
+<div class="container">
+  <div class="section-num">05 · Inteligencia Artificial</div>
+  <h2>IA aplicada a su sistema</h2>
+  <p>La IA no es magia ni hay que tenerle miedo. Es una herramienta. Lo importante es <strong>dónde</strong> aplicarla, <strong>cómo</strong> controlarla y <strong>cuándo</strong> el humano debe tomar el control.</p>
+
+  <h3>Repaso rápido del ecosistema</h3>
+  <div class="card-grid">
+    <div class="card" data-icon="🤖">
+      <h4>Machine Learning (ML)</h4>
+      <p>El sistema aprende de datos históricos. Ejemplo: predecir qué categoría corresponde a una tarea.</p>
+    </div>
+    <div class="card" data-icon="🧠">
+      <h4>Deep Learning (DL)</h4>
+      <p>ML con redes neuronales profundas. Útil para texto, imágenes y voz.</p>
+    </div>
+    <div class="card" data-icon="🔗">
+      <h4>MLP (Perceptrón Multicapa)</h4>
+      <p>Red neuronal básica, feedforward. El building block de las redes profundas.</p>
+    </div>
+    <div class="card" data-icon="💬">
+      <h4>LLMs (GPT, Claude, etc.)</h4>
+      <p>Modelos de lenguaje. Pueden usarse vía API para generar texto, clasificar, resumir.</p>
+    </div>
+  </div>
+
+  <h3>¿Dónde puede entrar la IA en su app?</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Tipo de app</th><th>Posible uso de IA</th><th>Nivel</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Gestor de tareas</td><td>Sugerir prioridad basada en el texto de la tarea</td><td>🟢 Básico</td></tr>
+        <tr><td>E-commerce</td><td>Recomendación de productos por historial</td><td>🟡 Medio</td></tr>
+        <tr><td>App de salud</td><td>Detectar patrones inusuales en los datos del usuario</td><td>🟡 Medio</td></tr>
+        <tr><td>Red social</td><td>Moderación automática de contenido</td><td>🔴 Avanzado</td></tr>
+        <tr><td>Sistema educativo</td><td>Generación de ejercicios adaptados al nivel</td><td>🟡 Medio</td></tr>
+        <tr><td>Cualquier app</td><td>Chatbot de soporte usando API de LLM</td><td>🟢 Básico</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>🛡️ Guardrails — Reglas para usar IA responsablemente</h3>
+  <p>Un <strong>guardrail</strong> es una regla o límite que le ponemos al sistema de IA para que no haga cosas que no queremos.</p>
+
+  <div class="ai-rule">
+    <div class="ai-rule-icon">🚫</div>
+    <p><strong>Guardrail 1 — No mostrar resultados sin mínimo de confianza:</strong> Si el modelo no está seguro (confianza &lt; 70%), mostrar "No podemos sugerir nada todavía" en vez de una respuesta incorrecta.</p>
+  </div>
+  <div class="ai-rule">
+    <div class="ai-rule-icon">👤</div>
+    <p><strong>Guardrail 2 — Human-in-the-loop para decisiones críticas:</strong> La IA sugiere, el humano decide. Ejemplo: la IA detecta una anomalía médica → alerta al usuario → el usuario confirma si desea continuar.</p>
+  </div>
+  <div class="ai-rule">
+    <div class="ai-rule-icon">🔍</div>
+    <p><strong>Guardrail 3 — Transparencia:</strong> Siempre informar al usuario que está interactuando con IA. "Sugerido por IA" debe verse claramente en la UI.</p>
+  </div>
+  <div class="ai-rule">
+    <div class="ai-rule-icon">📝</div>
+    <p><strong>Guardrail 4 — Log de decisiones:</strong> Guardar en base de datos qué sugirió la IA, cuándo y qué eligió el usuario. Permite auditoría y mejora del modelo.</p>
+  </div>
+  <div class="ai-rule">
+    <div class="ai-rule-icon">🔒</div>
+    <p><strong>Guardrail 5 — Nunca enviar datos sensibles a APIs externas:</strong> Si usan una API de IA externa (como OpenAI), no envíen contraseñas, DNI, datos médicos completos, o información privada sin consentimiento.</p>
+  </div>
+
+  <h3>Ejemplo simple — Sugerencia de prioridad con API de IA</h3>
+  <div class="code-block">
+    <span class="code-lang">javascript · llamada a api de ia</span>
+    <pre><span class="cmt">// backend/services/iaService.js</span>
+<span class="cmt">// Ejemplo conceptual: usar una API de IA para sugerir prioridad</span>
+
+<span class="kw">async function</span> <span class="fn">sugerirPrioridad</span>(textoTarea) {
+  <span class="cmt">// Solo enviamos el texto de la tarea, nunca datos del usuario</span>
+  <span class="kw">const</span> response = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://api.ejemplo-ia.com/classify'</span>, {
+    method: <span class="str">'POST'</span>,
+    headers: { <span class="str">'Authorization'</span>: <span class="str">`Bearer ${process.env.IA_API_KEY}`</span> },
+    body: <span class="type">JSON</span>.<span class="fn">stringify</span>({ text: textoTarea })
+  });
+
+  <span class="kw">const</span> data = <span class="kw">await</span> response.<span class="fn">json</span>();
+
+  <span class="cmt">// Guardrail: solo usamos la sugerencia si la confianza es alta</span>
+  <span class="kw">if</span> (data.confidence &lt; <span class="num">0.70</span>) {
+    <span class="kw">return</span> { sugerencia: <span class="kw">null</span>, mensaje: <span class="str">'No hay suficiente información para sugerir'</span> };
+  }
+
+  <span class="kw">return</span> {
+    sugerencia: data.label,        <span class="cmt">// 'alta', 'media', 'baja'</span>
+    confianza: data.confidence,
+    esSugerencia: <span class="kw">true</span>            <span class="cmt">// Siempre marcamos que es IA</span>
+  };
+}</pre>
+  </div>
+
+  <div class="activity">
+    <div class="activity-header">
+      <span class="activity-badge">IA en su proyecto</span>
+      <h3>¿Cómo usarían IA en su sistema?</h3>
+    </div>
+
+    <div class="fill-section">
+      <div class="fill-label">Qué funcionalidad de IA agregarían</div>
+      <textarea class="fill-input" placeholder="ej: Clasificación automática de urgencia para los recordatorios de medicamentos según el tipo de medicamento"></textarea>
+    </div>
+
+    <div class="fill-section">
+      <div class="fill-label">3 guardrails que aplicarían en su sistema</div>
+      <textarea class="fill-input" placeholder="1. No usar la sugerencia si confianza < 80%&#10;2. El usuario puede ignorar la sugerencia con un click&#10;3. No enviar datos personales de salud a APIs externas sin consentimiento explícito" style="min-height:90px"></textarea>
+    </div>
+
+    <div class="fill-section">
+      <div class="fill-label">¿En qué momento el humano debe tomar el control? (human-in-the-loop)</div>
+      <textarea class="fill-input" placeholder="ej: Cuando el sistema detecte que el usuario no tomó un medicamento crítico 3 veces seguidas, debe alertar al familiar de contacto pero NO hacer acciones automáticas"></textarea>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 6. REFS ─── -->
+<section id="refs">
+<div class="container">
+  <div class="section-num">06 · Referencias</div>
+  <h2>Documentación y recursos</h2>
+  <p>Material oficial y de referencia para 3° año · Tecnicatura en Software · I26.</p>
+
+  <h3>Frontend</h3>
+  <div class="ref-grid">
+    <a class="ref-card" href="https://react.dev" target="_blank" rel="noopener">
+      <div class="ref-cat">Frontend</div>
+      <div class="ref-title">React Docs (oficial)</div>
+      <div class="ref-url">react.dev</div>
+    </a>
+    <a class="ref-card" href="https://vitejs.dev" target="_blank" rel="noopener">
+      <div class="ref-cat">Build Tool</div>
+      <div class="ref-title">Vite — React + JS</div>
+      <div class="ref-url">vitejs.dev</div>
+    </a>
+    <a class="ref-card" href="https://developer.mozilla.org/es/docs/Web/API/Fetch_API" target="_blank" rel="noopener">
+      <div class="ref-cat">Web API</div>
+      <div class="ref-title">Fetch API — MDN</div>
+      <div class="ref-url">developer.mozilla.org</div>
+    </a>
+  </div>
+
+  <h3>Backend</h3>
+  <div class="ref-grid">
+    <a class="ref-card" href="https://nodejs.org/es/docs/" target="_blank" rel="noopener">
+      <div class="ref-cat">Runtime</div>
+      <div class="ref-title">Node.js Docs</div>
+      <div class="ref-url">nodejs.org</div>
+    </a>
+    <a class="ref-card" href="https://expressjs.com/es/" target="_blank" rel="noopener">
+      <div class="ref-cat">Framework</div>
+      <div class="ref-title">Express.js</div>
+      <div class="ref-url">expressjs.com</div>
+    </a>
+    <a class="ref-card" href="https://sideway.github.io/joi/" target="_blank" rel="noopener">
+      <div class="ref-cat">Validación</div>
+      <div class="ref-title">Joi — validación Node</div>
+      <div class="ref-url">joi.dev</div>
+    </a>
+  </div>
+
+  <h3>Base de datos</h3>
+  <div class="ref-grid">
+    <a class="ref-card" href="https://dev.mysql.com/doc/" target="_blank" rel="noopener">
+      <div class="ref-cat">Base de Datos</div>
+      <div class="ref-title">MySQL Docs</div>
+      <div class="ref-url">dev.mysql.com</div>
+    </a>
+    <a class="ref-card" href="https://www.postgresql.org/docs/" target="_blank" rel="noopener">
+      <div class="ref-cat">Base de Datos</div>
+      <div class="ref-title">PostgreSQL Docs</div>
+      <div class="ref-url">postgresql.org</div>
+    </a>
+    <a class="ref-card" href="https://dbdiagram.io" target="_blank" rel="noopener">
+      <div class="ref-cat">Herramienta</div>
+      <div class="ref-title">dbdiagram.io — ER gratis</div>
+      <div class="ref-url">dbdiagram.io</div>
+    </a>
+  </div>
+
+  <h3>Metodología ágil</h3>
+  <div class="ref-grid">
+    <a class="ref-card" href="https://scrumguides.org/docs/scrumguide/v2020/2020-Scrum-Guide-Spanish-Latin-South-American.pdf" target="_blank" rel="noopener">
+      <div class="ref-cat">Scrum</div>
+      <div class="ref-title">Guía Scrum 2020 (Español)</div>
+      <div class="ref-url">scrumguides.org</div>
+    </a>
+    <a class="ref-card" href="https://www.agilealliance.org/glossary/mvp/" target="_blank" rel="noopener">
+      <div class="ref-cat">MVP</div>
+      <div class="ref-title">MVP — Agile Alliance</div>
+      <div class="ref-url">agilealliance.org</div>
+    </a>
+    <a class="ref-card" href="https://linear.app" target="_blank" rel="noopener">
+      <div class="ref-cat">Herramienta</div>
+      <div class="ref-title">Linear — Issues y Sprints</div>
+      <div class="ref-url">linear.app</div>
+    </a>
+  </div>
+
+  <h3>Inteligencia Artificial</h3>
+  <div class="ref-grid">
+    <a class="ref-card" href="https://scikit-learn.org/stable/" target="_blank" rel="noopener">
+      <div class="ref-cat">ML · Python</div>
+      <div class="ref-title">scikit-learn</div>
+      <div class="ref-url">scikit-learn.org</div>
+    </a>
+    <a class="ref-card" href="https://www.tensorflow.org/?hl=es" target="_blank" rel="noopener">
+      <div class="ref-cat">Deep Learning</div>
+      <div class="ref-title">TensorFlow (Google)</div>
+      <div class="ref-url">tensorflow.org</div>
+    </a>
+    <a class="ref-card" href="https://platform.openai.com/docs" target="_blank" rel="noopener">
+      <div class="ref-cat">LLM API</div>
+      <div class="ref-title">OpenAI API Docs</div>
+      <div class="ref-url">platform.openai.com</div>
+    </a>
+    <a class="ref-card" href="https://developers.google.com/machine-learning/crash-course?hl=es-419" target="_blank" rel="noopener">
+      <div class="ref-cat">Curso gratuito</div>
+      <div class="ref-title">ML Crash Course (Google)</div>
+      <div class="ref-url">developers.google.com</div>
+    </a>
+  </div>
+
+  <h3>Arquitectura y buenas prácticas</h3>
+  <div class="ref-grid">
+    <a class="ref-card" href="https://12factor.net/es/" target="_blank" rel="noopener">
+      <div class="ref-cat">Arquitectura</div>
+      <div class="ref-title">The Twelve-Factor App</div>
+      <div class="ref-url">12factor.net</div>
+    </a>
+    <a class="ref-card" href="https://restfulapi.net/" target="_blank" rel="noopener">
+      <div class="ref-cat">API</div>
+      <div class="ref-title">REST API Tutorial</div>
+      <div class="ref-url">restfulapi.net</div>
+    </a>
+    <a class="ref-card" href="https://semver.org/lang/es/" target="_blank" rel="noopener">
+      <div class="ref-cat">Git · Versiones</div>
+      <div class="ref-title">Versionado Semántico</div>
+      <div class="ref-url">semver.org</div>
+    </a>
+  </div>
+
+  <div class="callout callout-info" style="margin-top:2rem">
+    <div class="callout-icon">📌</div>
+    <div class="callout-body">
+      <strong>Para la entrega final del proyecto (docs/)</strong>
+      <p>El repositorio debe incluir: <code>README.md</code> con instrucciones de instalación, <code>docs/vision.md</code> con visión + core + MVP, <code>docs/epicas.md</code> con las épicas e historias de usuario, y <code>database/schema.sql</code> con el modelo de datos.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <p><strong>Tecnicatura Superior en Software · I26 · 3° Año</strong></p>
+    <p>Desarrollo de Aplicaciones Web · Clase de Consolidación</p>
+  </div>
+  <button class="btn" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+</footer>
+
+</body>
+</html>

@@ -6,6 +6,88 @@
     <title>Portal Tecnicatura en Software | I26</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
+        /* ─── GLOBAL SITE NAV ─── */
+        .site-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 2000;
+            background: rgba(5, 5, 8, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            gap: 1rem;
+        }
+        .site-nav-brand {
+            font-family: 'Space Mono', monospace;
+            font-size: .78rem;
+            font-weight: 700;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--accent-c);
+            text-decoration: none;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .site-nav-links {
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+            list-style: none;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .site-nav-links::-webkit-scrollbar { display: none; }
+        .site-nav-links li a {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            color: var(--muted);
+            font-family: 'Space Mono', monospace;
+            font-size: .65rem;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            text-decoration: none;
+            padding: .35rem .7rem;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            white-space: nowrap;
+            transition: all .25s;
+        }
+        .site-nav-links li a:hover {
+            color: var(--text);
+            border-color: var(--border);
+            background: rgba(255,255,255,.04);
+        }
+        .site-nav-links li a.active {
+            color: var(--accent-c);
+            border-color: rgba(6,182,212,.3);
+            background: rgba(6,182,212,.07);
+        }
+        .site-nav-links li a .nav-badge {
+            font-size: .55rem;
+            padding: .1rem .3rem;
+            border-radius: 2px;
+            background: rgba(255,255,255,.08);
+        }
+        .site-nav-links li a .nav-badge.yr2 { background: rgba(245,158,11,.15); color: var(--accent-a); }
+        .site-nav-links li a .nav-badge.yr3 { background: rgba(124,58,237,.15); color: var(--accent-p); }
+        .site-nav-sep {
+            width: 1px;
+            height: 20px;
+            background: var(--border);
+            flex-shrink: 0;
+            margin: 0 .3rem;
+        }
+        @media(max-width: 640px) {
+            .site-nav { padding: 0 1rem; }
+            .site-nav-brand { font-size: .65rem; }
+            .site-nav-links li a span:not(.nav-badge) { display: none; }
+        }
         :root {
             --bg: #050508;
             --surface: #0f0f17;
@@ -41,6 +123,7 @@
 
         header {
             padding: 4rem 2rem;
+            padding-top: 5.5rem;
             text-align: center;
         }
 
@@ -305,9 +388,198 @@
             .vision-content { flex-direction: column; text-align: center; }
             .vision-icon { margin: 0 auto; }
         }
+
+        /* ─── NEURO NAV PANEL ─── */
+        .neuro-trigger {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--accent-p);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+            border: none;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .neuro-trigger:hover {
+            transform: scale(1.1) rotate(15deg);
+            background: #8b5cf6;
+        }
+
+        .neuro-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: rgba(15, 15, 23, 0.95);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid var(--border);
+            z-index: 1001;
+            padding: 3rem 2rem;
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -20px 0 50px rgba(0,0,0,0.5);
+        }
+        .neuro-panel.active {
+            right: 0;
+        }
+
+        .neuro-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .neuro-header { margin-bottom: 3rem; }
+        .neuro-header h3 { 
+            font-size: 1.8rem; 
+            margin-bottom: 0.5rem; 
+            background: linear-gradient(90deg, var(--accent-p), var(--accent-c));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .neuro-header p { color: var(--muted); font-size: 0.9rem; }
+
+        .neuro-item {
+            margin-bottom: 2.5rem;
+            padding-left: 1.5rem;
+            border-left: 2px solid var(--border);
+            transition: all 0.3s;
+        }
+        .neuro-item:hover { border-left-color: var(--accent-c); }
+        .neuro-item h4 { 
+            font-family: 'Space Mono', monospace; 
+            font-size: 0.75rem; 
+            color: var(--accent-a); 
+            text-transform: uppercase;
+            margin-bottom: 0.8rem;
+        }
+        .neuro-item p { font-size: 0.95rem; line-height: 1.6; color: var(--text); }
+        
+        .neuro-brain-tip {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: auto;
+            border: 1px dashed var(--border);
+        }
+        .neuro-brain-tip h5 { font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--accent-p); }
+        .neuro-brain-tip p { font-size: 0.85rem; color: var(--muted); font-style: italic; }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            z-index: 1000;
+        }
+        /* ─── GLOSARIO & FUN ─── */
+        .glossary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .glossary-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        .glossary-item:hover {
+            background: var(--surface);
+            border-color: var(--accent-p);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.2);
+        }
+        .glossary-item span {
+            display: block;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent-c);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            width: 50px;
+            height: 50px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            cursor: pointer;
+            z-index: 999;
+            opacity: 0;
+            transition: all 0.3s;
+            transform: translateY(20px);
+        }
+        .back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .back-to-top:hover {
+            background: var(--border);
+            color: white;
+        }
+
+        /* Fun interaction: reveal animation */
+        @keyframes revealText {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .revealed {
+            animation: revealText 0.4s forwards;
+            color: var(--accent-a) !important;
+            font-size: 0.85rem !important;
+        }
     </style>
 </head>
 <body>
+
+    <!-- ═══ GLOBAL SITE NAV ═══ -->
+    <nav class="site-nav" id="siteNav">
+        <a href="../index.html" class="site-nav-brand">I26 · Software</a>
+        <ul class="site-nav-links">
+            <li><a href="index.html" class="active" id="snav-home">🏠 <span>Portal</span></a></li>
+            <div class="site-nav-sep"></div>
+            <li><a href="2do/clase-php-mysql-I26.html" id="snav-php">
+                <span class="nav-badge yr2">2°</span> <span>PHP & MySQL</span>
+            </a></li>
+            <li><a href="2do/clase_2do_soft_I26_ReactNative.html" id="snav-rn">
+                <span class="nav-badge yr2">2°</span> <span>React Native</span>
+            </a></li>
+            <div class="site-nav-sep"></div>
+            <li><a href="3ro/clase-arquitectura-I26.html" id="snav-arch">
+                <span class="nav-badge yr3">3°</span> <span>Arquitectura</span>
+            </a></li>
+        </ul>
+    </nav>
+
     <header>
         <div class="eyebrow">Repositorio Central</div>
         <h1>Clases <span>Software</span></h1>
@@ -353,6 +625,18 @@
                         <span class="tag">MOBILE</span>
                     </div>
                 </a>
+
+                <!-- CLASE 4: TECECO -->
+                <a href="#" class="card p" onclick="event.preventDefault(); document.getElementById('neuroTrigger').click();">
+                    <div class="card-num">NEURO-NAV</div>
+                    <h2>Teoría de Comunicaciones</h2>
+                    <p>Entiende cómo la red se conecta con tu cerebro. Tips de concentración y relación con el software.</p>
+                    <div class="tag-row">
+                        <span class="tag">REDES</span>
+                        <span class="tag">CEREBRO</span>
+                        <span class="tag">FOCO</span>
+                    </div>
+                </a>
             </div>
         </section>
 
@@ -396,5 +680,82 @@
             </div>
         </div>
     </footer>
+
+    <!-- BOTONES ADICIONALES -->
+    <button class="neuro-trigger" id="neuroTrigger" title="Neuro-Navegación">🧠</button>
+    <button class="back-to-top" id="backToTop" title="Volver al inicio">↑</button>
+    
+    <div class="overlay" id="overlay"></div>
+    <div class="neuro-panel" id="neuroPanel">
+        <button class="neuro-close" id="neuroClose">×</button>
+        <div class="neuro-header">
+            <h3>Hub Neuro-Cognitivo</h3>
+            <p>Sincroniza tus neuronas con la infraestructura digital.</p>
+        </div>
+
+        <div class="neuro-item">
+            <h4>Señales y Sinapsis</h4>
+            <p>En **TECECO**, estudiamos cómo viajan los bits. En tu cerebro, la información viaja por impulsos eléctricos. Aprender protocolos de red es, literalmente, mapear la "red biológica" a la "red digital".</p>
+        </div>
+
+        <div class="neuro-item">
+            <h4>Glosario Dinámico ⚡</h4>
+            <p style="font-size: 0.8rem; margin-bottom: 1rem;">Toca un término para revelarlo rápido:</p>
+            <div class="glossary-grid">
+                <div class="glossary-item" onclick="reveal(this, 'Modulación: Cambiar la señal para enviar datos.')"><span>TECECO</span>MOD</div>
+                <div class="glossary-item" onclick="reveal(this, 'Latencia: El tiempo que tarda el bit en llegar.')"><span>NETWORK</span>PING</div>
+                <div class="glossary-item" onclick="reveal(this, 'Sinapsis: Conexión entre neuronas de código.')"><span>BRAIN</span>HUB</div>
+                <div class="glossary-item" onclick="reveal(this, 'Buffer: Almacén temporal de información.')"><span>DATA</span>FLOW</div>
+            </div>
+        </div>
+
+        <div class="neuro-brain-tip">
+            <h5>🧠 Hack para el Cerebro</h5>
+            <p>"Nuestro cerebro ama los patrones. Cuando estudies protocolos, asocialos con flujos de conversación reales. 25 min de foco total = 1 hora de estudio disperso."</p>
+        </div>
+    </div>
+
+    <script>
+        const trigger = document.getElementById('neuroTrigger');
+        const panel = document.getElementById('neuroPanel');
+        const close = document.getElementById('neuroClose');
+        const overlay = document.getElementById('overlay');
+        const btt = document.getElementById('backToTop');
+
+        // Toggle Panel
+        const togglePanel = () => {
+            panel.classList.toggle('active');
+            overlay.classList.toggle('active');
+        };
+
+        trigger.addEventListener('click', togglePanel);
+        close.addEventListener('click', togglePanel);
+        overlay.addEventListener('click', togglePanel);
+
+        // Back to top logic
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                btt.classList.add('visible');
+            } else {
+                btt.classList.remove('visible');
+            }
+        });
+
+        btt.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Dynamic Glossary Logic
+        function reveal(el, text) {
+            const original = el.innerHTML;
+            el.innerHTML = `<p class="revealed">${text}</p>`;
+            el.style.borderColor = 'var(--accent-a)';
+            
+            setTimeout(() => {
+                el.innerHTML = original;
+                el.style.borderColor = 'var(--border)';
+            }, 3000);
+        }
+    </script>
 </body>
 </html>

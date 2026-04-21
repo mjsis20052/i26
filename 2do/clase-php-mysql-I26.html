@@ -52,6 +52,64 @@ body {
   background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.8) 2px, rgba(255,255,255,0.8) 3px);
 }
 
+/* GLOBAL SITE NAV */
+.site-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  background: rgba(6,9,16,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(124,58,237,0.25);
+  height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px; gap: 1rem;
+}
+.site-nav-brand {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: .12em; font-size: 1rem; color: var(--text);
+  display: flex; align-items: center; gap: 8px;
+  text-decoration: none; flex-shrink: 0;
+}
+.site-nav-brand .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--php); box-shadow: 0 0 8px var(--php); animation: pulse 2s infinite; }
+.site-nav-links-all {
+  display: flex; align-items: center; gap: .25rem; list-style: none;
+  overflow-x: auto; scrollbar-width: none;
+}
+.site-nav-links-all::-webkit-scrollbar { display: none; }
+.site-nav-links-all li a {
+  display: inline-flex; align-items: center; gap: .35rem;
+  color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  font-size: .63rem; text-transform: uppercase; letter-spacing: .08em;
+  text-decoration: none; padding: .3rem .6rem;
+  border-radius: 4px; border: 1px solid transparent;
+  white-space: nowrap; transition: all .2s;
+}
+.site-nav-links-all li a:hover { color: var(--text); border-color: var(--border); background: rgba(255,255,255,.04); }
+.site-nav-links-all li a.active { color: var(--php2); border-color: rgba(124,58,237,.3); background: rgba(124,58,237,.08); }
+.site-nav-links-all .snav-badge {
+  font-size: .52rem; padding: .08rem .28rem; border-radius: 2px;
+  background: rgba(255,255,255,.08);
+}
+.site-nav-links-all .snav-badge.yr2 { background: rgba(245,158,11,.15); color: var(--xampp2); }
+.site-nav-links-all .snav-badge.yr3 { background: rgba(124,58,237,.15); color: var(--php2); }
+.snav-sep { width: 1px; height: 18px; background: var(--border); flex-shrink: 0; margin: 0 .25rem; }
+
+/* SUB NAV (section links) */
+.sub-nav {
+  position: fixed; top: 56px; left: 0; right: 0; z-index: 199;
+  background: rgba(6,9,16,0.88);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 32px; height: 40px; gap: 1.5rem;
+  overflow-x: auto; scrollbar-width: none;
+}
+.sub-nav::-webkit-scrollbar { display: none; }
+.sub-nav a {
+  font-family: 'JetBrains Mono', monospace; font-size: .62rem;
+  color: var(--muted); text-decoration: none; letter-spacing: .1em;
+  text-transform: uppercase; white-space: nowrap; transition: color .2s;
+}
+.sub-nav a:hover { color: var(--php2); }
+
 /* NAV */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
@@ -61,6 +119,7 @@ nav {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 32px; height: 56px;
 }
+
 .nav-brand {
   font-family: 'Bebas Neue', sans-serif;
   letter-spacing: 0.08em; font-size: 1.1rem; color: var(--text);
@@ -79,7 +138,7 @@ nav {
 /* HERO */
 .hero {
   position: relative; z-index: 10;
-  padding: 140px 40px 80px;
+  padding: 160px 40px 80px;
   max-width: 960px; margin: 0 auto;
   animation: fadeIn 1s ease both;
 }
@@ -396,20 +455,28 @@ footer {
 <div class="bg-layer"></div>
 <div class="scanlines"></div>
 
-<nav>
-  <div class="nav-brand">
-    <div class="nav-dot"></div>
-    DEV · I26
-  </div>
-  <div class="nav-links">
-    <a href="#xampp">XAMPP</a>
-    <a href="#mysql">MySQL</a>
-    <a href="#php">PHP</a>
-    <a href="#operadores">Operadores</a>
-    <a href="#decisiones">Decisiones</a>
-    <a href="#descargas">Descargas</a>
-  </div>
+<!-- GLOBAL SITE NAV -->
+<nav class="site-nav">
+  <a href="../index.html" class="site-nav-brand"><div class="dot"></div> I26 · Software</a>
+  <ul class="site-nav-links-all">
+    <li><a href="../index.html">🏠 <span>Portal</span></a></li>
+    <div class="snav-sep"></div>
+    <li><a href="clase-php-mysql-I26.html" class="active"><span class="snav-badge yr2">2°</span> PHP &amp; MySQL</a></li>
+    <li><a href="clase_2do_soft_I26_ReactNative.html"><span class="snav-badge yr2">2°</span> React Native</a></li>
+    <div class="snav-sep"></div>
+    <li><a href="../3ro/clase-arquitectura-I26.html"><span class="snav-badge yr3">3°</span> Arquitectura</a></li>
+  </ul>
 </nav>
+
+<!-- SUB NAV (secciones internas) -->
+<div class="sub-nav">
+  <a href="#xampp">XAMPP</a>
+  <a href="#mysql">MySQL</a>
+  <a href="#php">PHP</a>
+  <a href="#operadores">Operadores</a>
+  <a href="#decisiones">Decisiones</a>
+  <a href="#descargas">Descargas</a>
+</div>
 
 <div class="hero">
   <div class="hero-tag">Desarrollo de Software · 2do año · I26</div>

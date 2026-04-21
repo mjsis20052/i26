@@ -205,6 +205,55 @@
             h1 { font-size: 2.8rem; }
             .grid { grid-template-columns: 1fr; }
         }
+
+        /* ─── VISION SECTION ─── */
+        .vision-section {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.05), rgba(6, 182, 212, 0.05));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .vision-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: linear-gradient(to bottom, var(--accent-p), var(--accent-c));
+        }
+        .vision-content {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        .vision-icon {
+            font-size: 3rem;
+            background: var(--surface);
+            width: 80px; height: 80px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .vision-content h2 {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #fff, var(--muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .vision-content p {
+            color: var(--muted);
+            font-size: 1rem;
+            max-width: 800px;
+            line-height: 1.6;
+            margin: 0;
+        }
+        @media (max-width: 600px) {
+            .vision-content { flex-direction: column; text-align: center; }
+            .vision-icon { margin: 0 auto; }
+        }
     </style>
 </head>
 <body>
@@ -215,6 +264,17 @@
     </header>
 
     <main>
+        <!-- VISIÓN DEL PROYECTO -->
+        <section class="vision-section">
+            <div class="vision-content">
+                <div class="vision-icon">🎯</div>
+                <div>
+                    <h2>Visión del Proyecto</h2>
+                    <p>Integrar el desarrollo de aplicaciones móviles y web en un ecosistema profesional. Buscamos transformar conceptos en sistemas reales mediante el dominio de tecnologías modernas, arquitecturas escalables y metodologías ágiles.</p>
+                </div>
+            </div>
+        </section>
+
         <!-- SEGUNDO AÑO -->
         <section class="year-section">
             <h2 class="year-title">Segundo Año · Desarrollo App</h2>

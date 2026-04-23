@@ -1,4 +1,4 @@
-﻿Modelo de consulta para los alumnos
+Modelo de consulta para los alumnos
 Usen este modelo como guía para investigar, organizar lo que aprendieron y prepararse para la siguiente clase.
 <!DOCTYPE html>
 <html lang="es">
@@ -1269,6 +1269,9 @@ Usen este modelo como guía para investigar, organizar lo que aprendieron y prep
         <div class="eyebrow">Repositorio Central</div>
         <h1>Clases <span>Software</span></h1>
         <p class="sub">Recursos organizados por año y materia · Instituto I26.</p>
+        <div style="font-family: 'Space Mono', monospace; font-size: 0.75rem; color: #10b981; margin-top: 1.5rem; border: 1px solid rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1); border-radius: 4px; padding: 0.4rem 0.8rem; display: inline-block;">
+            Última actualización: 23 de Abril de 2026 — <strong>PHP & MySQL (Información completa)</strong>
+        </div>
     </header>
 
     <main>
@@ -1838,7 +1841,7 @@ Usen este modelo como guía para investigar, organizar lo que aprendieron y prep
         // (badges are added via data-badge attributes injected into existing card HTML)
         (function injectBadges() {
             DB.cursos.forEach(c => {
-                const link = document.querySelector(`a[href="${c.href}"]`);
+                const link = document.querySelector(`.card[href="${c.href}"]`);
                 if (!link) return;
                 // Wrap with relative div if not already
                 if (!link.querySelector(`.class-progress-badge[data-badge="${c.id}"]`)) {

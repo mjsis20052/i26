@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MySQL con XAMPP · 2° Año Software I26</title>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:ital,wght@0,400;0,600;0,700;1,400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0e1117;
+    --surface:   #161b27;
+    --surface2:  #1e2535;
+    --border:    #2a3347;
+    --ink:       #e8edf5;
+    --muted:     #637089;
+    --accent:    #f97316;   /* naranja vivo */
+    --blue:      #38bdf8;
+    --green:     #4ade80;
+    --yellow:    #facc15;
+    --red:       #f87171;
+    --purple:    #a78bfa;
+    --teal:      #2dd4bf;
+    --code-bg:   #090d14;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    font-family:'Familjen Grotesk',sans-serif;
+    background:var(--bg); color:var(--ink);
+    line-height:1.75; overflow-x:hidden;
+  }
+
+  /* ─ noise ─ */
+  body::after{
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    opacity:.6;
+  }
+
+  /* ─ NAV ─ */
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(14,17,23,.92); backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 2rem; height:52px;
+  }
+  .nav-logo{ font-size:.75rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+  .nav-links{ display:flex; gap:1.4rem; list-style:none; }
+  .nav-links a{ color:var(--muted); text-decoration:none; font-size:.7rem; font-family:'Fira Code',monospace; letter-spacing:.06em; transition:color .2s; }
+  .nav-links a:hover{ color:var(--ink); }
+
+  /* ─ HERO ─ */
+  .hero{
+    min-height:100vh; display:flex; flex-direction:column;
+    justify-content:center; padding:7rem 4rem 4rem;
+    position:relative; overflow:hidden;
+    border-bottom:1px solid var(--border);
+  }
+  /* animated grid */
+  .hero::before{
+    content:''; position:absolute; inset:0; z-index:0;
+    background-image:
+      linear-gradient(rgba(249,115,22,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(249,115,22,.06) 1px, transparent 1px);
+    background-size:48px 48px;
+    animation:gridMove 20s linear infinite;
+  }
+  @keyframes gridMove{ from{background-position:0 0;} to{background-position:48px 48px;} }
+  .hero-content{ position:relative; z-index:1; }
+  .eyebrow{
+    font-family:'Fira Code',monospace; font-size:.72rem;
+    letter-spacing:.2em; text-transform:uppercase; color:var(--blue);
+    margin-bottom:1.2rem; display:inline-flex; align-items:center; gap:.6rem;
+  }
+  .eyebrow::before{ content:''; width:24px; height:1px; background:var(--blue); }
+  h1{ font-size:clamp(2.6rem,6vw,5rem); font-weight:700; line-height:1.05; letter-spacing:-.02em; max-width:760px; margin-bottom:1.2rem; }
+  h1 .hl{ color:var(--accent); }
+  .hero-sub{ font-size:1.05rem; color:var(--muted); max-width:520px; margin-bottom:2rem; }
+  .pill-row{ display:flex; flex-wrap:wrap; gap:.5rem; }
+  .pill{ font-family:'Fira Code',monospace; font-size:.67rem; padding:.22rem .7rem; border-radius:20px; letter-spacing:.05em; }
+  .p-o{ background:rgba(249,115,22,.12); color:var(--accent); border:1px solid rgba(249,115,22,.3); }
+  .p-b{ background:rgba(56,189,248,.12); color:var(--blue); border:1px solid rgba(56,189,248,.3); }
+  .p-g{ background:rgba(74,222,128,.12); color:var(--green); border:1px solid rgba(74,222,128,.3); }
+  .p-y{ background:rgba(250,204,21,.12); color:var(--yellow); border:1px solid rgba(250,204,21,.3); }
+  .p-p{ background:rgba(167,139,250,.12); color:var(--purple); border:1px solid rgba(167,139,250,.3); }
+
+  /* ─ LAYOUT ─ */
+  .container{ max-width:980px; margin:0 auto; padding:0 2rem; position:relative; z-index:1; }
+  section{ padding:5rem 0; }
+  section+section{ border-top:1px solid var(--border); }
+
+  /* ─ SECTION HEADERS ─ */
+  .sn{ font-family:'Fira Code',monospace; font-size:.67rem; letter-spacing:.2em; color:var(--muted); text-transform:uppercase; margin-bottom:.7rem; }
+  h2{ font-size:clamp(1.7rem,3vw,2.3rem); font-weight:700; margin-bottom:1.2rem; letter-spacing:-.01em; }
+  h2 span{ color:var(--accent); }
+  h3{ font-size:1.1rem; font-weight:700; color:var(--blue); margin:2.2rem 0 .8rem; }
+  h4{ font-size:.92rem; font-weight:700; color:var(--yellow); margin:1.4rem 0 .5rem; }
+  p{ color:#9baab8; margin-bottom:.9rem; }
+  ul,ol{ color:#9baab8; padding-left:1.4rem; }
+  li{ margin-bottom:.4rem; }
+  strong{ color:var(--ink); }
+  code{ font-family:'Fira Code',monospace; font-size:.8em; background:var(--surface2); padding:.1rem .4rem; border-radius:3px; color:var(--accent); }
+
+  /* ─ CODE BLOCKS ─ */
+  .cb{
+    background:var(--code-bg); border:1px solid var(--border);
+    border-left:3px solid var(--accent);
+    border-radius:6px; padding:1.4rem 1.6rem;
+    margin:1.2rem 0; overflow-x:auto; position:relative;
+  }
+  .cb.blue { border-left-color:var(--blue); }
+  .cb.green{ border-left-color:var(--green); }
+  .cb.red  { border-left-color:var(--red); }
+  .cb.yellow{border-left-color:var(--yellow);}
+  .cb .lang{ position:absolute; top:.55rem; right:.8rem; font-family:'Fira Code',monospace; font-size:.62rem; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; }
+  .cb pre{ font-family:'Fira Code',monospace; font-size:.77rem; line-height:1.8; color:#c9d5e8; white-space:pre; tab-size:2; }
+  .kw { color:#f97316; }
+  .fn { color:#38bdf8; }
+  .str{ color:#4ade80; }
+  .cm { color:#3d4f6b; font-style:italic; }
+  .nm { color:#facc15; }
+  .tp { color:#a78bfa; }
+  .hl-line{ background:rgba(249,115,22,.08); display:block; margin:0 -1.6rem; padding:0 1.6rem; }
+
+  /* ─ CALLOUTS ─ */
+  .callout{ border-radius:6px; padding:1.1rem 1.3rem; margin:1.4rem 0; display:flex; gap:.9rem; align-items:flex-start; }
+  .ci{ font-size:1.3rem; flex-shrink:0; }
+  .cb-body strong{ display:block; margin-bottom:.2rem; font-size:.88rem; color:var(--ink); }
+  .cb-body p{ font-size:.86rem; margin:0; }
+  .ct { background:rgba(74,222,128,.07);  border:1px solid rgba(74,222,128,.25); }
+  .cw { background:rgba(249,115,22,.07);  border:1px solid rgba(249,115,22,.25); }
+  .ci-box{ background:rgba(56,189,248,.07); border:1px solid rgba(56,189,248,.25); }
+  .cy { background:rgba(250,204,21,.07);  border:1px solid rgba(250,204,21,.25); }
+
+  /* ─ DATA TYPE TABLE ─ */
+  .tw{ overflow-x:auto; margin:1.2rem 0; }
+  table{ width:100%; border-collapse:collapse; font-size:.84rem; }
+  th{ background:var(--surface2); color:var(--blue); font-family:'Fira Code',monospace; font-size:.67rem; letter-spacing:.1em; text-transform:uppercase; padding:.7rem 1rem; text-align:left; border-bottom:1px solid var(--border); }
+  td{ padding:.75rem 1rem; border-bottom:1px solid rgba(42,51,71,.5); color:#9baab8; }
+  tr:last-child td{ border-bottom:none; }
+  tr:hover td{ background:rgba(255,255,255,.02); }
+  .t-tp{ color:var(--purple); font-family:'Fira Code',monospace; font-weight:500; }
+  .t-ej{ color:var(--green); font-family:'Fira Code',monospace; font-size:.8rem; }
+  .t-uso{ font-size:.82rem; }
+
+  /* ─ VISUAL DIAGRAM ─ */
+  .diagram{
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:8px; padding:2rem; margin:1.8rem 0;
+    overflow-x:auto;
+  }
+  .er-wrap{ display:flex; align-items:flex-start; gap:2rem; flex-wrap:wrap; justify-content:center; }
+  .er-table{
+    background:var(--code-bg); border:2px solid var(--border);
+    border-radius:6px; min-width:200px; overflow:hidden;
+    font-family:'Fira Code',monospace; font-size:.78rem;
+  }
+  .er-table.hi1{ border-color:var(--accent); }
+  .er-table.hi2{ border-color:var(--blue); }
+  .er-table.hi3{ border-color:var(--green); }
+  .er-head{
+    padding:.55rem 1rem; font-size:.75rem; font-weight:700;
+    letter-spacing:.1em; text-transform:uppercase;
+  }
+  .h1{ background:rgba(249,115,22,.2); color:var(--accent); }
+  .h2{ background:rgba(56,189,248,.2); color:var(--blue); }
+  .h3{ background:rgba(74,222,128,.2); color:var(--green); }
+  .er-row{ display:flex; gap:.5rem; padding:.35rem 1rem; border-top:1px solid var(--border); align-items:center; }
+  .er-row.pk{ background:rgba(250,204,21,.06); }
+  .er-row.fk{ background:rgba(167,139,250,.06); }
+  .badge{ font-size:.6rem; padding:.1rem .35rem; border-radius:3px; font-weight:700; letter-spacing:.06em; }
+  .bpk{ background:rgba(250,204,21,.2); color:var(--yellow); }
+  .bfk{ background:rgba(167,139,250,.2); color:var(--purple); }
+  .bnn{ background:rgba(248,113,113,.15); color:var(--red); font-size:.55rem; }
+  .er-fname{ color:var(--ink); flex:1; }
+  .er-ftype{ color:var(--muted); font-size:.72rem; }
+  .er-conn{
+    display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:.3rem; padding-top:2rem;
+    color:var(--muted); font-size:.72rem; font-family:'Fira Code',monospace;
+  }
+  .er-conn .line{ width:2px; height:40px; background:linear-gradient(var(--accent),var(--blue)); border-radius:2px; }
+  .er-conn .arr{ color:var(--blue); font-size:1.2rem; }
+  .er-conn .lbl{ color:var(--yellow); font-size:.65rem; }
+
+  /* ─ CRUD SECTION ─ */
+  .crud-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:.8rem; margin:1.2rem 0; }
+  .crud-card{
+    border-radius:6px; padding:1rem; text-align:center;
+    border:1px solid transparent;
+  }
+  .crud-c{ background:rgba(74,222,128,.08); border-color:rgba(74,222,128,.25); }
+  .crud-r{ background:rgba(56,189,248,.08); border-color:rgba(56,189,248,.25); }
+  .crud-u{ background:rgba(250,204,21,.08); border-color:rgba(250,204,21,.25); }
+  .crud-d{ background:rgba(248,113,113,.08); border-color:rgba(248,113,113,.25); }
+  .crud-card .verb{ font-family:'Fira Code',monospace; font-size:1.2rem; font-weight:700; display:block; margin-bottom:.3rem; }
+  .crud-card .name{ font-size:.75rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
+  .crud-card .sql{ font-family:'Fira Code',monospace; font-size:.72rem; color:var(--muted); margin-top:.2rem; }
+  .cv{ color:var(--green); } .cr{ color:var(--blue); } .cu{ color:var(--yellow); } .cd{ color:var(--red); }
+
+  /* ─ ACTIVITY ─ */
+  .act{ background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:2rem; margin:2rem 0; }
+  .act-head{ display:flex; align-items:center; gap:.8rem; margin-bottom:1.4rem; }
+  .act-badge{ background:var(--accent); color:#fff; font-family:'Fira Code',monospace; font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; padding:.22rem .7rem; border-radius:3px; }
+  .act h3{ margin:0; color:var(--ink); font-size:1rem; }
+  .fill{ background:var(--surface2); border:1px solid var(--border); border-radius:4px; padding:1rem 1.1rem; margin:.6rem 0; }
+  .fl{ font-family:'Fira Code',monospace; font-size:.65rem; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; margin-bottom:.4rem; }
+  input.fi{ width:100%; background:transparent; border:none; border-bottom:1px solid var(--border); color:var(--ink); font-family:'Familjen Grotesk',sans-serif; font-size:.9rem; padding:.4rem 0; outline:none; transition:border-color .2s; margin-bottom:.3rem; }
+  input.fi:focus{ border-color:var(--accent); }
+  textarea.fi{ width:100%; background:transparent; border:1px solid var(--border); color:var(--ink); font-family:'Fira Code',monospace; font-size:.78rem; padding:.6rem; border-radius:3px; outline:none; resize:vertical; min-height:80px; transition:border-color .2s; }
+  textarea.fi:focus{ border-color:var(--accent); }
+
+  /* ─ REFS ─ */
+  .ref-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(185px,1fr)); gap:.8rem; margin:1rem 0; }
+  .ref-card{ background:var(--surface); border:1px solid var(--border); border-radius:5px; padding:1rem; text-decoration:none; display:block; transition:border-color .2s, transform .2s; }
+  .ref-card:hover{ border-color:var(--accent); transform:translateY(-2px); }
+  .ref-cat{ font-family:'Fira Code',monospace; font-size:.62rem; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; margin-bottom:.25rem; }
+  .ref-title{ color:var(--blue); font-size:.88rem; font-weight:700; }
+  .ref-url{ color:var(--muted); font-size:.7rem; font-family:'Fira Code',monospace; margin-top:.2rem; }
+  .ref-desc{ font-size:.8rem; color:#637089; margin-top:.3rem; }
+
+  /* ─ VIDEO CARD ─ */
+  .video-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1rem; margin:1.2rem 0; }
+  .video-card{ background:var(--surface); border:1px solid var(--border); border-radius:6px; overflow:hidden; text-decoration:none; display:block; transition:border-color .2s, transform .2s; }
+  .video-card:hover{ border-color:var(--red); transform:translateY(-2px); }
+  .video-thumb{ background:var(--surface2); height:130px; display:flex; align-items:center; justify-content:center; font-size:3rem; border-bottom:1px solid var(--border); position:relative; }
+  .video-thumb .yt-badge{ position:absolute; bottom:.5rem; right:.5rem; background:#ff0000; color:#fff; font-family:'Fira Code',monospace; font-size:.6rem; padding:.15rem .4rem; border-radius:2px; letter-spacing:.05em; }
+  .video-info{ padding:.9rem 1rem; }
+  .video-title{ font-size:.88rem; font-weight:700; color:var(--ink); margin-bottom:.2rem; }
+  .video-ch{ font-family:'Fira Code',monospace; font-size:.7rem; color:var(--muted); }
+
+  /* ─ TIMESTAMP VISUAL ─ */
+  .ts-visual{
+    background:var(--surface2); border:1px solid var(--border);
+    border-radius:6px; padding:1.4rem; margin:1.2rem 0;
+    font-family:'Fira Code',monospace; font-size:.82rem;
+    display:flex; flex-wrap:wrap; align-items:center; gap:.5rem;
+  }
+  .ts-part{ background:var(--code-bg); border:1px solid var(--border); border-radius:4px; padding:.35rem .7rem; }
+  .ts-part .label{ font-size:.6rem; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; display:block; margin-bottom:.1rem; }
+  .ts-part .val{ color:var(--green); font-size:.88rem; }
+  .ts-sep{ color:var(--muted); font-size:1.2rem; }
+
+  footer{ padding:3rem 4rem; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; position:relative; z-index:1; }
+  footer p{ color:var(--muted); font-size:.8rem; margin:0; }
+  .btn{ background:var(--accent); color:#fff; font-family:'Fira Code',monospace; font-size:.73rem; letter-spacing:.1em; text-transform:uppercase; padding:.6rem 1.4rem; border-radius:4px; border:none; cursor:pointer; text-decoration:none; transition:opacity .2s; display:inline-block; }
+  .btn:hover{ opacity:.85; }
+
+  @media(max-width:700px){
+    .hero{ padding:5rem 1.5rem 3rem; }
+    .container{ padding:0 1.5rem; }
+    nav .nav-links{ display:none; }
+    .crud-grid{ grid-template-columns:repeat(2,1fr); }
+    footer{ padding:2rem 1.5rem; }
+    .er-wrap{ flex-direction:column; align-items:center; }
+  }
+  @media print{
+    nav,.hero::before,footer .btn{ display:none; }
+    body{ background:#fff; color:#111; }
+    body::after{ display:none; }
+    .cb,.diagram{ background:#f8f8f8; border-color:#ddd; }
+    pre,code{ color:#222; } .kw{ color:#c2410c; } .str{ color:#15803d; } .cm{ color:#999; } .nm{ color:#a16207; } .tp{ color:#7c3aed; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">2° Año · I26 · MySQL</span>
+  <ul class="nav-links">
+    <li><a href="#tipos">Tipos</a></li>
+    <li><a href="#timestamps">Timestamp</a></li>
+    <li><a href="#crud">CRUD</a></li>
+    <li><a href="#relaciones">Relaciones</a></li>
+    <li><a href="#fk">Claves FK</a></li>
+    <li><a href="#actividad">Actividad</a></li>
+    <li><a href="#recursos">Recursos</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-content">
+    <div class="eyebrow">2° Año · Tecnicatura en Software · I26</div>
+    <h1>MySQL con <span class="hl">XAMPP</span>:<br>todo lo que<br>se complicó</h1>
+    <p class="hero-sub">Tipos de datos · TIMESTAMP · CRUD completo · Claves foráneas · Relaciones entre tablas. Con ejemplos reales y dónde practicarlo online.</p>
+    <div class="pill-row">
+      <span class="pill p-o">XAMPP · phpMyAdmin</span>
+      <span class="pill p-p">Tipos de datos</span>
+      <span class="pill p-y">TIMESTAMP · DATE</span>
+      <span class="pill p-g">CRUD</span>
+      <span class="pill p-b">Claves foráneas</span>
+      <span class="pill p-b">JOIN</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 01 TIPOS DE DATOS ─── -->
+<section id="tipos">
+<div class="container">
+  <div class="sn">01 · Fundamentos</div>
+  <h2>Tipos de datos en <span>MySQL</span></h2>
+  <p>Cuando creamos una tabla, cada columna necesita un tipo. El tipo le dice a MySQL <strong>qué clase de dato puede guardar ahí</strong> y cuánto espacio reservar. Elegir mal el tipo puede hacer que la base de datos sea lenta, desperdicie espacio o guarde datos incorrectos.</p>
+
+  <div class="callout ci-box">
+    <div class="ci">💡</div>
+    <div class="cb-body">
+      <strong>¿Por qué importa el tipo?</strong>
+      <p>Si guardamos la edad en un campo <code>VARCHAR</code> en vez de <code>INT</code>, MySQL no puede hacer operaciones como "encontrar a todos los mayores de 18". Los datos son correctos visualmente, pero no funcionan como números.</p>
+    </div>
+  </div>
+
+  <h3>Tipos numéricos</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Tipo</th><th>Ejemplo de valor</th><th>Rango</th><th>Cuándo usarlo</th></tr></thead>
+    <tbody>
+      <tr><td class="t-tp">INT</td><td class="t-ej">42, -10, 0</td><td>-2.1B a 2.1B</td><td class="t-uso">IDs, edades, cantidades enteras</td></tr>
+      <tr><td class="t-tp">INT UNSIGNED</td><td class="t-ej">0, 1, 500</td><td>0 a 4.2B</td><td class="t-uso">IDs que nunca son negativos (más común para PK)</td></tr>
+      <tr><td class="t-tp">TINYINT</td><td class="t-ej">0, 1, 127</td><td>-128 a 127</td><td class="t-uso">Flags booleanos (0/1), estados simples</td></tr>
+      <tr><td class="t-tp">DECIMAL(10,2)</td><td class="t-ej">1234.56</td><td>Exacto</td><td class="t-uso">Precios, dinero (nunca FLOAT para plata)</td></tr>
+      <tr><td class="t-tp">FLOAT / DOUBLE</td><td class="t-ej">3.14159</td><td>Aproximado</td><td class="t-uso">Coordenadas, mediciones científicas</td></tr>
+      <tr><td class="t-tp">BIGINT</td><td class="t-ej">9999999999</td><td>Muy grande</td><td class="t-uso">IDs de redes sociales, contadores muy grandes</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Tipos de texto</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Tipo</th><th>Ejemplo</th><th>Máximo</th><th>Cuándo usarlo</th></tr></thead>
+    <tbody>
+      <tr><td class="t-tp">VARCHAR(n)</td><td class="t-ej">'Ana García'</td><td>65,535 chars</td><td class="t-uso">Nombres, emails, títulos. El n es el máximo de chars</td></tr>
+      <tr><td class="t-tp">CHAR(n)</td><td class="t-ej">'AR', 'USD'</td><td>255 chars</td><td class="t-uso">Textos de largo fijo: códigos de país, DNI</td></tr>
+      <tr><td class="t-tp">TEXT</td><td class="t-ej">'Descripción larga...'</td><td>65,535 chars</td><td class="t-uso">Descripciones, comentarios, posts</td></tr>
+      <tr><td class="t-tp">MEDIUMTEXT</td><td class="t-ej">Artículo entero</td><td>16 MB</td><td class="t-uso">Contenido HTML, artículos largos</td></tr>
+      <tr><td class="t-tp">LONGTEXT</td><td class="t-ej">Libro entero</td><td>4 GB</td><td class="t-uso">Logs, datos muy extensos</td></tr>
+      <tr><td class="t-tp">ENUM</td><td class="t-ej">'activo','inactivo'</td><td>65,535 opciones</td><td class="t-uso">Estados con valores fijos y conocidos</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="callout ct">
+    <div class="ci">✅</div>
+    <div class="cb-body">
+      <strong>Regla de oro: VARCHAR vs TEXT</strong>
+      <p>Si el texto va a tener un límite conocido (nombre, email, título), usá <code>VARCHAR(200)</code>. Si es contenido largo sin límite claro (descripción, comentario), usá <code>TEXT</code>. No uses <code>TEXT</code> para todo: es más lento en búsquedas.</p>
+    </div>
+  </div>
+
+  <h3>Tipos booleanos</h3>
+  <p>MySQL no tiene un tipo <code>BOOLEAN</code> verdadero. Internamente usa <code>TINYINT(1)</code>: el valor <code>0</code> significa falso y el <code>1</code> verdadero.</p>
+  <div class="cb green">
+    <span class="lang">sql</span>
+    <pre><span class="cm">-- Estas dos formas son equivalentes en MySQL:</span>
+<span class="kw">CREATE TABLE</span> usuarios (
+  activo   <span class="tp">BOOLEAN</span>,           <span class="cm">-- MySQL lo convierte a TINYINT(1)</span>
+  verificado <span class="tp">TINYINT(1)</span> <span class="kw">DEFAULT</span> <span class="nm">0</span>  <span class="cm">-- 0=false, 1=true</span>
+);
+
+<span class="cm">-- Para insertar:</span>
+<span class="kw">INSERT INTO</span> usuarios (activo) <span class="kw">VALUES</span> (<span class="kw">TRUE</span>);   <span class="cm">-- o VALUES(1)</span>
+<span class="kw">INSERT INTO</span> usuarios (activo) <span class="kw">VALUES</span> (<span class="kw">FALSE</span>);  <span class="cm">-- o VALUES(0)</span>
+
+<span class="cm">-- Para consultar:</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> usuarios <span class="kw">WHERE</span> activo = <span class="nm">1</span>;     <span class="cm">-- los activos</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> usuarios <span class="kw">WHERE</span> activo = <span class="nm">0</span>;     <span class="cm">-- los inactivos</span></pre>
+  </div>
+</div>
+</section>
+
+<!-- ─── 02 TIMESTAMP ─── -->
+<section id="timestamps">
+<div class="container">
+  <div class="sn">02 · Lo que se complicó hoy</div>
+  <h2>Tipos de <span>fecha y hora</span></h2>
+  <p>Este es el tema que más confusión generó hoy. Vamos a verlo despacio con ejemplos concretos.</p>
+
+  <h3>Los 5 tipos de fecha en MySQL</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Tipo</th><th>Qué guarda</th><th>Formato</th><th>Ejemplo real</th></tr></thead>
+    <tbody>
+      <tr><td class="t-tp">DATE</td><td>Solo fecha, sin hora</td><td><code>YYYY-MM-DD</code></td><td class="t-ej">'2025-04-29'</td></tr>
+      <tr><td class="t-tp">TIME</td><td>Solo hora, sin fecha</td><td><code>HH:MM:SS</code></td><td class="t-ej">'14:30:00'</td></tr>
+      <tr><td class="t-tp">DATETIME</td><td>Fecha + hora. No cambia sola</td><td><code>YYYY-MM-DD HH:MM:SS</code></td><td class="t-ej">'2025-04-29 14:30:00'</td></tr>
+      <tr><td class="t-tp">TIMESTAMP</td><td>Fecha + hora. Puede actualizarse automáticamente</td><td><code>YYYY-MM-DD HH:MM:SS</code></td><td class="t-ej">'2025-04-29 14:30:00'</td></tr>
+      <tr><td class="t-tp">YEAR</td><td>Solo el año</td><td><code>YYYY</code></td><td class="t-ej">'2025'</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>¿Qué es TIMESTAMP exactamente?</h3>
+  <p>Un <strong>TIMESTAMP</strong> guarda un momento exacto en el tiempo (fecha + hora + zona horaria). La magia es que MySQL puede <strong>llenarlo automáticamente</strong> cuando se inserta un registro y actualizarlo cuando se modifica.</p>
+
+  <div class="ts-visual">
+    <div class="ts-part"><span class="label">año</span><span class="val">2025</span></div>
+    <span class="ts-sep">-</span>
+    <div class="ts-part"><span class="label">mes</span><span class="val">04</span></div>
+    <span class="ts-sep">-</span>
+    <div class="ts-part"><span class="label">día</span><span class="val">29</span></div>
+    <span class="ts-sep">&nbsp;&nbsp;</span>
+    <div class="ts-part"><span class="label">hora</span><span class="val">14</span></div>
+    <span class="ts-sep">:</span>
+    <div class="ts-part"><span class="label">minutos</span><span class="val">30</span></div>
+    <span class="ts-sep">:</span>
+    <div class="ts-part"><span class="label">segundos</span><span class="val">00</span></div>
+  </div>
+
+  <div class="cb yellow">
+    <span class="lang">sql · timestamp en práctica</span>
+    <pre><span class="kw">CREATE TABLE</span> publicaciones (
+  id          <span class="tp">INT</span> <span class="kw">AUTO_INCREMENT PRIMARY KEY</span>,
+  titulo      <span class="tp">VARCHAR(200)</span> <span class="kw">NOT NULL</span>,
+
+  <span class="cm">-- created_at: se llena SOLA cuando hacés el INSERT</span>
+  <span class="cm">-- DEFAULT CURRENT_TIMESTAMP = "poner la hora actual cuando se crea"</span>
+  created_at  <span class="tp">TIMESTAMP</span> <span class="kw">DEFAULT</span> CURRENT_TIMESTAMP,
+
+  <span class="cm">-- updated_at: se actualiza SOLA cada vez que hacés UPDATE</span>
+  <span class="cm">-- ON UPDATE CURRENT_TIMESTAMP = "poner la hora actual cuando se modifica"</span>
+  updated_at  <span class="tp">TIMESTAMP</span> <span class="kw">DEFAULT</span> CURRENT_TIMESTAMP <span class="kw">ON UPDATE</span> CURRENT_TIMESTAMP
+);
+
+<span class="cm">-- Si hacemos esto:</span>
+<span class="kw">INSERT INTO</span> publicaciones (titulo) <span class="kw">VALUES</span> (<span class="str">'Mi primera publicación'</span>);
+
+<span class="cm">-- MySQL guarda AUTOMÁTICAMENTE (sin que nosotros lo escribamos):</span>
+<span class="cm">-- created_at  = '2025-04-29 14:30:00'  ← momento del INSERT</span>
+<span class="cm">-- updated_at  = '2025-04-29 14:30:00'  ← mismo momento</span>
+
+<span class="cm">-- Si después actualizamos:</span>
+<span class="kw">UPDATE</span> publicaciones <span class="kw">SET</span> titulo = <span class="str">'Título corregido'</span> <span class="kw">WHERE</span> id = <span class="nm">1</span>;
+
+<span class="cm">-- Ahora:</span>
+<span class="cm">-- created_at  = '2025-04-29 14:30:00'  ← NO cambió (cuándo se creó)</span>
+<span class="cm">-- updated_at  = '2025-04-29 15:45:22'  ← SÍ cambió (cuándo se editó)</span></pre>
+  </div>
+
+  <div class="callout cw">
+    <div class="ci">⚠️</div>
+    <div class="cb-body">
+      <strong>TIMESTAMP vs DATETIME ¿cuál usar?</strong>
+      <p><strong>TIMESTAMP</strong>: perfecto para <code>created_at</code> y <code>updated_at</code>. Se actualiza solo. Rango: 1970–2038.<br>
+      <strong>DATETIME</strong>: para fechas que el usuario ingresa (fecha de nacimiento, fecha de un evento). Rango: 1000–9999. No tiene el límite del 2038.</p>
+    </div>
+  </div>
+
+  <h3>Funciones de fecha más usadas</h3>
+  <div class="cb">
+    <span class="lang">sql · funciones de fecha</span>
+    <pre><span class="cm">-- Obtener la fecha/hora actual</span>
+<span class="kw">SELECT</span> <span class="fn">NOW</span>();              <span class="cm">-- '2025-04-29 14:30:00'  (fecha + hora)</span>
+<span class="kw">SELECT</span> <span class="fn">CURDATE</span>();          <span class="cm">-- '2025-04-29'           (solo fecha)</span>
+<span class="kw">SELECT</span> <span class="fn">CURTIME</span>();          <span class="cm">-- '14:30:00'             (solo hora)</span>
+
+<span class="cm">-- Extraer partes de una fecha</span>
+<span class="kw">SELECT</span> <span class="fn">YEAR</span>(created_at)    <span class="kw">FROM</span> publicaciones;   <span class="cm">-- → 2025</span>
+<span class="kw">SELECT</span> <span class="fn">MONTH</span>(created_at)   <span class="kw">FROM</span> publicaciones;   <span class="cm">-- → 4</span>
+<span class="kw">SELECT</span> <span class="fn">DAY</span>(created_at)     <span class="kw">FROM</span> publicaciones;   <span class="cm">-- → 29</span>
+
+<span class="cm">-- Formatear fecha para mostrar</span>
+<span class="kw">SELECT</span> <span class="fn">DATE_FORMAT</span>(created_at, <span class="str">'%d/%m/%Y'</span>) <span class="kw">FROM</span> publicaciones;
+<span class="cm">-- → '29/04/2025'</span>
+
+<span class="kw">SELECT</span> <span class="fn">DATE_FORMAT</span>(created_at, <span class="str">'%d de %M de %Y'</span>) <span class="kw">FROM</span> publicaciones;
+<span class="cm">-- → '29 de April de 2025'</span>
+
+<span class="cm">-- Filtrar por fecha</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> publicaciones
+<span class="kw">WHERE</span> created_at >= <span class="str">'2025-01-01'</span>
+  <span class="kw">AND</span> created_at <  <span class="str">'2025-05-01'</span>;   <span class="cm">-- publicaciones de enero a abril</span>
+
+<span class="cm">-- Calcular diferencia entre fechas</span>
+<span class="kw">SELECT</span> <span class="fn">DATEDIFF</span>(<span class="fn">NOW</span>(), created_at) <span class="kw">AS</span> dias_desde_creacion
+<span class="kw">FROM</span> publicaciones;</pre>
+  </div>
+
+  <h3>NULL — el valor que no es ningún valor</h3>
+  <p>Un campo <code>NULL</code> significa que el dato <strong>no existe o se desconoce</strong>. Es diferente a cero o a una cadena vacía. Hay que manejarlo con cuidado.</p>
+  <div class="cb red">
+    <span class="lang">sql · null</span>
+    <pre><span class="cm">-- Campo que puede ser NULL (no es obligatorio)</span>
+<span class="kw">CREATE TABLE</span> usuarios (
+  telefono  <span class="tp">VARCHAR(20)</span>             <span class="cm">-- puede ser NULL (opcional)</span>
+  email     <span class="tp">VARCHAR(150)</span> <span class="kw">NOT NULL</span>  <span class="cm">-- NO puede ser NULL (obligatorio)</span>
+);
+
+<span class="cm">-- Buscar registros donde el campo ES null</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> usuarios <span class="kw">WHERE</span> telefono <span class="kw">IS NULL</span>;
+
+<span class="cm">-- Buscar registros donde el campo NO ES null</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> usuarios <span class="kw">WHERE</span> telefono <span class="kw">IS NOT NULL</span>;
+
+<span class="cm">-- ⚠️ ESTE ERROR ES MUY COMÚN: no funciona con = ni !=</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> usuarios <span class="kw">WHERE</span> telefono = <span class="kw">NULL</span>;    <span class="cm">-- ❌ no devuelve nada</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> usuarios <span class="kw">WHERE</span> telefono != <span class="kw">NULL</span>;   <span class="cm">-- ❌ tampoco funciona</span></pre>
+  </div>
+</div>
+</section>
+
+<!-- ─── 03 CRUD ─── -->
+<section id="crud">
+<div class="container">
+  <div class="sn">03 · CRUD completo</div>
+  <h2>Las 4 operaciones: <span>CRUD</span></h2>
+  <p>CRUD es el acrónimo de las 4 operaciones fundamentales que se hacen con datos. Todo sistema, de cualquier tipo, se reduce a estas 4 operaciones.</p>
+
+  <div class="crud-grid">
+    <div class="crud-card crud-c">
+      <span class="verb cv">C</span>
+      <div class="name cv">Create</div>
+      <div class="sql">INSERT INTO</div>
+    </div>
+    <div class="crud-card crud-r">
+      <span class="verb cr">R</span>
+      <div class="name cr">Read</div>
+      <div class="sql">SELECT</div>
+    </div>
+    <div class="crud-card crud-u">
+      <span class="verb cu">U</span>
+      <div class="name cu">Update</div>
+      <div class="sql">UPDATE SET</div>
+    </div>
+    <div class="crud-card crud-d">
+      <span class="verb cd">D</span>
+      <div class="name cd">Delete</div>
+      <div class="sql">DELETE FROM</div>
+    </div>
+  </div>
+
+  <p>Vamos a trabajar con una sola tabla de ejemplo para entender las 4 operaciones antes de pasar a las relaciones:</p>
+
+  <div class="cb">
+    <span class="lang">sql · crear la tabla</span>
+    <pre><span class="kw">CREATE TABLE</span> alumnos (
+  id         <span class="tp">INT</span> <span class="kw">UNSIGNED AUTO_INCREMENT PRIMARY KEY</span>,
+  nombre     <span class="tp">VARCHAR(100)</span> <span class="kw">NOT NULL</span>,
+  email      <span class="tp">VARCHAR(150)</span> <span class="kw">UNIQUE NOT NULL</span>,
+  legajo     <span class="tp">CHAR(8)</span> <span class="kw">UNIQUE</span>,
+  promedio   <span class="tp">DECIMAL(4,2)</span>,
+  activo     <span class="tp">TINYINT(1)</span> <span class="kw">DEFAULT</span> <span class="nm">1</span>,
+  created_at <span class="tp">TIMESTAMP</span> <span class="kw">DEFAULT</span> CURRENT_TIMESTAMP
+);</pre>
+  </div>
+
+  <h3>C — CREATE (INSERT INTO)</h3>
+  <div class="cb green">
+    <span class="lang">sql · insert</span>
+    <pre><span class="cm">-- Insertar un registro (especificando columnas — recomendado)</span>
+<span class="kw">INSERT INTO</span> alumnos (nombre, email, legajo, promedio)
+<span class="kw">VALUES</span> (<span class="str">'Ana García'</span>, <span class="str">'ana@tecni.edu'</span>, <span class="str">'SW20001'</span>, <span class="nm">8.50</span>);
+
+<span class="cm">-- Insertar múltiples registros de una sola vez</span>
+<span class="kw">INSERT INTO</span> alumnos (nombre, email, legajo, promedio)
+<span class="kw">VALUES</span>
+  (<span class="str">'Carlos Ruiz'</span>,    <span class="str">'carlos@tecni.edu'</span>, <span class="str">'SW20002'</span>, <span class="nm">7.20</span>),
+  (<span class="str">'Sofía Méndez'</span>,   <span class="str">'sofia@tecni.edu'</span>,  <span class="str">'SW20003'</span>, <span class="nm">9.10</span>),
+  (<span class="str">'Lucas Herrera'</span>,  <span class="str">'lucas@tecni.edu'</span>,  <span class="str">'SW20004'</span>, <span class="nm">6.80</span>);
+
+<span class="cm">-- El id y created_at se llenan SOLOS (AUTO_INCREMENT y DEFAULT)</span></pre>
+  </div>
+
+  <h3>R — READ (SELECT)</h3>
+  <div class="cb blue">
+    <span class="lang">sql · select</span>
+    <pre><span class="cm">-- Traer todos los registros, todas las columnas</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> alumnos;
+
+<span class="cm">-- Traer solo algunas columnas</span>
+<span class="kw">SELECT</span> id, nombre, email <span class="kw">FROM</span> alumnos;
+
+<span class="cm">-- Filtrar con WHERE</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> alumnos <span class="kw">WHERE</span> promedio >= <span class="nm">8</span>;
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> alumnos <span class="kw">WHERE</span> activo = <span class="nm">1</span>;
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> alumnos <span class="kw">WHERE</span> nombre <span class="kw">LIKE</span> <span class="str">'%García%'</span>;  <span class="cm">-- contiene "García"</span>
+
+<span class="cm">-- Ordenar resultados</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> alumnos <span class="kw">ORDER BY</span> promedio <span class="kw">DESC</span>;    <span class="cm">-- mayor a menor</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> alumnos <span class="kw">ORDER BY</span> nombre <span class="kw">ASC</span>;      <span class="cm">-- A a Z</span>
+
+<span class="cm">-- Limitar cantidad de resultados</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> alumnos <span class="kw">LIMIT</span> <span class="nm">10</span>;                  <span class="cm">-- solo los primeros 10</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> alumnos <span class="kw">LIMIT</span> <span class="nm">10</span> <span class="kw">OFFSET</span> <span class="nm">20</span>;        <span class="cm">-- del 21 al 30 (paginación)</span>
+
+<span class="cm">-- Contar, promediar, sumar</span>
+<span class="kw">SELECT</span> <span class="fn">COUNT</span>(*) <span class="kw">AS</span> total       <span class="kw">FROM</span> alumnos;
+<span class="kw">SELECT</span> <span class="fn">AVG</span>(promedio) <span class="kw">AS</span> media  <span class="kw">FROM</span> alumnos;
+<span class="kw">SELECT</span> <span class="fn">MAX</span>(promedio) <span class="kw">AS</span> mejor  <span class="kw">FROM</span> alumnos;
+<span class="kw">SELECT</span> <span class="fn">MIN</span>(promedio) <span class="kw">AS</span> peor   <span class="kw">FROM</span> alumnos;</pre>
+  </div>
+
+  <h3>U — UPDATE</h3>
+  <div class="cb yellow">
+    <span class="lang">sql · update</span>
+    <pre><span class="cm">-- Actualizar un campo de un registro específico</span>
+<span class="kw">UPDATE</span> alumnos
+<span class="kw">SET</span> promedio = <span class="nm">9.20</span>
+<span class="kw">WHERE</span> id = <span class="nm">1</span>;
+
+<span class="cm">-- Actualizar múltiples campos a la vez</span>
+<span class="kw">UPDATE</span> alumnos
+<span class="kw">SET</span> promedio = <span class="nm">8.50</span>, activo = <span class="nm">0</span>
+<span class="kw">WHERE</span> id = <span class="nm">3</span>;
+
+<span class="cm">-- Actualizar TODOS los registros que cumplen una condición</span>
+<span class="kw">UPDATE</span> alumnos
+<span class="kw">SET</span> activo = <span class="nm">0</span>
+<span class="kw">WHERE</span> promedio < <span class="nm">4</span>;
+
+<span class="cm">-- ⚠️ PELIGRO: UPDATE sin WHERE actualiza TODA la tabla</span>
+<span class="kw">UPDATE</span> alumnos <span class="kw">SET</span> activo = <span class="nm">0</span>;  <span class="cm">-- ← desactiva a TODOS</span></pre>
+  </div>
+
+  <div class="callout cw">
+    <div class="ci">🚨</div>
+    <div class="cb-body">
+      <strong>El error más común: UPDATE y DELETE sin WHERE</strong>
+      <p>Un <code>UPDATE</code> o <code>DELETE</code> sin <code>WHERE</code> afecta <strong>todos los registros</strong> de la tabla. Antes de ejecutar uno, siempre hacé un <code>SELECT</code> con la misma condición para verificar qué registros vas a modificar.</p>
+    </div>
+  </div>
+
+  <h3>D — DELETE</h3>
+  <div class="cb red">
+    <span class="lang">sql · delete</span>
+    <pre><span class="cm">-- Eliminar un registro específico</span>
+<span class="kw">DELETE FROM</span> alumnos <span class="kw">WHERE</span> id = <span class="nm">4</span>;
+
+<span class="cm">-- Eliminar varios registros</span>
+<span class="kw">DELETE FROM</span> alumnos <span class="kw">WHERE</span> activo = <span class="nm">0</span>;
+
+<span class="cm">-- ✅ BUENA PRÁCTICA: primero verificá con SELECT qué vas a borrar</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> alumnos <span class="kw">WHERE</span> activo = <span class="nm">0</span>;  <span class="cm">-- ← primero esto</span>
+<span class="kw">DELETE FROM</span> alumnos <span class="kw">WHERE</span> activo = <span class="nm">0</span>;   <span class="cm">-- ← después esto</span>
+
+<span class="cm">-- Vaciar tabla COMPLETA (cuidado)</span>
+<span class="kw">TRUNCATE TABLE</span> alumnos;   <span class="cm">-- borra todo y resetea el auto_increment</span>
+
+<span class="cm">-- ⚠️ PELIGRO: sin WHERE borra todo</span>
+<span class="kw">DELETE FROM</span> alumnos;   <span class="cm">-- ← elimina TODOS los alumnos</span></pre>
+  </div>
+</div>
+</section>
+
+<!-- ─── 04 RELACIONES ─── -->
+<section id="relaciones">
+<div class="container">
+  <div class="sn">04 · Relaciones</div>
+  <h2>Relaciones entre <span>tablas</span></h2>
+  <p>En el mundo real, los datos se relacionan entre sí. Un alumno cursa muchas materias. Un producto pertenece a una categoría. Un pedido tiene muchos productos. Las bases de datos relacionales están diseñadas exactamente para esto.</p>
+
+  <h3>Los 3 tipos de relación</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Tipo</th><th>Descripción</th><th>Ejemplo</th><th>Cómo se implementa</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>1 a 1</strong><br><code style="color:var(--green)">1:1</code></td>
+        <td>Un registro se relaciona con exactamente un registro de otra tabla</td>
+        <td>Usuario → Perfil extendido</td>
+        <td>FK con UNIQUE en la tabla secundaria</td>
+      </tr>
+      <tr>
+        <td><strong>1 a muchos</strong><br><code style="color:var(--accent)">1:N</code></td>
+        <td>Un registro se relaciona con muchos de otra tabla</td>
+        <td>Categoría → muchos Productos<br>Alumno → muchas Notas</td>
+        <td>FK en la tabla del lado "muchos"</td>
+      </tr>
+      <tr>
+        <td><strong>Muchos a muchos</strong><br><code style="color:var(--purple)">N:M</code></td>
+        <td>Muchos registros de A se relacionan con muchos de B</td>
+        <td>Alumnos ↔ Materias<br>Pedidos ↔ Productos</td>
+        <td>Tabla intermedia (pivot) con dos FK</td>
+      </tr>
+    </tbody>
+  </table></div>
+
+  <h3>Ejemplo completo: Sistema escolar</h3>
+  <p>Vamos a construir un sistema con <strong>3 tablas relacionadas</strong>: alumnos, materias y las notas (que relaciona alumnos con materias).</p>
+
+  <div class="diagram">
+    <div class="er-wrap">
+
+      <!-- TABLA ALUMNOS -->
+      <div class="er-table hi1">
+        <div class="er-head h1">alumnos</div>
+        <div class="er-row pk">
+          <span class="badge bpk">PK</span>
+          <span class="er-fname">id</span>
+          <span class="er-ftype">INT UNSIGNED</span>
+        </div>
+        <div class="er-row">
+          <span class="badge bnn">NN</span>
+          <span class="er-fname">nombre</span>
+          <span class="er-ftype">VARCHAR(100)</span>
+        </div>
+        <div class="er-row">
+          <span class="badge bnn">NN</span>
+          <span class="er-fname">email</span>
+          <span class="er-ftype">VARCHAR(150)</span>
+        </div>
+        <div class="er-row">
+          <span class="er-fname">created_at</span>
+          <span class="er-ftype">TIMESTAMP</span>
+        </div>
+      </div>
+
+      <!-- CONEXIÓN LEFT -->
+      <div class="er-conn">
+        <span class="lbl">1</span>
+        <div class="line"></div>
+        <span class="arr">→</span>
+        <div class="line"></div>
+        <span class="lbl">N</span>
+      </div>
+
+      <!-- TABLA NOTAS (pivot) -->
+      <div class="er-table hi3">
+        <div class="er-head h3">notas ← tabla intermedia</div>
+        <div class="er-row pk">
+          <span class="badge bpk">PK</span>
+          <span class="er-fname">id</span>
+          <span class="er-ftype">INT</span>
+        </div>
+        <div class="er-row fk">
+          <span class="badge bfk">FK</span>
+          <span class="er-fname">alumno_id</span>
+          <span class="er-ftype">INT → alumnos.id</span>
+        </div>
+        <div class="er-row fk">
+          <span class="badge bfk">FK</span>
+          <span class="er-fname">materia_id</span>
+          <span class="er-ftype">INT → materias.id</span>
+        </div>
+        <div class="er-row">
+          <span class="badge bnn">NN</span>
+          <span class="er-fname">nota</span>
+          <span class="er-ftype">DECIMAL(4,2)</span>
+        </div>
+        <div class="er-row">
+          <span class="er-fname">fecha_examen</span>
+          <span class="er-ftype">DATE</span>
+        </div>
+        <div class="er-row">
+          <span class="er-fname">created_at</span>
+          <span class="er-ftype">TIMESTAMP</span>
+        </div>
+      </div>
+
+      <!-- CONEXIÓN RIGHT -->
+      <div class="er-conn">
+        <span class="lbl">N</span>
+        <div class="line" style="background:linear-gradient(var(--blue),var(--green))"></div>
+        <span class="arr" style="color:var(--green)">←</span>
+        <div class="line" style="background:linear-gradient(var(--green),var(--blue))"></div>
+        <span class="lbl">1</span>
+      </div>
+
+      <!-- TABLA MATERIAS -->
+      <div class="er-table hi2">
+        <div class="er-head h2">materias</div>
+        <div class="er-row pk">
+          <span class="badge bpk">PK</span>
+          <span class="er-fname">id</span>
+          <span class="er-ftype">INT UNSIGNED</span>
+        </div>
+        <div class="er-row">
+          <span class="badge bnn">NN</span>
+          <span class="er-fname">nombre</span>
+          <span class="er-ftype">VARCHAR(100)</span>
+        </div>
+        <div class="er-row">
+          <span class="er-fname">codigo</span>
+          <span class="er-ftype">CHAR(6) UNIQUE</span>
+        </div>
+        <div class="er-row">
+          <span class="er-fname">created_at</span>
+          <span class="er-ftype">TIMESTAMP</span>
+        </div>
+      </div>
+
+    </div>
+    <p style="text-align:center; margin-top:1rem; font-family:'Fira Code',monospace; font-size:.7rem; color:var(--muted);">
+      <span style="color:var(--yellow)">PK</span> = Primary Key &nbsp;·&nbsp; <span style="color:var(--purple)">FK</span> = Foreign Key &nbsp;·&nbsp; <span style="color:var(--red)">NN</span> = NOT NULL
+    </p>
+  </div>
+</div>
+</section>
+
+<!-- ─── 05 CLAVES FORÁNEAS ─── -->
+<section id="fk">
+<div class="container">
+  <div class="sn">05 · Lo que más se complicó</div>
+  <h2>Claves foráneas: <span>FOREIGN KEY</span></h2>
+  <p>Una <strong>clave foránea (FK)</strong> es una columna que apunta al ID de otra tabla. Es lo que crea la relación real entre dos tablas y hace que MySQL garantice que los datos sean coherentes.</p>
+
+  <div class="callout ci-box">
+    <div class="ci">🔗</div>
+    <div class="cb-body">
+      <strong>¿Para qué sirve la FK?</strong>
+      <p>Sin FK podría existir una nota con <code>alumno_id = 999</code> y ningún alumno con ese ID. La FK le dice a MySQL: "no permitas guardar una nota si el alumno_id no existe en la tabla alumnos". Eso se llama <strong>integridad referencial</strong>.</p>
+    </div>
+  </div>
+
+  <h3>Crear las tablas con FK paso a paso</h3>
+  <div class="cb">
+    <span class="lang">sql · tabla alumnos (primero)</span>
+    <pre><span class="cm">-- ⚠️ ORDEN IMPORTANTE: primero crear las tablas "padre"</span>
+<span class="cm">-- La tabla que tiene la PK siempre va primero</span>
+
+<span class="kw">CREATE TABLE</span> alumnos (
+  id         <span class="tp">INT UNSIGNED</span> <span class="kw">AUTO_INCREMENT PRIMARY KEY</span>,
+  nombre     <span class="tp">VARCHAR(100)</span> <span class="kw">NOT NULL</span>,
+  email      <span class="tp">VARCHAR(150)</span> <span class="kw">UNIQUE NOT NULL</span>,
+  created_at <span class="tp">TIMESTAMP</span> <span class="kw">DEFAULT</span> CURRENT_TIMESTAMP
+);
+
+<span class="kw">CREATE TABLE</span> materias (
+  id         <span class="tp">INT UNSIGNED</span> <span class="kw">AUTO_INCREMENT PRIMARY KEY</span>,
+  nombre     <span class="tp">VARCHAR(100)</span> <span class="kw">NOT NULL</span>,
+  codigo     <span class="tp">CHAR(6)</span> <span class="kw">UNIQUE</span>,
+  created_at <span class="tp">TIMESTAMP</span> <span class="kw">DEFAULT</span> CURRENT_TIMESTAMP
+);</pre>
+  </div>
+
+  <div class="cb green">
+    <span class="lang">sql · tabla notas (después, con FK)</span>
+    <pre><span class="cm">-- Después creamos la tabla "hija" que tiene las FK</span>
+<span class="kw">CREATE TABLE</span> notas (
+  id          <span class="tp">INT UNSIGNED</span> <span class="kw">AUTO_INCREMENT PRIMARY KEY</span>,
+
+  <span class="cm">-- Estas columnas van a guardar IDs de otras tablas</span>
+  alumno_id   <span class="tp">INT UNSIGNED</span> <span class="kw">NOT NULL</span>,
+  materia_id  <span class="tp">INT UNSIGNED</span> <span class="kw">NOT NULL</span>,
+
+  nota        <span class="tp">DECIMAL(4,2)</span> <span class="kw">NOT NULL</span>,
+  fecha_examen <span class="tp">DATE</span>,
+  created_at  <span class="tp">TIMESTAMP</span> <span class="kw">DEFAULT</span> CURRENT_TIMESTAMP,
+
+  <span class="cm">-- Aquí declaramos las FOREIGN KEYS</span>
+  <span class="cm">-- FOREIGN KEY (columna_local) REFERENCES tabla_padre(columna_pk)</span>
+  <span class="kw">FOREIGN KEY</span> (alumno_id)  <span class="kw">REFERENCES</span> alumnos(id)  <span class="kw">ON DELETE CASCADE</span>,
+  <span class="kw">FOREIGN KEY</span> (materia_id) <span class="kw">REFERENCES</span> materias(id) <span class="kw">ON DELETE RESTRICT</span>
+);</pre>
+  </div>
+
+  <h3>ON DELETE — ¿Qué pasa cuando borro el padre?</h3>
+  <p>Si borro un alumno, ¿qué pasa con sus notas? MySQL necesita saberlo. Se define con <code>ON DELETE</code>:</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Opción</th><th>¿Qué hace?</th><th>Cuándo usarlo</th></tr></thead>
+    <tbody>
+      <tr><td><code>CASCADE</code></td><td>Borra también los registros hijos automáticamente</td><td>Notas de un alumno, comentarios de un post</td></tr>
+      <tr><td><code>RESTRICT</code></td><td>Impide borrar el padre si tiene hijos (error)</td><td>No borrar una materia si tiene notas registradas</td></tr>
+      <tr><td><code>SET NULL</code></td><td>Pone NULL en la FK del hijo</td><td>Si el padre es opcional</td></tr>
+      <tr><td><code>NO ACTION</code></td><td>Igual que RESTRICT (default)</td><td>Cuando querés control manual</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Insertar datos relacionados</h3>
+  <div class="cb">
+    <span class="lang">sql · insertar con fk</span>
+    <pre><span class="cm">-- 1. Primero insertar los padres</span>
+<span class="kw">INSERT INTO</span> alumnos (nombre, email) <span class="kw">VALUES</span>
+  (<span class="str">'Ana García'</span>,   <span class="str">'ana@tecni.edu'</span>),
+  (<span class="str">'Carlos Ruiz'</span>,  <span class="str">'carlos@tecni.edu'</span>);
+<span class="cm">-- Ana quedó con id=1, Carlos con id=2</span>
+
+<span class="kw">INSERT INTO</span> materias (nombre, codigo) <span class="kw">VALUES</span>
+  (<span class="str">'Base de Datos'</span>,  <span class="str">'BD001'</span>),
+  (<span class="str">'Programación'</span>,   <span class="str">'PR001'</span>);
+<span class="cm">-- Base de Datos id=1, Programación id=2</span>
+
+<span class="cm">-- 2. Después insertar los hijos con los IDs correctos</span>
+<span class="kw">INSERT INTO</span> notas (alumno_id, materia_id, nota, fecha_examen) <span class="kw">VALUES</span>
+  (<span class="nm">1</span>, <span class="nm">1</span>, <span class="nm">8.50</span>, <span class="str">'2025-04-15'</span>),  <span class="cm">-- Ana en Base de Datos: 8.5</span>
+  (<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">9.20</span>, <span class="str">'2025-04-20'</span>),  <span class="cm">-- Ana en Programación: 9.2</span>
+  (<span class="nm">2</span>, <span class="nm">1</span>, <span class="nm">7.00</span>, <span class="str">'2025-04-15'</span>);  <span class="cm">-- Carlos en Base de Datos: 7.0</span>
+
+<span class="cm">-- ⚠️ Esto fallaría porque no existe alumno_id=999:</span>
+<span class="kw">INSERT INTO</span> notas (alumno_id, materia_id, nota) <span class="kw">VALUES</span> (<span class="nm">999</span>, <span class="nm">1</span>, <span class="nm">8.0</span>);
+<span class="cm">-- ERROR 1452: Cannot add or update a child row: a foreign key constraint fails</span></pre>
+  </div>
+
+  <h3>JOIN — Consultar tablas relacionadas juntas</h3>
+  <p>Para traer datos de varias tablas en una sola consulta, usamos <code>JOIN</code>. Es la operación más poderosa de SQL.</p>
+
+  <div class="cb blue">
+    <span class="lang">sql · inner join</span>
+    <pre><span class="cm">-- INNER JOIN: trae solo los registros que tienen coincidencia en ambas tablas</span>
+
+<span class="kw">SELECT</span>
+  a.nombre     <span class="kw">AS</span> alumno,
+  m.nombre     <span class="kw">AS</span> materia,
+  n.nota,
+  n.fecha_examen
+<span class="kw">FROM</span> notas n
+  <span class="kw">INNER JOIN</span> alumnos  a <span class="kw">ON</span> n.alumno_id  = a.id
+  <span class="kw">INNER JOIN</span> materias m <span class="kw">ON</span> n.materia_id = m.id
+<span class="kw">ORDER BY</span> a.nombre, m.nombre;
+
+<span class="cm">-- Resultado:</span>
+<span class="cm">-- alumno       | materia         | nota | fecha_examen</span>
+<span class="cm">-- -------------|-----------------|------|-------------</span>
+<span class="cm">-- Ana García   | Base de Datos   | 8.50 | 2025-04-15</span>
+<span class="cm">-- Ana García   | Programación    | 9.20 | 2025-04-20</span>
+<span class="cm">-- Carlos Ruiz  | Base de Datos   | 7.00 | 2025-04-15</span>
+
+<span class="cm">-- Filtrar: notas de un alumno específico</span>
+<span class="kw">SELECT</span> m.nombre <span class="kw">AS</span> materia, n.nota
+<span class="kw">FROM</span> notas n
+  <span class="kw">INNER JOIN</span> materias m <span class="kw">ON</span> n.materia_id = m.id
+<span class="kw">WHERE</span> n.alumno_id = <span class="nm">1</span>;   <span class="cm">-- solo notas de Ana (id=1)</span>
+
+<span class="cm">-- Promedio de cada alumno</span>
+<span class="kw">SELECT</span>
+  a.nombre,
+  <span class="fn">AVG</span>(n.nota) <span class="kw">AS</span> promedio,
+  <span class="fn">COUNT</span>(n.id) <span class="kw">AS</span> materias_rendidas
+<span class="kw">FROM</span> notas n
+  <span class="kw">INNER JOIN</span> alumnos a <span class="kw">ON</span> n.alumno_id = a.id
+<span class="kw">GROUP BY</span> a.id, a.nombre
+<span class="kw">ORDER BY</span> promedio <span class="kw">DESC</span>;</pre>
+  </div>
+
+  <div class="callout ct">
+    <div class="ci">✅</div>
+    <div class="cb-body">
+      <strong>Truco para recordar JOIN</strong>
+      <p>Pensá en el JOIN como un "pegamento" entre tablas. <code>FROM notas n INNER JOIN alumnos a ON n.alumno_id = a.id</code> dice: "traé las notas, y pegalas con los alumnos donde el alumno_id de la nota coincida con el id del alumno".</p>
+    </div>
+  </div>
+
+  <h3>Tipos de JOIN (visual)</h3>
+  <div class="tw"><table>
+    <thead><tr><th>JOIN</th><th>¿Qué devuelve?</th><th>Cuándo usarlo</th></tr></thead>
+    <tbody>
+      <tr><td><code>INNER JOIN</code></td><td>Solo los que tienen coincidencia en AMBAS tablas</td><td>La mayoría de los casos (el más común)</td></tr>
+      <tr><td><code>LEFT JOIN</code></td><td>Todos de la izquierda + coincidencias de la derecha (NULL si no hay)</td><td>Alumnos aunque no tengan notas aún</td></tr>
+      <tr><td><code>RIGHT JOIN</code></td><td>Todos de la derecha + coincidencias de la izquierda</td><td>Poco común, se puede reescribir como LEFT</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="cb">
+    <span class="lang">sql · left join</span>
+    <pre><span class="cm">-- LEFT JOIN: muestra TODOS los alumnos, incluso los que no rindieron nada</span>
+<span class="kw">SELECT</span>
+  a.nombre,
+  <span class="fn">IFNULL</span>(<span class="fn">COUNT</span>(n.id), <span class="nm">0</span>) <span class="kw">AS</span> examenes_rendidos
+<span class="kw">FROM</span> alumnos a
+  <span class="kw">LEFT JOIN</span> notas n <span class="kw">ON</span> n.alumno_id = a.id
+<span class="kw">GROUP BY</span> a.id, a.nombre;
+
+<span class="cm">-- Resultado incluye alumnos con 0 exámenes (INNER JOIN los excluiría)</span></pre>
+  </div>
+</div>
+</section>
+
+<!-- ─── 06 ACTIVIDAD ─── -->
+<section id="actividad">
+<div class="container">
+  <div class="sn">06 · Actividad</div>
+  <h2>Práctica en <span>XAMPP</span></h2>
+
+  <div class="act">
+    <div class="act-head"><span class="act-badge">Ejercicio 1</span><h3>Crear la base de datos del sistema escolar</h3></div>
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:1rem">Abrir phpMyAdmin (<code>http://localhost/phpmyadmin</code>) y ejecutar el siguiente script completo en la pestaña SQL:</p>
+    <div class="cb green">
+      <span class="lang">sql · script completo para copiar</span>
+      <pre><span class="kw">CREATE DATABASE IF NOT EXISTS</span> escuela_i26;
+<span class="kw">USE</span> escuela_i26;
+
+<span class="kw">CREATE TABLE</span> alumnos (
+  id         <span class="tp">INT UNSIGNED</span> <span class="kw">AUTO_INCREMENT PRIMARY KEY</span>,
+  nombre     <span class="tp">VARCHAR(100)</span> <span class="kw">NOT NULL</span>,
+  email      <span class="tp">VARCHAR(150)</span> <span class="kw">UNIQUE NOT NULL</span>,
+  fecha_nacimiento <span class="tp">DATE</span>,
+  activo     <span class="tp">TINYINT(1)</span> <span class="kw">DEFAULT</span> <span class="nm">1</span>,
+  created_at <span class="tp">TIMESTAMP</span> <span class="kw">DEFAULT</span> CURRENT_TIMESTAMP
+);
+
+<span class="kw">CREATE TABLE</span> materias (
+  id         <span class="tp">INT UNSIGNED</span> <span class="kw">AUTO_INCREMENT PRIMARY KEY</span>,
+  nombre     <span class="tp">VARCHAR(100)</span> <span class="kw">NOT NULL</span>,
+  codigo     <span class="tp">CHAR(6)</span> <span class="kw">UNIQUE</span>,
+  created_at <span class="tp">TIMESTAMP</span> <span class="kw">DEFAULT</span> CURRENT_TIMESTAMP
+);
+
+<span class="kw">CREATE TABLE</span> notas (
+  id          <span class="tp">INT UNSIGNED</span> <span class="kw">AUTO_INCREMENT PRIMARY KEY</span>,
+  alumno_id   <span class="tp">INT UNSIGNED</span> <span class="kw">NOT NULL</span>,
+  materia_id  <span class="tp">INT UNSIGNED</span> <span class="kw">NOT NULL</span>,
+  nota        <span class="tp">DECIMAL(4,2)</span> <span class="kw">NOT NULL</span>,
+  fecha_examen <span class="tp">DATE</span>,
+  created_at  <span class="tp">TIMESTAMP</span> <span class="kw">DEFAULT</span> CURRENT_TIMESTAMP,
+  <span class="kw">FOREIGN KEY</span> (alumno_id)  <span class="kw">REFERENCES</span> alumnos(id)  <span class="kw">ON DELETE CASCADE</span>,
+  <span class="kw">FOREIGN KEY</span> (materia_id) <span class="kw">REFERENCES</span> materias(id) <span class="kw">ON DELETE RESTRICT</span>
+);
+
+<span class="cm">-- Datos de prueba</span>
+<span class="kw">INSERT INTO</span> alumnos (nombre, email, fecha_nacimiento) <span class="kw">VALUES</span>
+  (<span class="str">'Ana García'</span>,   <span class="str">'ana@i26.edu'</span>,    <span class="str">'2005-03-15'</span>),
+  (<span class="str">'Carlos Ruiz'</span>,  <span class="str">'carlos@i26.edu'</span>, <span class="str">'2004-07-22'</span>),
+  (<span class="str">'Sofía Méndez'</span>, <span class="str">'sofia@i26.edu'</span>,  <span class="str">'2005-11-08'</span>);
+
+<span class="kw">INSERT INTO</span> materias (nombre, codigo) <span class="kw">VALUES</span>
+  (<span class="str">'Base de Datos'</span>, <span class="str">'BD001'</span>),
+  (<span class="str">'Programación'</span>,  <span class="str">'PR001'</span>),
+  (<span class="str">'Redes'</span>,         <span class="str">'RD001'</span>);
+
+<span class="kw">INSERT INTO</span> notas (alumno_id, materia_id, nota, fecha_examen) <span class="kw">VALUES</span>
+  (<span class="nm">1</span>, <span class="nm">1</span>, <span class="nm">8.50</span>, <span class="str">'2025-04-15'</span>),
+  (<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">9.20</span>, <span class="str">'2025-04-20'</span>),
+  (<span class="nm">2</span>, <span class="nm">1</span>, <span class="nm">7.00</span>, <span class="str">'2025-04-15'</span>),
+  (<span class="nm">3</span>, <span class="nm">1</span>, <span class="nm">9.80</span>, <span class="str">'2025-04-15'</span>),
+  (<span class="nm">3</span>, <span class="nm">2</span>, <span class="nm">8.10</span>, <span class="str">'2025-04-20'</span>);</pre>
+    </div>
+  </div>
+
+  <div class="act">
+    <div class="act-head"><span class="act-badge">Ejercicio 2</span><h3>Consultas para responder</h3></div>
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:1rem">Escribir la consulta SQL que responde cada pregunta y anotar el resultado:</p>
+
+    <div class="fill"><div class="fl">Pregunta 1 — ¿Cuántos alumnos hay en la tabla?</div>
+    <textarea class="fi" placeholder="SELECT ..."></textarea></div>
+
+    <div class="fill"><div class="fl">Pregunta 2 — Mostrar nombre y nota de todos los exámenes de Ana García</div>
+    <textarea class="fi" placeholder="SELECT a.nombre, m.nombre AS materia, n.nota FROM ..."></textarea></div>
+
+    <div class="fill"><div class="fl">Pregunta 3 — ¿Cuál es el promedio de notas de cada alumno? (usar AVG y GROUP BY)</div>
+    <textarea class="fi" placeholder="SELECT ..."></textarea></div>
+
+    <div class="fill"><div class="fl">Pregunta 4 — Actualizar la nota del alumno 1 en la materia 1 a 9.00</div>
+    <textarea class="fi" placeholder="UPDATE notas SET ..."></textarea></div>
+
+    <div class="fill"><div class="fl">Pregunta 5 — Mostrar alumnos que nacieron después del 01/01/2005</div>
+    <textarea class="fi" placeholder="SELECT ..."></textarea></div>
+  </div>
+
+  <div class="act">
+    <div class="act-head"><span class="act-badge">Ejercicio 3</span><h3>Diseñar su propia base de datos</h3></div>
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:1rem">Cada equipo diseña la base de datos para su app de 2° año:</p>
+
+    <div class="fill"><div class="fl">Nombre de la base de datos</div>
+    <input class="fi" type="text" placeholder="ej: mi_app_movil"></div>
+
+    <div class="fill"><div class="fl">Tabla 1: nombre y columnas con tipos de datos</div>
+    <textarea class="fi" placeholder="ej: usuarios (id INT PK, nombre VARCHAR(100), email VARCHAR(150) UNIQUE, created_at TIMESTAMP)"></textarea></div>
+
+    <div class="fill"><div class="fl">Tabla 2: nombre, columnas y la FK que la relaciona con Tabla 1</div>
+    <textarea class="fi" placeholder="ej: publicaciones (id INT PK, usuario_id INT FK→usuarios.id, titulo VARCHAR(200), contenido TEXT, created_at TIMESTAMP)"></textarea></div>
+
+    <div class="fill"><div class="fl">Relación entre ambas tablas (1:1, 1:N o N:M) y por qué</div>
+    <input class="fi" type="text" placeholder="ej: 1:N porque un usuario puede tener muchas publicaciones"></div>
+
+    <div class="fill"><div class="fl">¿Qué ON DELETE usarían para la FK? ¿CASCADE o RESTRICT? ¿Por qué?</div>
+    <textarea class="fi" placeholder="ej: CASCADE, porque si se borra el usuario queremos borrar también sus publicaciones. No tiene sentido dejarlas huérfanas."></textarea></div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 07 RECURSOS ─── -->
+<section id="recursos">
+<div class="container">
+  <div class="sn">07 · Recursos</div>
+  <h2>Dónde practicar y <span>seguir aprendiendo</span></h2>
+
+  <h3>🌐 Practicar SQL online (sin instalar nada)</h3>
+  <div class="ref-grid">
+    <a class="ref-card" href="https://sqlfiddle.com/" target="_blank" rel="noopener">
+      <div class="ref-cat">Online · MySQL</div>
+      <div class="ref-title">SQLFiddle</div>
+      <div class="ref-url">sqlfiddle.com</div>
+      <div class="ref-desc">Crear tablas y probar queries en el navegador. Ideal para practicar sin XAMPP.</div>
+    </a>
+    <a class="ref-card" href="https://www.db-fiddle.com/" target="_blank" rel="noopener">
+      <div class="ref-cat">Online · MySQL 8</div>
+      <div class="ref-title">DB Fiddle</div>
+      <div class="ref-url">db-fiddle.com</div>
+      <div class="ref-desc">Más moderno que SQLFiddle. Soporta MySQL 8, PostgreSQL y SQLite.</div>
+    </a>
+    <a class="ref-card" href="https://onecompiler.com/mysql" target="_blank" rel="noopener">
+      <div class="ref-cat">Online · Gratis</div>
+      <div class="ref-title">OneCompiler MySQL</div>
+      <div class="ref-url">onecompiler.com/mysql</div>
+      <div class="ref-desc">Rápido y sin registro. Perfecto para probar queries sueltos.</div>
+    </a>
+    <a class="ref-card" href="https://www.w3schools.com/mysql/trymysql.asp?filename=trysql_select_all" target="_blank" rel="noopener">
+      <div class="ref-cat">Online · Tutorial</div>
+      <div class="ref-title">W3Schools MySQL Try-it</div>
+      <div class="ref-url">w3schools.com</div>
+      <div class="ref-desc">Incluye base de datos de ejemplo (tienda) para practicar SELECT y JOIN.</div>
+    </a>
+    <a class="ref-card" href="https://www.sqlteaching.com/" target="_blank" rel="noopener">
+      <div class="ref-cat">Ejercicios guiados</div>
+      <div class="ref-title">SQL Teaching</div>
+      <div class="ref-url">sqlteaching.com</div>
+      <div class="ref-desc">Ejercicios interactivos progresivos: de SELECT básico hasta JOIN.</div>
+    </a>
+    <a class="ref-card" href="https://mystery.knightlab.com/" target="_blank" rel="noopener">
+      <div class="ref-cat">Juego · SQL</div>
+      <div class="ref-title">SQL Murder Mystery 🕵️</div>
+      <div class="ref-url">mystery.knightlab.com</div>
+      <div class="ref-desc">Resolver un caso de asesinato usando SQL. JOIN, WHERE, subconsultas.</div>
+    </a>
+  </div>
+
+  <h3>📖 Documentación oficial</h3>
+  <div class="ref-grid">
+    <a class="ref-card" href="https://dev.mysql.com/doc/refman/8.0/en/" target="_blank" rel="noopener">
+      <div class="ref-cat">Oficial</div>
+      <div class="ref-title">MySQL 8.0 Reference</div>
+      <div class="ref-url">dev.mysql.com</div>
+      <div class="ref-desc">Manual completo. Para tipos de datos: sección 11.</div>
+    </a>
+    <a class="ref-card" href="https://dev.mysql.com/doc/refman/8.0/en/date-and-time-types.html" target="_blank" rel="noopener">
+      <div class="ref-cat">Tipos de fecha</div>
+      <div class="ref-title">Date and Time Types</div>
+      <div class="ref-url">dev.mysql.com</div>
+      <div class="ref-desc">TIMESTAMP, DATE, DATETIME, TIME explicados con ejemplos.</div>
+    </a>
+    <a class="ref-card" href="https://dev.mysql.com/doc/refman/8.0/en/ansi-diff-foreign-keys.html" target="_blank" rel="noopener">
+      <div class="ref-cat">Foreign Keys</div>
+      <div class="ref-title">Foreign Key Constraints</div>
+      <div class="ref-url">dev.mysql.com</div>
+      <div class="ref-desc">Documentación oficial de FK, ON DELETE, ON UPDATE.</div>
+    </a>
+    <a class="ref-card" href="https://www.apachefriends.org/es/faq_windows.html" target="_blank" rel="noopener">
+      <div class="ref-cat">XAMPP</div>
+      <div class="ref-title">XAMPP FAQ Windows</div>
+      <div class="ref-url">apachefriends.org</div>
+      <div class="ref-desc">Solución a los problemas más comunes al instalar XAMPP.</div>
+    </a>
+  </div>
+
+  <h3>🎥 Videos recomendados (YouTube)</h3>
+  <div class="video-grid">
+    <a class="video-card" href="https://www.youtube.com/results?search_query=mysql+xampp+crud+español+principiantes" target="_blank" rel="noopener">
+      <div class="video-thumb">🗄️<span class="yt-badge">YouTube</span></div>
+      <div class="video-info">
+        <div class="video-title">MySQL con XAMPP — CRUD completo en español</div>
+        <div class="video-ch">Buscar: "mysql xampp crud español"</div>
+      </div>
+    </a>
+    <a class="video-card" href="https://www.youtube.com/results?search_query=foreign+key+mysql+español+claves+foraneas" target="_blank" rel="noopener">
+      <div class="video-thumb">🔗<span class="yt-badge">YouTube</span></div>
+      <div class="video-info">
+        <div class="video-title">Claves foráneas MySQL — FK explicadas desde cero</div>
+        <div class="video-ch">Buscar: "foreign key mysql español"</div>
+      </div>
+    </a>
+    <a class="video-card" href="https://www.youtube.com/results?search_query=join+mysql+español+tutorial+inner+left" target="_blank" rel="noopener">
+      <div class="video-thumb">🔀<span class="yt-badge">YouTube</span></div>
+      <div class="video-info">
+        <div class="video-title">JOIN en MySQL — INNER, LEFT, RIGHT explicados</div>
+        <div class="video-ch">Buscar: "join mysql español inner left"</div>
+      </div>
+    </a>
+    <a class="video-card" href="https://www.youtube.com/results?search_query=timestamp+datetime+mysql+diferencia" target="_blank" rel="noopener">
+      <div class="video-thumb">📅<span class="yt-badge">YouTube</span></div>
+      <div class="video-info">
+        <div class="video-title">TIMESTAMP vs DATETIME en MySQL — ¿cuál usar?</div>
+        <div class="video-ch">Buscar: "timestamp datetime mysql diferencia"</div>
+      </div>
+    </a>
+  </div>
+
+  <h3>🛠️ Herramientas útiles</h3>
+  <div class="ref-grid">
+    <a class="ref-card" href="https://dbdiagram.io/" target="_blank" rel="noopener">
+      <div class="ref-cat">Diagramas</div>
+      <div class="ref-title">dbdiagram.io</div>
+      <div class="ref-url">dbdiagram.io</div>
+      <div class="ref-desc">Dibujar diagramas ER gratis. Exporta a SQL, PNG, PDF.</div>
+    </a>
+    <a class="ref-card" href="https://drawsql.app/" target="_blank" rel="noopener">
+      <div class="ref-cat">Diagramas</div>
+      <div class="ref-title">DrawSQL</div>
+      <div class="ref-url">drawsql.app</div>
+      <div class="ref-desc">Crear diagramas de base de datos visualmente con drag-and-drop.</div>
+    </a>
+    <a class="ref-card" href="https://www.tableplus.com/" target="_blank" rel="noopener">
+      <div class="ref-cat">Cliente MySQL</div>
+      <div class="ref-title">TablePlus</div>
+      <div class="ref-url">tableplus.com</div>
+      <div class="ref-desc">Alternativa visual a phpMyAdmin. Muy intuitivo. Versión gratuita disponible.</div>
+    </a>
+  </div>
+
+  <div class="callout ct" style="margin-top:2rem">
+    <div class="ci">🏆</div>
+    <div class="cb-body">
+      <strong>Tip para consolidar: practicá 15 minutos por día en SQLFiddle</strong>
+      <p>La mejor forma de fijar SQL es escribirlo. Con <strong>sqlfiddle.com</strong> o <strong>onecompiler.com/mysql</strong> pueden practicar los ejercicios de esta clase sin necesitar XAMPP. Abran el browser y practiquen los INSERTs, los JOINs y las FK hasta que salgan solos.</p>
+    </div>
+  </div>
+
+  <!-- ─── SECCIÓN ESPECIAL: EL "CLICK" ─── -->
+  <div class="act" style="border: 2px solid var(--accent); background: rgba(249, 115, 22, 0.05);">
+    <div class="act-head">
+      <span class="act-badge" style="background: var(--purple);">CLASE ESPECIAL</span>
+      <h3 style="color: var(--accent);">CRUD Avanzado: El "Click" de las Relaciones</h3>
+    </div>
+    <p>Sabemos que les costó entender cómo se conectan las tablas en un sistema real. Aquí está el resumen definitivo para que no queden dudas:</p>
+    
+    <h4>1. Actualización de Fechas (Lo que siempre preguntan)</h4>
+    <p>¿Cómo actualizo una fecha de examen o de entrega sin romper nada?</p>
+    <div class="cb yellow">
+      <span class="lang">sql · update de fecha</span>
+      <pre><span class="cm">-- Cambiar la fecha de un examen específico</span>
+<span class="kw">UPDATE</span> notas 
+<span class="kw">SET</span> fecha_examen = <span class="str">'2025-05-10'</span>, nota = <span class="nm">9.50</span>
+<span class="kw">WHERE</span> alumno_id = <span class="nm">1</span> <span class="kw">AND</span> materia_id = <span class="nm">2</span>;</pre>
+    </div>
+
+    <h4>2. El Secreto de las FK (Foreign Keys)</h4>
+    <p>La FK no es solo un número; es un <strong>vínculo de integridad</strong>. Si intentás borrar un alumno que tiene notas y la FK está en <code>RESTRICT</code>, MySQL te va a frenar. Eso es <strong>seguridad</strong>.</p>
+    
+    <div class="callout ci-box" style="border-color: var(--purple); background: rgba(167, 139, 250, 0.1);">
+      <div class="ci">🧠</div>
+      <div class="cb-body">
+        <strong>¿Cuándo hace "click"?</strong>
+        <p>Hace click cuando entendés que <strong>la base de datos es la verdad del sistema</strong>. PHP y React Native solo muestran esa verdad. Si la base de datos está bien relacionada con sus FKs y tipos de datos correctos, el resto del código fluye solo.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<footer>
+  <div>
+    <p><strong>Tecnicatura Superior en Software · I26 · 2° Año</strong></p>
+    <p>MySQL con XAMPP · Tipos de datos · CRUD · Claves Foráneas · Relaciones</p>
+  </div>
+  <button class="btn" onclick="window.print()">🖨️ Imprimir / PDF</button>
+</footer>
+
+</body>
+</html>

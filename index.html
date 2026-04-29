@@ -1,5 +1,3 @@
-Modelo de consulta para los alumnos
-Usen este modelo como guía para investigar, organizar lo que aprendieron y prepararse para la siguiente clase.
 <!DOCTYPE html>
 <html lang="es">
 
@@ -1270,7 +1268,7 @@ Usen este modelo como guía para investigar, organizar lo que aprendieron y prep
         <h1>Clases <span>Software</span></h1>
         <p class="sub">Recursos organizados por año y materia · Instituto I26.</p>
         <div style="font-family: 'Space Mono', monospace; font-size: 0.75rem; color: #10b981; margin-top: 1.5rem; border: 1px solid rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1); border-radius: 4px; padding: 0.4rem 0.8rem; display: inline-block;">
-            Última actualización: 23 de Abril de 2026 — <strong>PHP & MySQL (Información completa)</strong>
+            Última actualización: 29 de Abril de 2026 — <strong>MySQL Avanzado (FK & CRUD Relacional)</strong>
         </div>
     </header>
 
@@ -1307,6 +1305,20 @@ Usen este modelo como guía para investigar, organizar lo que aprendieron y prep
                         <h3>Backend con PHP & MySQL</h3>
                         <p>El punto de partida. Variables, tipos de datos, operadores y decisiones en PHP. Conexi&oacute;n a MySQL con XAMPP, CRUD completo con formularios (Crear &middot; Leer &middot; Actualizar &middot; Eliminar), estructura del lenguaje SQL, Primary Keys, Foreign Keys e integridad referencial. Ac&aacute; nace la l&oacute;gica de negocio de todo sistema.</p>
                         <a href="2do/clase-php-mysql-I26.html" class="path-link yr2a">Ir a la clase →</a>
+                    </div>
+                </div>
+
+                <!-- CLASE ESPECIAL: CRUD FK -->
+                <div class="path-item">
+                    <div class="path-dot yr2a" style="border-color: var(--accent-p); background: rgba(124, 58, 237, 0.05);">🔗</div>
+                    <div class="path-body">
+                        <div class="path-meta">
+                            <span class="path-badge yr2">2° Año</span>
+                            CLASE ESPECIAL
+                        </div>
+                        <h3 style="color: var(--accent-p);">MySQL Avanzado: FK & CRUD Relacional</h3>
+                        <p>Lo que m&aacute;s cost&oacute; entender: c&oacute;mo relacionar tablas de verdad. Claves for&aacute;neas (FK), integridad referencial profunda, UPDATE con fechas autom&aacute;ticas y el CRUD de segundo nivel donde los datos est&aacute;n vivos y conectados.</p>
+                        <a href="2do/clase_2do_MySQL_CRUD_FK_I26.html" class="path-link yr2a" style="color: var(--accent-p); border-color: rgba(124, 58, 237, 0.3);">Ir a la clase avanzada →</a>
                     </div>
                 </div>
 
@@ -1379,6 +1391,18 @@ Usen este modelo como guía para investigar, organizar lo que aprendieron y prep
                         <span class="tag">SQL</span>
                         <span class="tag">CRUD</span>
                          <span class="tag">BACKEND</span>
+                    </div>
+                </a>
+
+                <!-- CLASE ESPECIAL: CRUD FK -->
+                <a href="2do/clase_2do_MySQL_CRUD_FK_I26.html" class="card p">
+                    <div class="card-num">CLASE 01.5</div>
+                    <h2 style="color: var(--accent-p);">MySQL Avanzado (FK)</h2>
+                    <p>Relaciones entre tablas, claves foráneas, integridad referencial y actualización de fechas automáticas. El "click" que faltaba.</p>
+                    <div class="tag-row">
+                        <span class="tag">RELACIONES</span>
+                        <span class="tag">FOREIGN KEYS</span>
+                        <span class="tag">AVANZADO</span>
                     </div>
                 </a>
 
@@ -1492,6 +1516,15 @@ Usen este modelo como guía para investigar, organizar lo que aprendieron y prep
                     color: 'var(--accent-a)',
                 },
                 {
+                    id: 'mysql-fk',
+                    anio: 2,
+                    emoji: '🔗',
+                    titulo: 'MySQL Avanzado (FK)',
+                    meta: '2° Año · Clase Especial',
+                    href: '2do/clase_2do_MySQL_CRUD_FK_I26.html',
+                    color: 'var(--accent-p)',
+                },
+                {
                     id: 'react-native',
                     anio: 2,
                     emoji: '📱',
@@ -1601,266 +1634,170 @@ Usen este modelo como guía para investigar, organizar lo que aprendieron y prep
                     this.renderLastVisit(),
                 ].join('');
 
-                this.bindEvents();
-                this.animateBar();
-            },
-
-            getStats() {
-                const total = DB.cursos.length;
-                const done = DB.cursos.filter(c => Storage.getStatus(c.id).done).length;
-                return { total, done, pct: Math.round((done / total) * 100) };
+                this.attachEvents();
             },
 
             renderProgress() {
-                const { total, done, pct } = this.getStats();
+                const status = DB.cursos.map(c => Storage.getStatus(c.id).done);
+                const doneCount = status.filter(Boolean).length;
+                const pct = Math.round((doneCount / DB.cursos.length) * 100);
+
                 return `
-            <div class="np-section">
-                <div class="np-section-title">📊 Tu progreso</div>
-                <div class="np-progress-wrap">
-                    <div class="np-progress-label">
-                        <span>${done} de ${total} clases vistas</span>
-                        <span class="np-progress-pct" id="npPct">${pct}%</span>
+                    <div class="np-section">
+                        <div class="np-section-title">Tu Nivel de Dominio</div>
+                        <div class="np-progress-wrap">
+                            <div class="np-progress-label">
+                                <span>Progreso en la Tecnicatura</span>
+                                <span class="np-progress-pct">${pct}%</span>
+                            </div>
+                            <div class="np-bar-track">
+                                <div class="np-bar-fill" style="width: ${pct}%"></div>
+                            </div>
+                            <div class="np-progress-sub">Has completado ${doneCount} de ${DB.cursos.length} módulos clave.</div>
+                        </div>
                     </div>
-                    <div class="np-bar-track"><div class="np-bar-fill" id="npBar" style="width:0%"></div></div>
-                    <div class="np-progress-sub">${pct === 100 ? '✅ ¡Módulo completo!' : pct > 0 ? '🔥 Seguí así' : '⚡ Empezá por la primera clase'}</div>
-                </div>
-            </div>`;
+                `;
             },
 
             renderClassList() {
                 const items = DB.cursos.map(c => {
-                    const st = Storage.getStatus(c.id);
-                    const doneClass = st.done ? 'done' : '';
-                    const check = st.done ? '✓' : '';
-                    const lastStr = st.lastVisit
-                        ? `Último acceso: ${this.relTime(st.lastVisit)}`
-                        : 'Sin visitas registradas';
+                    const s = Storage.getStatus(c.id);
                     return `
-                <div class="np-class-item ${doneClass}" data-id="${c.id}" data-href="${c.href}" role="button" tabindex="0">
-                    <div class="np-ci-icon">${c.emoji}</div>
-                    <div class="np-ci-body">
-                        <div class="np-ci-name">${c.titulo}</div>
-                        <div class="np-ci-meta">${c.meta} · ${lastStr}</div>
-                    </div>
-                    <div class="np-ci-check" data-check="${c.id}">${check}</div>
-                </div>`;
+                        <a href="${c.href}" class="np-class-item ${s.done ? 'done' : ''}" data-id="${c.id}">
+                            <div class="np-ci-icon">${c.emoji}</div>
+                            <div class="np-ci-body">
+                                <div class="np-ci-name">${c.titulo}</div>
+                                <div class="np-ci-meta">${c.meta}</div>
+                            </div>
+                            <div class="np-ci-check">✓</div>
+                        </a>
+                    `;
                 }).join('');
 
                 return `
-            <div class="np-section">
-                <div class="np-section-title">📚 Clases</div>
-                <div class="np-class-list">${items}</div>
-                <p style="font-family:'Space Mono',monospace;font-size:.58rem;color:var(--muted);margin-top:.6rem">Click → abre la clase · Check → marcar completada</p>
-            </div>`;
+                    <div class="np-section">
+                        <div class="np-section-title">Clases & Estado</div>
+                        <div class="np-class-list">${items}</div>
+                    </div>
+                `;
             },
 
             renderGlosario() {
-                // Show 4 random terms each time panel opens
-                const shuffled = [...DB.glosario].sort(() => Math.random() - .5).slice(0, 4);
-                const items = shuffled.map((g, i) => `
-                <div class="np-gloss-item" data-gi="${i}" data-def="${g.def}">
-                    <div class="np-gloss-cat">${g.cat}</div>
-                    <div class="np-gloss-term">${g.term}</div>
-                </div>
-            `).join('');
+                const items = DB.glosario.map((g, i) => `
+                    <div class="np-gloss-item" data-index="${i}">
+                        <div class="np-gloss-cat">${g.cat}</div>
+                        <div class="np-gloss-term">${g.term}</div>
+                    </div>
+                `).join('');
+
                 return `
-            <div class="np-section">
-                <div class="np-section-title">⚡ Glosario rápido</div>
-                <div class="np-glossary-grid">${items}</div>
-            </div>`;
+                    <div class="np-section">
+                        <div class="np-section-title">Glosario de Poder</div>
+                        <div class="np-glossary-grid">${items}</div>
+                    </div>
+                `;
             },
 
             renderTip() {
                 const tip = DB.tips[this.tipIndex];
                 return `
-            <div class="np-section">
-                <div class="np-section-title">🧠 Hack cognitivo</div>
-                <div class="np-tip-card">
-                    <div class="np-tip-text" id="npTipText">${tip}</div>
-                    <div class="np-tip-nav">
-                        <button class="np-tip-btn" id="npTipPrev">← Ant</button>
-                        <button class="np-tip-btn" id="npTipNext">Sig →</button>
+                    <div class="np-section">
+                        <div class="np-section-title">Brain Hack</div>
+                        <div class="np-tip-card">
+                            <h5>Cápsula de Enfoque</h5>
+                            <div class="np-tip-text" id="tipText">${tip}</div>
+                            <div class="np-tip-nav">
+                                <button class="np-tip-btn" id="nextTip">Ver otro →</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>`;
+                `;
             },
 
             renderLastVisit() {
-                const lv = Storage.lastGlobalVisit();
-                const txt = lv ? `Última sesión: ${this.relTime(lv)}` : 'Primera vez aquí — ¡bienvenido!';
-                return `<div class="np-last">${txt}</div>`;
-            },
-
-            relTime(iso) {
-                const diff = Date.now() - new Date(iso).getTime();
-                const m = Math.floor(diff / 60000);
-                const h = Math.floor(diff / 3600000);
-                const d = Math.floor(diff / 86400000);
-                if (m < 1) return 'ahora mismo';
-                if (m < 60) return `hace ${m} min`;
-                if (h < 24) return `hace ${h} h`;
-                return `hace ${d} día${d > 1 ? 's' : ''}`;
-            },
-
-            animateBar() {
-                const { pct } = this.getStats();
-                requestAnimationFrame(() => {
-                    const bar = document.getElementById('npBar');
-                    if (bar) bar.style.width = pct + '%';
+                const last = Storage.lastGlobalVisit();
+                if (!last) return '';
+                const dateStr = new Date(last).toLocaleString('es-AR', {
+                    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
                 });
+                return `<div class="np-last">Última sinapsis: ${dateStr}</div>`;
             },
 
-            refreshProgress() {
-                const { total, done, pct } = this.getStats();
-                const pctEl = document.getElementById('npPct');
-                const barEl = document.getElementById('npBar');
-                if (pctEl) pctEl.textContent = pct + '%';
-                if (barEl) barEl.style.width = pct + '%';
-            },
-
-            bindEvents() {
-                // Class items — click to navigate, check to toggle done
-                document.querySelectorAll('.np-class-item').forEach(item => {
-                    item.addEventListener('click', (e) => {
+            attachEvents() {
+                // Toggle done status
+                document.querySelectorAll('.np-ci-check').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const item = btn.closest('.np-class-item');
                         const id = item.dataset.id;
-                        const href = item.dataset.href;
-                        const checkEl = item.querySelector('.np-ci-check');
-                        // If clicking the check circle, just toggle; otherwise navigate
-                        if (e.target === checkEl || checkEl.contains(e.target)) {
-                            const nowDone = Storage.toggleDone(id);
-                            item.classList.toggle('done', nowDone);
-                            checkEl.textContent = nowDone ? '✓' : '';
-                            this.refreshProgress();
-                            this.refreshPortalBadges();
-                        } else {
-                            Storage.recordVisit(id);
-                            window.location.href = href;
-                        }
-                    });
-                    item.addEventListener('keydown', e => {
-                        if (e.key === 'Enter') item.click();
+                        Storage.toggleDone(id);
+                        this.build();
                     });
                 });
 
-                // Glossary
-                document.querySelectorAll('.np-gloss-item').forEach(el => {
-                    el.addEventListener('click', () => {
-                        const def = el.dataset.def;
-                        if (el.classList.contains('revealed')) {
-                            // Reset
-                            el.classList.remove('revealed');
-                            el.querySelector('.np-gloss-term').style.display = '';
-                            const defEl = el.querySelector('.np-gloss-def');
-                            if (defEl) defEl.remove();
-                        } else {
-                            el.classList.add('revealed');
-                            el.querySelector('.np-gloss-term').style.display = 'none';
-                            const d = document.createElement('div');
-                            d.className = 'np-gloss-def';
-                            d.textContent = def;
-                            el.appendChild(d);
-                        }
+                // Glossary reveal
+                document.querySelectorAll('.np-gloss-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const idx = item.dataset.index;
+                        const data = DB.glosario[idx];
+                        item.classList.add('revealed');
+                        item.innerHTML = `<div class="np-gloss-def">${data.def}</div>`;
                     });
                 });
 
-                // Tips navigation
-                const tipText = document.getElementById('npTipText');
-                document.getElementById('npTipNext')?.addEventListener('click', () => {
+                // Next tip
+                document.getElementById('nextTip')?.addEventListener('click', () => {
                     this.tipIndex = (this.tipIndex + 1) % DB.tips.length;
-                    tipText.style.opacity = '0';
-                    setTimeout(() => {
-                        tipText.textContent = DB.tips[this.tipIndex];
-                        tipText.style.opacity = '1';
-                    }, 200);
+                    document.getElementById('tipText').textContent = DB.tips[this.tipIndex];
                 });
-                document.getElementById('npTipPrev')?.addEventListener('click', () => {
-                    this.tipIndex = (this.tipIndex - 1 + DB.tips.length) % DB.tips.length;
-                    tipText.style.opacity = '0';
-                    setTimeout(() => {
-                        tipText.textContent = DB.tips[this.tipIndex];
-                        tipText.style.opacity = '1';
-                    }, 200);
-                });
-            },
-
-            /* Inject status badges onto the portal cards */
-            refreshPortalBadges() {
-                DB.cursos.forEach(c => {
-                    const st = Storage.getStatus(c.id);
-                    const badge = document.querySelector(`.class-progress-badge[data-badge="${c.id}"]`);
-                    if (!badge) return;
-                    if (st.done) {
-                        badge.className = 'class-progress-badge done';
-                        badge.textContent = '✓ Completada';
-                    } else if (st.lastVisit) {
-                        badge.className = 'class-progress-badge going';
-                        badge.textContent = '▶ En progreso';
-                    } else {
-                        badge.className = 'class-progress-badge new';
-                        badge.textContent = '● Nueva';
-                    }
-                });
-            },
+            }
         };
 
         /* ═══════════════════════════════════════════════════════════
-           INIT — Panel toggle + back-to-top + portal badges
+           UI CONTROLLER — Maneja la apertura/cierre del panel y el scroll
            ═══════════════════════════════════════════════════════════ */
-        const trigger = document.getElementById('neuroTrigger');
-        const panel = document.getElementById('neuroPanel');
-        const closeBtn = document.getElementById('neuroClose');
+        const neuroTrigger = document.getElementById('neuroTrigger');
+        const neuroPanel = document.getElementById('neuroPanel');
+        const neuroClose = document.getElementById('neuroClose');
         const overlay = document.getElementById('overlay');
-        const btt = document.getElementById('backToTop');
+        const backToTop = document.getElementById('backToTop');
 
-        const openPanel = () => {
-            Panel.build();
-            panel.classList.add('active');
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        };
-        const closePanel = () => {
-            panel.classList.remove('active');
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
+        const togglePanel = () => {
+            neuroPanel.classList.toggle('active');
+            overlay.classList.toggle('active');
+            if (neuroPanel.classList.contains('active')) Panel.build();
         };
 
-        trigger.addEventListener('click', () =>
-            panel.classList.contains('active') ? closePanel() : openPanel()
-        );
-        closeBtn.addEventListener('click', closePanel);
-        overlay.addEventListener('click', closePanel);
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+        neuroTrigger.addEventListener('click', togglePanel);
+        neuroClose.addEventListener('click', togglePanel);
+        overlay.addEventListener('click', togglePanel);
 
-        // Back to top
-        window.addEventListener('scroll', () =>
-            btt.classList.toggle('visible', window.scrollY > 300)
-        );
-        btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) backToTop.classList.add('visible');
+            else backToTop.classList.remove('visible');
+        });
 
-        // Inject status badges on the portal cards on page load
-        // (badges are added via data-badge attributes injected into existing card HTML)
-        (function injectBadges() {
-            DB.cursos.forEach(c => {
-                const link = document.querySelector(`.card[href="${c.href}"]`);
-                if (!link) return;
-                // Wrap with relative div if not already
-                if (!link.querySelector(`.class-progress-badge[data-badge="${c.id}"]`)) {
-                    const badge = document.createElement('span');
-                    badge.className = 'class-progress-badge new';
-                    badge.dataset.badge = c.id;
-                    badge.textContent = '● Nueva';
-                    link.style.position = 'relative';
-                    link.appendChild(badge);
-                }
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Al cargar, registrar visita si estamos en una clase (simulado aquí)
+        window.addEventListener('DOMContentLoaded', () => {
+            // Animación de entrada para las cards
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((c, i) => {
+                c.style.opacity = '0';
+                c.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    c.style.transition = 'all 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+                    c.style.opacity = '1';
+                    c.style.transform = 'translateY(0)';
+                }, i * 100);
             });
-            Panel.refreshPortalBadges();
-        })();
+        });
 
-        // Record visit to this portal page itself
-        Storage.recordVisit('portal');
     </script>
 </body>
 
 </html>
-
-

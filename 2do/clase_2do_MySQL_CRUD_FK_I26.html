@@ -268,7 +268,12 @@
 <body>
 
 <nav>
-  <span class="nav-logo">2° Año · I26 · MySQL</span>
+  <div style="display:flex; align-items:center; gap:1.5rem;">
+    <a href="../index.html" class="nav-logo" style="color:var(--muted); text-decoration:none; display:flex; align-items:center; gap:0.5rem; transition:color 0.2s;">
+      <span style="font-size:1.2rem;">←</span> <span>Portal</span>
+    </a>
+    <span class="nav-logo">2° Año · I26 · MySQL</span>
+  </div>
   <ul class="nav-links">
     <li><a href="#tipos">Tipos</a></li>
     <li><a href="#timestamps">Timestamp</a></li>
@@ -1220,14 +1225,48 @@
     </div>
   </div>
 </div>
-</section>
+  <!-- ─── 08 EL GRAN RETO ─── -->
+  <section id="desafio" style="background: linear-gradient(180deg, var(--bg) 0%, rgba(124, 58, 237, 0.05) 100%);">
+    <div class="container">
+      <div class="sn">08 · El Próximo Paso</div>
+      <h2>🏁 Hacia el <span>Proyecto Final</span></h2>
+      <p>Ya dominás las piezas sueltas (CRUD, FK, Relaciones). El verdadero poder aparece cuando integrás esto en una aplicación real. Tu camino a seguir es:</p>
+
+      <div class="ref-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+        <div class="act" style="margin:0; border-top: 3px solid var(--purple);">
+          <h4 style="color:var(--purple); margin-top:0;">1. El Mapa de Datos</h4>
+          <p style="font-size:0.85rem;">Diseñá tu propio DER (Diagrama Entidad Relación). No programes ni una línea hasta que tus tablas y FKs tengan sentido en papel o en <code>dbdiagram.io</code>.</p>
+        </div>
+        <div class="act" style="margin:0; border-top: 3px solid var(--accent);">
+          <h4 style="color:var(--accent); margin-top:0;">2. El Motor MySQL</h4>
+          <p style="font-size:0.85rem;">Creá la base de datos en XAMPP. Insertá datos de prueba reales. Hacé los JOINs a mano en la consola SQL antes de pasarlos a tu código PHP o Node.js.</p>
+        </div>
+        <div class="act" style="margin:0; border-top: 3px solid var(--blue);">
+          <h4 style="color:var(--blue); margin-top:0;">3. La Interfaz Viva</h4>
+          <p style="font-size:0.85rem;">Conectá tu Front-end (React Native o Web) con esta base de datos. Recordá: el usuario nunca ve el SQL, solo ve la experiencia que vos construiste sobre él.</p>
+        </div>
+      </div>
+
+      <div class="callout ci-box" style="margin-top:3rem; border-color: var(--green); background: rgba(74, 222, 128, 0.05);">
+        <div class="ci">🚀</div>
+        <div class="cb-body">
+          <strong>Reto Semanal:</strong>
+          <p>Tomá tu idea de proyecto y definí las 3 tablas principales. Asegurate de que al menos dos estén relacionadas con una <code>FOREIGN KEY</code>. Si lográs que un <code>DELETE CASCADE</code> funcione correctamente, ya estás en el siguiente nivel.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
 
 <footer>
-  <div>
+  <div style="display:flex; flex-direction:column; gap:0.3rem;">
     <p><strong>Tecnicatura Superior en Software · I26 · 2° Año</strong></p>
-    <p>MySQL con XAMPP · Tipos de datos · CRUD · Claves Foráneas · Relaciones</p>
+    <p style="font-size:0.7rem; opacity:0.7;">MySQL con XAMPP · Tipos de datos · CRUD · Claves Foráneas · Relaciones</p>
   </div>
-  <button class="btn" onclick="window.print()">🖨️ Imprimir / PDF</button>
+  <div style="display:flex; gap:1rem;">
+    <a href="../index.html" class="btn" style="background:transparent; border:1px solid var(--border); color:var(--muted);">← Volver al Portal</a>
+    <button class="btn" onclick="window.print()">🖨️ Imprimir / PDF</button>
+  </div>
 </footer>
 
 </body>

@@ -256,6 +256,21 @@
     footer{ padding:2rem 1.5rem; }
     .er-wrap{ flex-direction:column; align-items:center; }
   }
+
+  /* ── BACK TO TOP ── */
+  .back-to-top {
+    position: fixed; bottom: 2rem; right: 2rem;
+    width: 48px; height: 48px; background: var(--surface2);
+    color: var(--accent); border: 1px solid var(--border);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; cursor: pointer; z-index: 1000;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    opacity: 0; pointer-events: none;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+  }
+  .back-to-top.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .back-to-top:hover { transform: translateY(-5px); border-color: var(--accent); background: var(--bg); }
+
   @media print{
     nav,.hero::before,footer .btn{ display:none; }
     body{ background:#fff; color:#111; }
@@ -270,7 +285,7 @@
 <nav>
   <div style="display:flex; align-items:center; gap:1.5rem;">
     <a href="../index.html" class="nav-logo" style="color:var(--muted); text-decoration:none; display:flex; align-items:center; gap:0.5rem; transition:color 0.2s;">
-      <span style="font-size:1.2rem;">←</span> <span>Portal</span>
+      <span style="font-size:1.1rem;">🏠</span> <span>Home</span>
     </a>
     <span class="nav-logo">2° Año · I26 · MySQL</span>
   </div>
@@ -1269,5 +1284,15 @@
   </div>
 </footer>
 
+  <button class="back-to-top" id="backToTop" aria-label="Volver arriba">↑</button>
+
+  <script>
+    const btn = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 400) { btn.classList.add('show'); }
+      else { btn.classList.remove('show'); }
+    });
+    btn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  </script>
 </body>
 </html>

@@ -429,20 +429,22 @@
 
   /* ─── PRINT BUTTON ─── */
   .btn {
-    display: inline-block;
-    background: var(--accent);
-    color: #fff; font-family: 'Space Mono', monospace;
-    font-size: .75rem; letter-spacing: .1em;
-    text-transform: uppercase; padding: .6rem 1.4rem;
-    border-radius: 3px; border: none; cursor: pointer;
-    text-decoration: none;
-    transition: opacity .2s;
-  }
-  .btn:hover { opacity: .85; }
-  .btn-outline {
-    background: transparent; color: var(--accent2);
     border: 1px solid var(--accent2);
   }
+
+  /* ── BACK TO TOP ── */
+  .back-to-top {
+    position: fixed; bottom: 2rem; right: 2rem;
+    width: 48px; height: 48px; background: var(--surface);
+    color: var(--accent); border: 1px solid var(--border);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; cursor: pointer; z-index: 1000;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    opacity: 0; pointer-events: none;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+  }
+  .back-to-top.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .back-to-top:hover { transform: translateY(-5px); border-color: var(--accent); background: var(--bg); }
 
   @media print {
     nav, .scroll-hint, footer .btn { display: none; }
@@ -455,11 +457,10 @@
 </head>
 <body>
 
-<!-- GLOBAL SITE NAV -->
 <nav class="site-nav">
   <a href="../index.html" class="site-nav-brand">I26 · Software</a>
   <ul class="site-nav-links-all">
-    <li><a href="../index.html">🏠 <span>Portal</span></a></li>
+    <li><a href="../index.html">🏠 <span>Home</span></a></li>
     <div class="snav-sep"></div>
     <li><a href="../2do/clase-php-mysql-I26.html"><span class="snav-badge yr2">2°</span> PHP &amp; MySQL</a></li>
     <li><a href="../2do/clase_2do_soft_I26_ReactNative.html"><span class="snav-badge yr2">2°</span> React Native</a></li>
@@ -1403,15 +1404,55 @@ npm run dev</pre>
       <a href="../2do/clase-php-mysql-I26.html" class="nav-btn nav-btn-secondary">Repasar desde clase 1</a>
     </div>
   </div>
-</div>
+<!-- ─── PRÓXIMOS PASOS ─── -->
+<section id="proximos-pasos" style="background: rgba(124,58,237,0.05); border-top: 2px solid var(--accent);">
+  <div class="container">
+    <div class="section-num">Final · De la Teoría a la Práctica</div>
+    <h2>📐 Del Plano <mark>a la Obra</mark></h2>
+    <p>Tenés la arquitectura y tenés las épicas. Ahora empieza el <strong>Sprint 1</strong>. Recordá que en 3er año no evaluamos solo "que ande", sino "cómo está construido".</p>
+    
+    <div class="card-grid">
+      <div class="card" data-icon="🏗️">
+        <h4>1. El Core Primero</h4>
+        <p>No pierdas tiempo con el login si el motor de tu sistema no funciona. Construí la funcionalidad principal en el primer Sprint.</p>
+      </div>
+      <div class="card" data-icon="🧩">
+        <h4>2. Atomic Design</h4>
+        <p>Creá componentes pequeños y reutilizables en React. Tu "App.jsx" no debería tener más de 100 líneas.</p>
+      </div>
+      <div class="card" data-icon="🤖">
+        <h4>3. IA como Copiloto</h4>
+        <p>Usá la IA para generar código repetitivo (Boilerplate), pero vos tomá las decisiones de arquitectura.</p>
+      </div>
+    </div>
+
+    <div class="activity">
+      <div class="activity-header">
+        <div class="activity-badge">RECOMENDACIÓN</div>
+        <h3>Tu primer commit</h3>
+      </div>
+      <p>Configurá tu repositorio en GitHub hoy mismo. Hacé el primer "Hello World" de tu backend y frontend conectados. Si lográs que el frontend reciba un simple "JSON" del backend, ya ganaste el 50% de la batalla técnica.</p>
+    </div>
+  </div>
+</section>
 
 <footer>
-  <div>
-    <p><strong>Tecnicatura Superior en Software &middot; I26 &middot; 3&deg; A&ntilde;o</strong></p>
-    <p>Desarrollo de Aplicaciones Web &middot; Clase de Consolidaci&oacute;n</p>
+  <p>Tecnicatura en Software · I26 · 3° Año</p>
+  <div style="display:flex; gap:1rem;">
+    <a href="../index.html" class="btn btn-outline">← Volver al Home</a>
+    <button class="btn" onclick="window.print()">Imprimir Clase</button>
   </div>
-  <button class="btn" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
 </footer>
 
+<button class="back-to-top" id="backToTop" aria-label="Volver arriba">↑</button>
+
+<script>
+  const backToBtn = document.getElementById('backToTop');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 400) { backToBtn.classList.add('show'); }
+    else { backToBtn.classList.remove('show'); }
+  });
+  backToBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+</script>
 </body>
 </html>

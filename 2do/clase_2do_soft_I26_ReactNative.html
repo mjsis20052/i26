@@ -419,6 +419,20 @@
     .connect-diagram { flex-direction:column; }
   }
 
+  /* ── BACK TO TOP ── */
+  .back-to-top {
+    position: fixed; bottom: 2rem; right: 2rem;
+    width: 48px; height: 48px; background: var(--surface);
+    color: var(--accent); border: 1px solid var(--border);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; cursor: pointer; z-index: 1000;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    opacity: 0; pointer-events: none;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+  }
+  .back-to-top.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .back-to-top:hover { transform: translateY(-5px); border-color: var(--accent); background: var(--bg); }
+
   @media print {
     nav, .hero-bg-text, footer .btn { display:none; }
     body { background:#fff; color:#111; }
@@ -431,11 +445,10 @@
 </head>
 <body>
 
-<!-- GLOBAL SITE NAV -->
 <nav class="site-nav">
   <a href="../index.html" class="site-nav-brand">I26 · Software</a>
   <ul class="site-nav-links-all">
-    <li><a href="../index.html">🏠 <span>Portal</span></a></li>
+    <li><a href="../index.html">🏠 <span>Home</span></a></li>
     <div class="snav-sep"></div>
     <li><a href="clase-php-mysql-I26.html"><span class="snav-badge yr2">2°</span> PHP &amp; MySQL</a></li>
     <li><a href="clase_2do_soft_I26_ReactNative.html" class="active"><span class="snav-badge yr2">2°</span> React Native</a></li>
@@ -1462,13 +1475,57 @@ npx expo start
   </div>
 </div>
 
-<footer>
-  <div>
-    <p><strong>Tecnicatura Superior en Software &middot; I26 &middot; 2&deg; A&ntilde;o</strong></p>
-    <p>Desarrollo de Aplicaciones &middot; React Native &middot; Conexi&oacute;n con 3&deg; a&ntilde;o</p>
+<!-- ─── PRÓXIMOS PASOS ─── -->
+<section id="proximos-pasos" style="background: rgba(212,70,10,0.03); border-top: 2px solid var(--accent); padding: 3rem 0; margin-top: 3rem;">
+  <div class="container" style="max-width:980px; margin:0 auto; padding:0 2.5rem;">
+    <div class="sec-num">Final · Hoja de Ruta</div>
+    <h2>🚀 ¿Cómo <mark>seguir</mark> desde acá?</h2>
+    <p>Ya tenés la base de React Native y sabés cómo levantar un servidor PHP. El verdadero desafío es la <strong>integración</strong>. Para tu proyecto final, seguí estos pasos:</p>
+    
+    <div class="card-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:1rem; margin: 2rem 0;">
+      <div class="card">
+        <div class="card-icon">📡</div>
+        <h4>1. Tu API es el Puente</h4>
+        <p>No programes lógica pesada en la App. Dejale eso al PHP. La app solo debe "pedir" y "mostrar".</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📱</div>
+        <h4>2. UX Mobile First</h4>
+        <p>Recordá que en el celular no hay "hover". Todo es táctil. Usá <code>TouchableOpacity</code> para que el usuario sienta el feedback.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧱</div>
+        <h4>3. Componentes Limpios</h4>
+        <p>Separá tu código. Un archivo para el componente de "Card", otro para la "Screen". No mezcles todo en App.js.</p>
+      </div>
+    </div>
+
+    <div class="callout c-tip" style="background:white; padding:1.5rem; border-radius:8px; border:1px solid var(--accent);">
+      <div class="callout-body">
+        <strong>💡 Reto de Consolidación:</strong>
+        <p>Intentá que tu App de 2do año consuma al menos un dato de la base de datos que usa la web app de 3er año. Si lográs esa conexión, entendiste cómo funciona el software profesional a gran escala.</p>
+      </div>
+    </div>
   </div>
-  <button class="btn" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+</section>
+
+<footer>
+  <p>Tecnicatura en Software · I26 · 2° Año</p>
+  <div style="display:flex; gap:1rem;">
+    <a href="../index.html" class="btn" style="background:var(--accent2); color:white; padding: 0.5rem 1rem; text-decoration:none; border-radius:4px;">← Volver al Home</a>
+    <button class="btn" onclick="window.print()">Imprimir Clase</button>
+  </div>
 </footer>
 
+<button class="back-to-top" id="backToTop" aria-label="Volver arriba">↑</button>
+
+<script>
+  const btn = document.getElementById('backToTop');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 400) { btn.classList.add('show'); }
+    else { btn.classList.remove('show'); }
+  });
+  btn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+</script>
 </body>
 </html>

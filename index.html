@@ -1239,6 +1239,51 @@
                 gap: 1rem;
             }
         }
+        /* ─── BACK TO TOP ─── */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 52px;
+            height: 52px;
+            background: var(--surface);
+            color: var(--accent-c);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            opacity: 0;
+            pointer-events: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-c);
+            background: var(--bg);
+            box-shadow: 0 15px 30px rgba(6, 182, 212, 0.2);
+        }
+
+        @media(max-width: 768px) {
+            .back-to-top {
+                bottom: 1.5rem;
+                right: 1.5rem;
+                width: 44px;
+                height: 44px;
+                font-size: 1.2rem;
+            }
+        }
     </style>
 </head>
 
@@ -1797,6 +1842,21 @@
             });
         });
 
+    </script>
+    <button class="back-to-top" id="backToTop" aria-label="Volver arriba">↑</button>
+
+    <script>
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 400) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
     </script>
 </body>
 

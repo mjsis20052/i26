@@ -16,10 +16,10 @@
             left: 0;
             right: 0;
             z-index: 2000;
-            background: rgba(5, 5, 8, 0.92);
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(8, 21, 60, 0.95));
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+            border-bottom: 1px solid rgba(96, 165, 250, 0.3);
             height: 56px;
             display: flex;
             align-items: center;
@@ -34,7 +34,7 @@
             font-weight: 700;
             letter-spacing: .18em;
             text-transform: uppercase;
-            color: var(--accent-c);
+            color: #7dd3fc;
             text-decoration: none;
             white-space: nowrap;
             flex-shrink: 0;
@@ -57,29 +57,37 @@
             display: inline-flex;
             align-items: center;
             gap: .4rem;
-            color: var(--muted);
+            color: #cbd5e1;
             font-family: 'Space Mono', monospace;
             font-size: .65rem;
             text-transform: uppercase;
             letter-spacing: .1em;
             text-decoration: none;
             padding: .35rem .7rem;
-            border-radius: 4px;
+            border-radius: 6px;
             border: 1px solid transparent;
             white-space: nowrap;
             transition: all .25s;
         }
 
         .site-nav-links li a:hover {
-            color: var(--text);
-            border-color: var(--border);
-            background: rgba(255, 255, 255, .04);
+            color: #eff6ff;
+            border-color: rgba(96, 165, 250, 0.35);
+            background: rgba(56, 189, 248, .12);
         }
 
         .site-nav-links li a.active {
-            color: var(--accent-c);
-            border-color: rgba(6, 182, 212, .3);
-            background: rgba(6, 182, 212, .07);
+            color: #ffffff;
+            border-color: rgba(16, 185, 129, .4);
+            background: linear-gradient(135deg, rgba(59, 130, 246, .92), rgba(16, 185, 129, .94));
+            box-shadow: 0 8px 24px rgba(56, 189, 248, .18);
+        }
+
+        .site-nav-links li a#snav-home {
+            color: #ffffff;
+            border-color: rgba(59, 130, 246, .45);
+            background: linear-gradient(135deg, rgba(56, 189, 248, .95), rgba(16, 185, 129, .9));
+            box-shadow: 0 8px 20px rgba(56, 189, 248, .22);
         }
 
         .site-nav-links li a .nav-badge {

@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REPASO TOTAL · MySQL + PHP · 2° Año I26</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper:   #f0ead8;
+  --paper2:  #e8e0cc;
+  --paper3:  #ddd4bb;
+  --ink:     #1c1208;
+  --muted:   #7a6a50;
+  --border:  #c4b898;
+  --red:     #c0392b;
+  --blue:    #1a4a7a;
+  --green:   #1a5c2e;
+  --orange:  #b05000;
+  --purple:  #5a1a8a;
+  --yellow:  #c07800;
+  --code-bg: #1c1208;
+  --code-fg: #f0ead8;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  font-family: 'Archivo', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+
+/* ── TEXTURA DE PAPEL ── */
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+/* ── NAV ── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  background: rgba(240,234,216,0.95);
+  border-bottom: 2.5px solid var(--ink);
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 0 2rem; height:50px;
+}
+.nav-brand {
+  font-family:'Archivo Black',sans-serif;
+  font-size:.75rem; letter-spacing:.15em; text-transform:uppercase; color:var(--red);
+}
+.nav-links { display:flex; gap:1.5rem; list-style:none; }
+.nav-links a {
+  font-family:'JetBrains Mono',monospace;
+  color:var(--muted); text-decoration:none; font-size:.62rem;
+  letter-spacing:.08em; text-transform:uppercase; transition:color .2s;
+}
+.nav-links a:hover { color:var(--ink); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  padding: 6rem 4rem 3rem;
+  border-bottom: 2.5px solid var(--ink);
+  position:relative; overflow:hidden;
+}
+/* líneas de cuaderno */
+.hero::after {
+  content:'';
+  position:absolute; inset:0; pointer-events:none;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 31px,
+    rgba(28,18,8,.08) 31px,
+    rgba(28,18,8,.08) 32px
+  );
+  background-position: 0 60px;
+}
+.hero-stamp {
+  position:absolute; top:3.5rem; right:3rem;
+  border: 4px solid var(--red); color:var(--red);
+  font-family:'Archivo Black',sans-serif;
+  font-size:.65rem; letter-spacing:.2em; text-transform:uppercase;
+  padding:.5rem 1rem; transform:rotate(4deg);
+  opacity:.7;
+}
+.hero-num {
+  font-family:'JetBrains Mono',monospace;
+  font-size:.68rem; color:var(--muted); letter-spacing:.2em;
+  text-transform:uppercase; margin-bottom:1rem;
+  display:flex; align-items:center; gap:.5rem;
+}
+.hero-num::before { content:''; width:24px; height:2px; background:var(--red); }
+
+h1 {
+  font-family:'Archivo Black',sans-serif;
+  font-size: clamp(3rem,7vw,6.5rem);
+  line-height:.95; letter-spacing:-.02em;
+  max-width:900px; margin-bottom:1.5rem;
+  position:relative; z-index:1;
+}
+h1 .line-red   { color:var(--red); display:block; }
+h1 .line-blue  { color:var(--blue); display:block; }
+h1 .line-green { color:var(--green); display:block; }
+
+.hero-sub {
+  font-size:.95rem; color:var(--muted); max-width:580px;
+  margin-bottom:2rem; position:relative; z-index:1;
+}
+.tag-row { display:flex; flex-wrap:wrap; gap:.5rem; position:relative; z-index:1; }
+.tag {
+  font-family:'JetBrains Mono',monospace; font-size:.62rem;
+  padding:.2rem .7rem; border:1.5px solid; letter-spacing:.05em;
+}
+.tr { border-color:var(--red);    color:var(--red); }
+.tb { border-color:var(--blue);   color:var(--blue); }
+.tg { border-color:var(--green);  color:var(--green); }
+.to { border-color:var(--orange); color:var(--orange); }
+.tp { border-color:var(--purple); color:var(--purple); }
+
+/* ── LAYOUT ── */
+.container { max-width:980px; margin:0 auto; padding:0 2.5rem; position:relative; z-index:1; }
+section { padding:4.5rem 0; }
+section + section { border-top:2px solid var(--border); }
+
+/* ── SECTION HEADERS ── */
+.sec-label {
+  display:inline-block;
+  font-family:'Archivo Black',sans-serif;
+  font-size:.6rem; letter-spacing:.25em; text-transform:uppercase;
+  background:var(--ink); color:var(--paper);
+  padding:.18rem .65rem; margin-bottom:1rem;
+}
+.sec-label.red    { background:var(--red); }
+.sec-label.blue   { background:var(--blue); }
+.sec-label.green  { background:var(--green); }
+.sec-label.orange { background:var(--orange); }
+.sec-label.purple { background:var(--purple); }
+
+h2 {
+  font-family:'Archivo Black',sans-serif;
+  font-size:clamp(1.8rem,3.5vw,2.8rem);
+  line-height:1.05; letter-spacing:-.01em; margin-bottom:1.1rem;
+}
+h3 {
+  font-family:'Archivo Black',sans-serif;
+  font-size:1rem; color:var(--orange); margin:2rem 0 .6rem;
+  border-bottom:1.5px solid var(--border); padding-bottom:.3rem;
+}
+h4 {
+  font-family:'Archivo',sans-serif; font-weight:600;
+  font-size:.88rem; color:var(--blue); margin:1.2rem 0 .3rem;
+}
+p { color:#4a3e2a; margin-bottom:.85rem; font-size:.9rem; }
+ul,ol { color:#4a3e2a; padding-left:1.4rem; font-size:.9rem; }
+li { margin-bottom:.35rem; }
+strong { color:var(--ink); }
+code {
+  font-family:'JetBrains Mono',monospace;
+  background:var(--paper3); color:var(--red);
+  padding:.08rem .38rem; border:1px solid var(--border);
+  font-size:.8em;
+}
+
+/* ── CODE BLOCKS ── */
+.cb {
+  background:var(--code-bg);
+  border:2px solid var(--ink);
+  box-shadow:4px 4px 0 var(--ink);
+  padding:1.3rem 1.5rem;
+  margin:1rem 0; overflow-x:auto; position:relative;
+}
+.cb.red    { border-color:var(--red);    box-shadow:4px 4px 0 var(--red); }
+.cb.blue   { border-color:var(--blue);   box-shadow:4px 4px 0 var(--blue); }
+.cb.green  { border-color:var(--green);  box-shadow:4px 4px 0 var(--green); }
+.cb.orange { border-color:var(--orange); box-shadow:4px 4px 0 var(--orange); }
+.cb.purple { border-color:var(--purple); box-shadow:4px 4px 0 var(--purple); }
+.cb .lang {
+  position:absolute; top:.5rem; right:.8rem;
+  font-family:'JetBrains Mono',monospace; font-size:.58rem;
+  color:#6a5a40; letter-spacing:.12em; text-transform:uppercase;
+}
+.cb pre {
+  font-family:'JetBrains Mono',monospace;
+  font-size:.74rem; line-height:1.85; color:var(--code-fg);
+  white-space:pre; tab-size:2;
+}
+.kw  { color:#7dd3fc; }
+.dt  { color:#fbbf24; }
+.st  { color:#86efac; }
+.cm  { color:#57534e; font-style:italic; }
+.fn  { color:#67e8f9; }
+.nm  { color:#f9a8d4; }
+.tn  { color:#a5f3fc; }
+.op  { color:#fb923c; }
+
+/* ── TABLES ── */
+.tw { overflow-x:auto; margin:1rem 0; }
+table {
+  width:100%; border-collapse:collapse; font-size:.82rem;
+  border:2px solid var(--ink);
+}
+th {
+  background:var(--ink); color:var(--paper);
+  font-family:'Archivo Black',sans-serif;
+  font-size:.62rem; letter-spacing:.1em; text-transform:uppercase;
+  padding:.6rem .9rem; text-align:left;
+  border-right:1px solid rgba(255,255,255,.15);
+}
+td { padding:.6rem .9rem; border-bottom:1px solid var(--border); color:#4a3e2a; border-right:1px solid var(--border); }
+td:last-child,th:last-child { border-right:none; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:var(--paper2); }
+.yes { color:var(--green); font-weight:700; }
+.no  { color:var(--red);   font-weight:700; }
+.med { color:var(--orange);font-weight:700; }
+
+/* ── CALLOUTS ── */
+.callout {
+  border:2px solid var(--ink); padding:1rem 1.2rem;
+  margin:1.2rem 0; display:flex; gap:.8rem; align-items:flex-start;
+  box-shadow:3px 3px 0 var(--ink);
+}
+.callout.tip    { border-color:var(--green);  box-shadow:3px 3px 0 var(--green);  background:rgba(26,92,46,.05); }
+.callout.warn   { border-color:var(--red);    box-shadow:3px 3px 0 var(--red);    background:rgba(192,57,43,.05); }
+.callout.info   { border-color:var(--blue);   box-shadow:3px 3px 0 var(--blue);   background:rgba(26,74,122,.05); }
+.callout.purple { border-color:var(--purple); box-shadow:3px 3px 0 var(--purple); background:rgba(90,26,138,.05); }
+.c-icon { font-size:1.3rem; flex-shrink:0; }
+.c-body strong { display:block; font-size:.83rem; margin-bottom:.2rem; }
+.c-body p { font-size:.83rem; margin:0; }
+
+/* ── QUIZ CARDS ── */
+.quiz-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1rem; margin:1.2rem 0; }
+.quiz-card {
+  background:var(--paper2); border:2px solid var(--ink);
+  box-shadow:3px 3px 0 var(--ink); padding:1.2rem;
+  cursor:pointer; user-select:none;
+  transition:transform .1s;
+}
+.quiz-card:active { transform:translate(2px,2px); box-shadow:1px 1px 0 var(--ink); }
+.qc-num {
+  font-family:'Archivo Black',sans-serif; font-size:.6rem;
+  letter-spacing:.2em; color:var(--muted); text-transform:uppercase;
+  margin-bottom:.3rem;
+}
+.qc-q { font-weight:600; font-size:.88rem; margin-bottom:.8rem; }
+.qc-a {
+  background:var(--code-bg); color:var(--code-fg);
+  font-family:'JetBrains Mono',monospace; font-size:.75rem;
+  padding:.6rem .8rem; border-radius:2px;
+  display:none; line-height:1.6;
+}
+.quiz-card.revealed .qc-a { display:block; }
+.qc-hint { font-size:.7rem; color:var(--muted); margin-top:.5rem; font-style:italic; }
+
+/* ── FLOW / ROADMAP ── */
+.roadmap {
+  background:var(--paper2); border:2px solid var(--ink);
+  box-shadow:5px 5px 0 var(--ink);
+  padding:1.8rem; margin:1.5rem 0;
+}
+.rm-title {
+  font-family:'Archivo Black',sans-serif; font-size:.65rem;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
+  margin-bottom:1.4rem;
+}
+.rm-steps { display:flex; flex-direction:column; gap:0; }
+.rm-step {
+  display:grid; grid-template-columns:40px 1fr;
+  gap:0 1.2rem;
+}
+.rm-line {
+  display:flex; flex-direction:column; align-items:center;
+}
+.rm-dot {
+  width:32px; height:32px; border-radius:50%;
+  background:var(--ink); color:var(--paper);
+  font-family:'Archivo Black',sans-serif; font-size:.75rem;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.rm-dot.red    { background:var(--red); }
+.rm-dot.blue   { background:var(--blue); }
+.rm-dot.green  { background:var(--green); }
+.rm-dot.orange { background:var(--orange); }
+.rm-dot.purple { background:var(--purple); }
+.rm-connector {
+  width:2px; flex:1; min-height:28px;
+  background:var(--border); margin:3px 0;
+}
+.rm-content { padding:.2rem 0 1.4rem; }
+.rm-content .rm-label {
+  font-family:'Archivo Black',sans-serif; font-size:.82rem; margin-bottom:.2rem;
+}
+.rm-content .rm-desc { font-size:.8rem; color:var(--muted); }
+.rm-content .rm-tech {
+  display:flex; flex-wrap:wrap; gap:.3rem; margin-top:.4rem;
+}
+.rm-tech .tag { font-size:.58rem; padding:.12rem .5rem; }
+
+/* ── CHECKLIST ── */
+.checklist { list-style:none; padding:0; margin:1rem 0; }
+.checklist li {
+  display:flex; align-items:flex-start; gap:.7rem;
+  padding:.5rem 0; border-bottom:1px dashed var(--border);
+  font-size:.88rem;
+}
+.checklist li:last-child { border-bottom:none; }
+.ck-box {
+  width:18px; height:18px; border:2px solid var(--ink);
+  flex-shrink:0; margin-top:.1rem; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.75rem; transition:background .15s;
+}
+.ck-box.checked { background:var(--green); border-color:var(--green); color:white; }
+.ck-text { flex:1; }
+
+/* ── FILL INPUTS ── */
+.fill-block {
+  background:var(--paper2); border:2px solid var(--ink);
+  box-shadow:3px 3px 0 var(--ink); padding:1.2rem; margin:.6rem 0;
+}
+.fill-label {
+  font-family:'JetBrains Mono',monospace; font-size:.62rem;
+  color:var(--muted); letter-spacing:.12em; text-transform:uppercase; margin-bottom:.4rem;
+}
+.fill-input {
+  width:100%; background:transparent; border:none;
+  border-bottom:1.5px dashed var(--border);
+  color:var(--ink); font-family:'Archivo',sans-serif;
+  font-size:.88rem; padding:.35rem 0; outline:none; transition:border-color .2s;
+  margin-bottom:.3rem;
+}
+.fill-input:focus { border-color:var(--red); border-style:solid; }
+textarea.fill-input {
+  border:1.5px dashed var(--border); padding:.5rem;
+  resize:vertical; min-height:65px;
+}
+textarea.fill-input:focus { border-color:var(--red); border-style:solid; }
+
+/* ── ERROR CARDS ── */
+.error-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; margin:1.2rem 0; }
+.error-card {
+  background:var(--paper); border:2px solid var(--red);
+  box-shadow:3px 3px 0 var(--red); padding:1.1rem;
+}
+.err-title {
+  font-family:'JetBrains Mono',monospace; font-size:.68rem;
+  color:var(--red); margin-bottom:.4rem; font-weight:500;
+}
+.err-cause { font-size:.8rem; color:var(--muted); margin-bottom:.4rem; }
+.err-fix {
+  font-size:.8rem; color:var(--green); font-weight:600;
+  padding:.4rem .6rem; background:rgba(26,92,46,.08);
+  border-left:2px solid var(--green);
+}
+
+/* ── PROMPT BOX ── */
+.prompt-box {
+  background:var(--code-bg); border:2px solid var(--purple);
+  box-shadow:5px 5px 0 var(--purple);
+  padding:2rem; margin:1.5rem 0;
+}
+.pb-header {
+  display:flex; align-items:center; gap:.8rem; margin-bottom:1.2rem;
+}
+.pb-logo {
+  font-family:'Archivo Black',sans-serif; font-size:.7rem;
+  letter-spacing:.15em; text-transform:uppercase; color:var(--purple);
+  border:1.5px solid var(--purple); padding:.2rem .6rem;
+}
+.pb-title { font-family:'Archivo Black',sans-serif; color:var(--paper); font-size:.9rem; }
+.pb-desc { font-size:.8rem; color:#a89880; margin-bottom:1rem; }
+.pb-copy-btn {
+  background:var(--purple); color:var(--paper);
+  font-family:'JetBrains Mono',monospace; font-size:.65rem;
+  letter-spacing:.1em; text-transform:uppercase;
+  border:none; padding:.4rem 1rem; cursor:pointer;
+  margin-bottom:1rem; transition:opacity .2s;
+}
+.pb-copy-btn:hover { opacity:.85; }
+.prompt-text {
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1);
+  padding:1.2rem; font-family:'JetBrains Mono',monospace;
+  font-size:.72rem; line-height:1.8; color:#d4c9b8;
+  white-space:pre-wrap; word-break:break-word;
+  max-height:360px; overflow-y:auto;
+}
+.pt-section { color:#7dd3fc; font-weight:500; }
+.pt-key { color:#fbbf24; }
+.pt-val { color:#86efac; }
+.pt-note { color:#57534e; font-style:italic; }
+
+/* ── BTN ── */
+.btn {
+  display:inline-block; background:var(--ink); color:var(--paper);
+  font-family:'Archivo Black',sans-serif; font-size:.68rem;
+  letter-spacing:.1em; text-transform:uppercase;
+  padding:.55rem 1.4rem; border:2px solid var(--ink);
+  box-shadow:3px 3px 0 var(--muted); cursor:pointer;
+  text-decoration:none; transition:all .15s;
+}
+.btn:hover { box-shadow:1px 1px 0 var(--muted); transform:translate(2px,2px); }
+.btn.red { background:var(--red); border-color:var(--red); box-shadow:3px 3px 0 #8b1a12; }
+
+footer {
+  padding:2.5rem 4rem; border-top:2.5px solid var(--ink);
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;
+  position:relative; z-index:1;
+}
+footer p { color:var(--muted); font-size:.75rem; margin:0; font-family:'JetBrains Mono',monospace; }
+
+@media(max-width:700px){
+  .hero { padding:5rem 1.5rem 2.5rem; }
+  .container { padding:0 1.5rem; }
+  nav .nav-links { display:none; }
+  footer { padding:2rem 1.5rem; }
+  h1 { font-size:2.5rem; }
+}
+@media print {
+  nav,footer .btn { display:none; }
+  body::before { display:none; }
+  .cb { box-shadow:none; border:1px solid #ccc; background:#f5f5f5; }
+  pre,code { color:#222; }
+  .kw{color:#1d4ed8;}.st{color:#15803d;}.cm{color:#9ca3af;}.dt{color:#92400e;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">I26 · Repaso Especial</span>
+  <ul class="nav-links">
+    <li><a href="#flujo">Flujo</a></li>
+    <li><a href="#tipos">Tipos</a></li>
+    <li><a href="#fechas">Fechas</a></li>
+    <li><a href="#crud">CRUD</a></li>
+    <li><a href="#relaciones">Relaciones</a></li>
+    <li><a href="#errores">Errores</a></li>
+    <li><a href="#quiz">Quiz</a></li>
+
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-stamp">CLASE ESPECIAL</div>
+  <div class="hero-num">2° Año · I26 · Tecnicatura Superior en Desarrollo de Software</div>
+  <h1>
+    <span class="line-red">REPASO</span>
+    <span class="line-blue">TOTAL</span>
+    <span class="line-green">MySQL</span>
+  </h1>
+  <p class="hero-sub">Todo lo que vimos, consolidado. Tipos de datos · TIMESTAMP · CRUD · Relaciones · FK · Errores comunes · Quiz de verificación</p>
+  <div class="tag-row">
+    <span class="tag tr">MySQL</span>
+    <span class="tag tb">XAMPP</span>
+    <span class="tag to">TIMESTAMP</span>
+    <span class="tag tp">Foreign Keys</span>
+    <span class="tag tg">CRUD</span>
+    <span class="tag tr">PHP</span>
+
+  </div>
+</div>
+
+<!-- ─── 0. FLUJO DE APRENDIZAJE ─── -->
+<section id="flujo">
+<div class="container">
+  <div class="sec-label">00 · Flujo de aprendizaje</div>
+  <h2>¿Dónde estamos<br>y para qué sirve esto?</h2>
+  <p>Antes de repasar, entendemos el mapa completo. Cada cosa que aprendieron tiene un lugar específico en el sistema que van a construir.</p>
+
+  <div class="roadmap">
+    <div class="rm-title">Ruta de aprendizaje · 2° Año → 3° Año · I26</div>
+    <div class="rm-steps">
+
+      <div class="rm-step">
+        <div class="rm-line">
+          <div class="rm-dot red">1</div>
+          <div class="rm-connector"></div>
+        </div>
+        <div class="rm-content">
+          <div class="rm-label">PHP + MySQL — Base de datos y backend</div>
+          <div class="rm-desc">Variables, tipos, CRUD, conexión mysqli. El motor que guarda y devuelve datos.</div>
+          <div class="rm-tech">
+            <span class="tag tr">PHP</span><span class="tag tb">MySQL</span><span class="tag to">XAMPP</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rm-step">
+        <div class="rm-line">
+          <div class="rm-dot orange">2</div>
+          <div class="rm-connector"></div>
+        </div>
+        <div class="rm-content">
+          <div class="rm-label">MySQL Avanzado — Relaciones y FK ← HOY REPASAMOS ESTO</div>
+          <div class="rm-desc">Tipos de datos correctos, TIMESTAMP, claves foráneas, relaciones 1:N y N:M, JOINs.</div>
+          <div class="rm-tech">
+            <span class="tag to">TIMESTAMP</span><span class="tag tp">FK</span><span class="tag tg">JOIN</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rm-step">
+        <div class="rm-line">
+          <div class="rm-dot blue">3</div>
+          <div class="rm-connector"></div>
+        </div>
+        <div class="rm-content">
+          <div class="rm-label">PHP → API REST — El backend responde JSON</div>
+          <div class="rm-desc">El servidor PHP deja de devolver HTML y empieza a devolver JSON. Ese JSON lo consume la app móvil.</div>
+          <div class="rm-tech">
+            <span class="tag tr">PHP</span><span class="tag tb">JSON</span><span class="tag tg">REST API</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rm-step">
+        <div class="rm-line">
+          <div class="rm-dot green">4</div>
+          <div class="rm-connector"></div>
+        </div>
+        <div class="rm-content">
+          <div class="rm-label">React Native — App móvil que consume la API</div>
+          <div class="rm-desc">La app hace fetch() al servidor PHP. El mismo backend que construyeron acá responde al celular.</div>
+          <div class="rm-tech">
+            <span class="tag tg">React Native</span><span class="tag tb">Expo</span><span class="tag to">fetch()</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rm-step">
+        <div class="rm-line">
+          <div class="rm-dot purple">5</div>
+        </div>
+        <div class="rm-content">
+          <div class="rm-label">3° Año — Web app que comparte la misma API</div>
+          <div class="rm-desc">React + Node. Un dato creado en la web aparece en la app móvil de 2°. El mismo backend, dos frontends.</div>
+          <div class="rm-tech">
+            <span class="tag tp">React Web</span><span class="tag tb">Node.js</span><span class="tag tg">Integración</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <div class="c-icon">🎯</div>
+    <div class="c-body">
+      <strong>La conexión clave que hay que entender hoy</strong>
+      <p>Las tablas que diseñen <strong>bien</strong> (con tipos correctos, TIMESTAMP, FK) son exactamente las que va a consultar la app móvil. Una base de datos mal diseñada hace que todo lo que venga después sea más difícil.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 1. TIPOS ─── -->
+<section id="tipos">
+<div class="container">
+  <div class="sec-label red">01 · Tipos de datos</div>
+  <h2>Elegir el tipo<br>correcto importa</h2>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>Para guardar...</th><th>Tipo correcto</th><th>Tipo incorrecto</th><th>Por qué</th></tr></thead>
+      <tbody>
+        <tr><td>ID de tabla</td><td class="yes">INT UNSIGNED AI</td><td class="no">VARCHAR / TEXT</td><td>Necesita ser número, único, automático</td></tr>
+        <tr><td>Nombre, email, título</td><td class="yes">VARCHAR(n)</td><td class="no">TEXT</td><td>TEXT es más lento en búsquedas y filtros</td></tr>
+        <tr><td>Descripción larga</td><td class="yes">TEXT</td><td class="no">VARCHAR(5000)</td><td>VARCHAR tiene límite duro, TEXT no</td></tr>
+        <tr><td>Precio / dinero</td><td class="yes">DECIMAL(10,2)</td><td class="no">FLOAT / DOUBLE</td><td>FLOAT tiene errores de redondeo</td></tr>
+        <tr><td>Activo / inactivo</td><td class="yes">BOOLEAN / TINYINT(1)</td><td class="no">VARCHAR('si','no')</td><td>Boolean es más eficiente y claro</td></tr>
+        <tr><td>Estado fijo</td><td class="yes">ENUM('a','b','c')</td><td class="no">VARCHAR sin control</td><td>ENUM valida que solo entren valores permitidos</td></tr>
+        <tr><td>Fecha de nacimiento</td><td class="yes">DATE</td><td class="no">VARCHAR / TIMESTAMP</td><td>DATE es solo fecha, no necesita hora</td></tr>
+        <tr><td>Cuándo se creó</td><td class="yes">TIMESTAMP DEFAULT NOW()</td><td class="no">DATE / VARCHAR</td><td>TIMESTAMP se llena solo y guarda hora exacta</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>La tabla bien tipada — ejemplo completo</h3>
+  <div class="cb green">
+    <span class="lang">sql</span>
+    <pre><span class="kw">CREATE TABLE</span> <span class="tn">alumnos</span> (
+
+  <span class="cm">-- ID: siempre INT UNSIGNED AUTO_INCREMENT</span>
+  id               <span class="dt">INT UNSIGNED</span>    <span class="kw">AUTO_INCREMENT PRIMARY KEY</span>,
+
+  <span class="cm">-- Texto corto conocido → VARCHAR con límite razonable</span>
+  nombre           <span class="dt">VARCHAR</span>(<span class="nm">100</span>)   <span class="kw">NOT NULL</span>,
+  email            <span class="dt">VARCHAR</span>(<span class="nm">150</span>)   <span class="kw">NOT NULL UNIQUE</span>,
+  legajo           <span class="dt">CHAR</span>(<span class="nm">8</span>)       <span class="kw">UNIQUE</span>,
+
+  <span class="cm">-- Solo fecha (sin hora) → DATE</span>
+  fecha_nacimiento <span class="dt">DATE</span>,
+
+  <span class="cm">-- Número exacto con 2 decimales → DECIMAL</span>
+  promedio         <span class="dt">DECIMAL</span>(<span class="nm">4</span>,<span class="nm">2</span>),
+
+  <span class="cm">-- Verdadero/falso → BOOLEAN (internamente TINYINT(1))</span>
+  activo           <span class="dt">BOOLEAN</span>         <span class="kw">DEFAULT</span> <span class="kw">TRUE</span>,
+
+  <span class="cm">-- Estado de lista cerrada → ENUM</span>
+  estado           <span class="dt">ENUM</span>(<span class="st">'cursando'</span>,<span class="st">'egresado'</span>,<span class="st">'baja'</span>) <span class="kw">DEFAULT</span> <span class="st">'cursando'</span>,
+
+  <span class="cm">-- Fecha y hora automática → TIMESTAMP</span>
+  created_at       <span class="dt">TIMESTAMP</span>       <span class="kw">DEFAULT</span> <span class="fn">CURRENT_TIMESTAMP</span>,
+  updated_at       <span class="dt">TIMESTAMP</span>       <span class="kw">DEFAULT</span> <span class="fn">CURRENT_TIMESTAMP</span>
+                                    <span class="kw">ON UPDATE</span> <span class="fn">CURRENT_TIMESTAMP</span>
+);</pre>
+  </div>
+</div>
+</section>
+
+<!-- ─── 2. FECHAS ─── -->
+<section id="fechas">
+<div class="container">
+  <div class="sec-label orange">02 · Fechas y TIMESTAMP</div>
+  <h2>Lo que más costó:<br>DATE vs TIMESTAMP</h2>
+
+  <div class="callout info">
+    <div class="c-icon">📌</div>
+    <div class="c-body">
+      <strong>La diferencia en una oración</strong>
+      <p><strong>DATE</strong> = solo la fecha, el usuario la ingresa (nacimiento, evento). <strong>TIMESTAMP</strong> = fecha + hora, MySQL la pone automáticamente (cuándo se creó/modificó un registro).</p>
+    </div>
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>Tipo</th><th>Guarda</th><th>Se llena solo</th><th>Caso de uso típico</th></tr></thead>
+      <tbody>
+        <tr><td><code>DATE</code></td><td>2025-04-29</td><td class="no">No</td><td>Fecha de nacimiento, fecha de un evento</td></tr>
+        <tr><td><code>TIME</code></td><td>14:30:00</td><td class="no">No</td><td>Hora de clase, horario de atención</td></tr>
+        <tr><td><code>DATETIME</code></td><td>2025-04-29 14:30:00</td><td class="no">No (o sí con DEFAULT)</td><td>Reservas, eventos con fecha y hora exacta</td></tr>
+        <tr><td><code>TIMESTAMP</code></td><td>2025-04-29 14:30:00</td><td class="yes">SÍ — con DEFAULT/ON UPDATE</td><td>created_at, updated_at en CUALQUIER tabla</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>TIMESTAMP paso a paso — qué pasa en cada operación</h3>
+  <div class="cb orange">
+    <span class="lang">sql · paso a paso</span>
+    <pre><span class="cm">-- PASO 1: Creamos la tabla con TIMESTAMP</span>
+<span class="kw">CREATE TABLE</span> <span class="tn">posts</span> (
+  id         <span class="dt">INT</span>         <span class="kw">AUTO_INCREMENT PRIMARY KEY</span>,
+  titulo     <span class="dt">VARCHAR</span>(<span class="nm">200</span>),
+  created_at <span class="dt">TIMESTAMP</span>   <span class="kw">DEFAULT</span> <span class="fn">CURRENT_TIMESTAMP</span>,
+  updated_at <span class="dt">TIMESTAMP</span>   <span class="kw">DEFAULT</span> <span class="fn">CURRENT_TIMESTAMP</span> <span class="kw">ON UPDATE</span> <span class="fn">CURRENT_TIMESTAMP</span>
+);
+
+<span class="cm">-- PASO 2: Insertamos UN registro</span>
+<span class="cm">-- ⚠️ NO escribimos created_at ni updated_at — MySQL los completa solo</span>
+<span class="kw">INSERT INTO</span> <span class="tn">posts</span> (titulo) <span class="kw">VALUES</span> (<span class="st">'Mi primer post'</span>);
+
+<span class="cm">-- Resultado en la tabla:</span>
+<span class="cm">-- id=1  titulo='Mi primer post'  created_at='2025-05-04 10:00:00'  updated_at='2025-05-04 10:00:00'</span>
+
+<span class="cm">-- PASO 3: Modificamos el registro 2 horas después</span>
+<span class="kw">UPDATE</span> <span class="tn">posts</span> <span class="kw">SET</span> titulo = <span class="st">'Título corregido'</span> <span class="kw">WHERE</span> id = <span class="nm">1</span>;
+
+<span class="cm">-- Resultado ahora:</span>
+<span class="cm">-- created_at = '2025-05-04 10:00:00'  ← NO CAMBIÓ (cuándo se creó)</span>
+<span class="cm">-- updated_at = '2025-05-04 12:00:00'  ← SÍ CAMBIÓ (cuándo se editó)</span>
+
+<span class="cm">-- PASO 4: Consultar con formato legible</span>
+<span class="kw">SELECT</span>
+  id,
+  titulo,
+  <span class="fn">DATE_FORMAT</span>(created_at, <span class="st">'%d/%m/%Y %H:%i'</span>) <span class="kw">AS</span> creado,
+  <span class="fn">DATE_FORMAT</span>(updated_at, <span class="st">'%d/%m/%Y %H:%i'</span>) <span class="kw">AS</span> modificado,
+  <span class="fn">DATEDIFF</span>(<span class="fn">NOW</span>(), created_at) <span class="kw">AS</span> dias_viejo
+<span class="kw">FROM</span> <span class="tn">posts</span>;</pre>
+  </div>
+
+  <div class="callout warn">
+    <div class="c-icon">⚠️</div>
+    <div class="c-body">
+      <strong>El error más común con fechas</strong>
+      <p>Intentar poner <code>WHERE fecha = NULL</code> en vez de <code>WHERE fecha IS NULL</code>. Con fechas (y con cualquier campo), NULL se consulta con <code>IS NULL</code> o <code>IS NOT NULL</code>, nunca con <code>=</code>.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 3. CRUD ─── -->
+<section id="crud">
+<div class="container">
+  <div class="sec-label blue">03 · CRUD</div>
+  <h2>Las 4 operaciones<br>con una tabla de ejemplo</h2>
+  <p>Usamos una sola tabla (<code>alumnos</code>) para ver el ciclo completo. Esta es exactamente la tabla que va a consultar la app móvil con fetch().</p>
+
+  <h3>C — CREATE (INSERT)</h3>
+  <div class="cb green">
+    <span class="lang">sql</span>
+    <pre><span class="cm">-- Insertar uno</span>
+<span class="kw">INSERT INTO</span> <span class="tn">alumnos</span> (nombre, email, legajo, promedio)
+<span class="kw">VALUES</span> (<span class="st">'Ana García'</span>, <span class="st">'ana@tecni.edu'</span>, <span class="st">'SW20001'</span>, <span class="nm">8.50</span>);
+
+<span class="cm">-- Insertar varios a la vez (más eficiente)</span>
+<span class="kw">INSERT INTO</span> <span class="tn">alumnos</span> (nombre, email, legajo, promedio)
+<span class="kw">VALUES</span>
+  (<span class="st">'Carlos Ruiz'</span>,   <span class="st">'carlos@tecni.edu'</span>, <span class="st">'SW20002'</span>, <span class="nm">7.20</span>),
+  (<span class="st">'Sofía Méndez'</span>,  <span class="st">'sofia@tecni.edu'</span>,  <span class="st">'SW20003'</span>, <span class="nm">9.10</span>),
+  (<span class="st">'Lucas Torres'</span>,  <span class="st">'lucas@tecni.edu'</span>,  <span class="st">'SW20004'</span>, <span class="nm">6.80</span>);
+
+<span class="cm">-- ✅ id, activo, created_at, updated_at se completan solos</span></pre>
+  </div>
+
+  <h3>R — READ (SELECT)</h3>
+  <div class="cb blue">
+    <span class="lang">sql</span>
+    <pre><span class="cm">-- Traer todos</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tn">alumnos</span>;
+
+<span class="cm">-- Traer columnas específicas (mejor práctica)</span>
+<span class="kw">SELECT</span> id, nombre, email, promedio <span class="kw">FROM</span> <span class="tn">alumnos</span>;
+
+<span class="cm">-- Filtrar: solo activos con promedio mayor a 7</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tn">alumnos</span>
+<span class="kw">WHERE</span> activo = <span class="kw">TRUE</span> <span class="kw">AND</span> promedio > <span class="nm">7.00</span>
+<span class="kw">ORDER BY</span> promedio <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> <span class="nm">10</span>;
+
+<span class="cm">-- Buscar por texto parcial</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="tn">alumnos</span>
+<span class="kw">WHERE</span> nombre <span class="kw">LIKE</span> <span class="st">'%García%'</span>;  <span class="cm">-- % = cualquier cosa</span>
+
+<span class="cm">-- Contar cuántos hay</span>
+<span class="kw">SELECT COUNT</span>(*) <span class="kw">AS</span> total, <span class="fn">AVG</span>(promedio) <span class="kw">AS</span> promedio_general
+<span class="kw">FROM</span> <span class="tn">alumnos</span>
+<span class="kw">WHERE</span> activo = <span class="kw">TRUE</span>;</pre>
+  </div>
+
+  <h3>U — UPDATE ⚠️ siempre con WHERE</h3>
+  <div class="cb orange">
+    <span class="lang">sql</span>
+    <pre><span class="cm">-- Actualizar un campo de un registro específico</span>
+<span class="kw">UPDATE</span> <span class="tn">alumnos</span>
+<span class="kw">SET</span> promedio = <span class="nm">9.00</span>, estado = <span class="st">'egresado'</span>
+<span class="kw">WHERE</span> id = <span class="nm">1</span>;
+<span class="cm">-- updated_at se actualiza SOLA gracias al ON UPDATE</span>
+
+<span class="cm">-- ✅ Verificar SIEMPRE antes de ejecutar:</span>
+<span class="cm">-- ¿Cuántos registros voy a afectar?</span>
+<span class="kw">SELECT COUNT</span>(*) <span class="kw">FROM</span> <span class="tn">alumnos</span> <span class="kw">WHERE</span> id = <span class="nm">1</span>; <span class="cm">-- debería ser 1</span>
+
+<span class="cm">-- ⛔ SIN WHERE afecta TODOS los registros — nunca hacer esto</span>
+<span class="cm">-- UPDATE alumnos SET activo = FALSE;  ← borra TODOS los activos</span></pre>
+  </div>
+
+  <h3>D — DELETE ⚠️ siempre con WHERE</h3>
+  <div class="cb red">
+    <span class="lang">sql</span>
+    <pre><span class="cm">-- Eliminar un registro específico</span>
+<span class="kw">DELETE FROM</span> <span class="tn">alumnos</span> <span class="kw">WHERE</span> id = <span class="nm">4</span>;
+
+<span class="cm">-- ✅ Mejor práctica: soft delete (no borrar, desactivar)</span>
+<span class="kw">UPDATE</span> <span class="tn">alumnos</span>
+<span class="kw">SET</span> activo = <span class="kw">FALSE</span>
+<span class="kw">WHERE</span> id = <span class="nm">4</span>;
+<span class="cm">-- El registro sigue existiendo, pero el sistema lo ignora</span>
+<span class="cm">-- Así se puede recuperar si fue un error</span></pre>
+  </div>
+</div>
+</section>
+
+<!-- ─── 4. RELACIONES ─── -->
+<section id="relaciones">
+<div class="container">
+  <div class="sec-label green">04 · Relaciones y FK</div>
+  <h2>Tablas que se<br>hablan entre sí</h2>
+
+  <div class="callout info">
+    <div class="c-icon">🔗</div>
+    <div class="c-body">
+      <strong>La regla del orden al crear tablas</strong>
+      <p>Siempre crear primero la tabla <strong>padre</strong> (la que no tiene FK) y después la tabla <strong>hija</strong> (la que tiene FK). Si lo hacés al revés, MySQL da error porque no puede referenciar algo que no existe.</p>
+    </div>
+  </div>
+
+  <h3>Relación 1:N — Un alumno tiene muchos proyectos</h3>
+  <div class="cb">
+    <span class="lang">sql · 1:N</span>
+    <pre><span class="cm">-- 1️⃣ PRIMERO: tabla padre (alumnos ya existe de antes)</span>
+
+<span class="cm">-- 2️⃣ DESPUÉS: tabla hija con la FK</span>
+<span class="kw">CREATE TABLE</span> <span class="tn">proyectos</span> (
+  id           <span class="dt">INT UNSIGNED</span>    <span class="kw">AUTO_INCREMENT PRIMARY KEY</span>,
+
+  <span class="cm">-- La FK: apunta al id de la tabla alumnos</span>
+  alumno_id    <span class="dt">INT UNSIGNED</span>    <span class="kw">NOT NULL</span>,
+
+  nombre       <span class="dt">VARCHAR</span>(<span class="nm">200</span>)   <span class="kw">NOT NULL</span>,
+  tecnologia   <span class="dt">ENUM</span>(<span class="st">'React Native'</span>,<span class="st">'React Web'</span>,<span class="st">'PHP'</span>,<span class="st">'Otro'</span>),
+  nota         <span class="dt">DECIMAL</span>(<span class="nm">4</span>,<span class="nm">2</span>),
+  created_at   <span class="dt">TIMESTAMP</span>       <span class="kw">DEFAULT</span> <span class="fn">CURRENT_TIMESTAMP</span>,
+
+  <span class="cm">-- Declarar la FOREIGN KEY</span>
+  <span class="kw">FOREIGN KEY</span> (alumno_id)
+    <span class="kw">REFERENCES</span> <span class="tn">alumnos</span>(id)
+    <span class="kw">ON DELETE CASCADE</span>   <span class="cm">-- si se borra el alumno, sus proyectos también</span>
+    <span class="kw">ON UPDATE CASCADE</span>   <span class="cm">-- si cambia el id del alumno, se actualiza acá</span>
+);
+
+<span class="cm">-- Insertar respetando la FK</span>
+<span class="kw">INSERT INTO</span> <span class="tn">proyectos</span> (alumno_id, nombre, tecnologia, nota)
+<span class="kw">VALUES</span> (<span class="nm">1</span>, <span class="st">'App de Recordatorios'</span>, <span class="st">'React Native'</span>, <span class="nm">9.50</span>);
+<span class="cm">-- ✅ alumno_id=1 existe en la tabla alumnos → funciona</span>
+<span class="cm">-- ❌ alumno_id=999 no existe → ERROR de FK</span>
+
+<span class="cm">-- JOIN para ver proyectos CON el nombre del alumno</span>
+<span class="kw">SELECT</span>
+  p.nombre     <span class="kw">AS</span> proyecto,
+  p.nota,
+  p.tecnologia,
+  a.nombre     <span class="kw">AS</span> alumno,
+  a.legajo
+<span class="kw">FROM</span>       <span class="tn">proyectos</span> p
+<span class="kw">INNER JOIN</span> <span class="tn">alumnos</span>   a <span class="kw">ON</span> p.alumno_id = a.id
+<span class="kw">ORDER BY</span> p.nota <span class="kw">DESC</span>;</pre>
+  </div>
+
+  <h3>ON DELETE — qué pasa cuando borramos el padre</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Opción</th><th>¿Qué hace?</th><th>Cuándo usarlo</th></tr></thead>
+      <tbody>
+        <tr><td><code>CASCADE</code></td><td class="yes">Borra los hijos automáticamente</td><td>Posts de un usuario. Sin el usuario no tienen sentido.</td></tr>
+        <tr><td><code>SET NULL</code></td><td class="med">Pone NULL en el FK del hijo</td><td>Tareas asignadas. Sin el asignado, la tarea queda sin dueño.</td></tr>
+        <tr><td><code>RESTRICT</code></td><td class="no">Impide borrar al padre</td><td>Órdenes de compra. No podemos borrar un cliente con historial.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- ─── 5. ERRORES COMUNES ─── -->
+<section id="errores">
+<div class="container">
+  <div class="sec-label purple">05 · Errores comunes</div>
+  <h2>Los errores que<br>siempre aparecen</h2>
+  <p>Estos son los errores que más se repiten. Reconocerlos ahorra mucho tiempo.</p>
+
+  <div class="error-grid">
+    <div class="error-card">
+      <div class="err-title">ERROR 1452 · FK fails</div>
+      <div class="err-cause">Intentar insertar con un FK que no existe en la tabla padre.</div>
+      <div class="err-fix">✅ Verificar que el ID padre exista antes de hacer el INSERT hijo.</div>
+    </div>
+    <div class="error-card">
+      <div class="err-title">ERROR 1451 · Cannot delete parent</div>
+      <div class="err-cause">Intentar borrar un registro padre que tiene hijos referenciándolo (ON DELETE RESTRICT).</div>
+      <div class="err-fix">✅ Borrar primero los hijos, o cambiar a ON DELETE CASCADE.</div>
+    </div>
+    <div class="error-card">
+      <div class="err-title">ERROR 1062 · Duplicate entry</div>
+      <div class="err-cause">Insertar un valor repetido en una columna UNIQUE (email, legajo).</div>
+      <div class="err-fix">✅ Verificar con SELECT antes del INSERT, o usar INSERT IGNORE.</div>
+    </div>
+    <div class="error-card">
+      <div class="err-title">UPDATE sin WHERE</div>
+      <div class="err-cause">Se modifica TODA la tabla. No da error, simplemente destruye los datos.</div>
+      <div class="err-fix">✅ SIEMPRE poner WHERE id = n. Probar el SELECT antes del UPDATE.</div>
+    </div>
+    <div class="error-card">
+      <div class="err-title">WHERE campo = NULL</div>
+      <div class="err-cause">NULL no se compara con =. La consulta devuelve 0 resultados aunque haya NULLs.</div>
+      <div class="err-fix">✅ Usar siempre IS NULL o IS NOT NULL.</div>
+    </div>
+    <div class="error-card">
+      <div class="err-title">FK antes que la tabla padre</div>
+      <div class="err-cause">Crear la tabla hija (con FK) antes que la tabla padre. MySQL no puede referenciar algo que no existe.</div>
+      <div class="err-fix">✅ Crear siempre primero la tabla padre, después la hija.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 6. QUIZ ─── -->
+<section id="quiz">
+<div class="container">
+  <div class="sec-label red">06 · Quiz de verificación</div>
+  <h2>¿Quedó claro?<br>Tocá para ver la respuesta</h2>
+  <p>Tocá cada tarjeta para revelar la respuesta. Primero intentá responder mentalmente.</p>
+
+  <div class="quiz-grid">
+    <div class="quiz-card" onclick="this.classList.toggle('revealed')">
+      <div class="qc-num">Pregunta 01</div>
+      <div class="qc-q">¿Qué tipo de dato uso para guardar el precio de un producto?</div>
+      <div class="qc-a">DECIMAL(10,2)<br><br>Nunca FLOAT ni DOUBLE para dinero — tienen errores de redondeo. DECIMAL es exacto.</div>
+      <div class="qc-hint">👆 Tocá para ver</div>
+    </div>
+    <div class="quiz-card" onclick="this.classList.toggle('revealed')">
+      <div class="qc-num">Pregunta 02</div>
+      <div class="qc-q">¿Qué hace ON UPDATE CURRENT_TIMESTAMP en un campo TIMESTAMP?</div>
+      <div class="qc-a">Actualiza automáticamente el campo a la fecha y hora actual cada vez que se hace un UPDATE en esa fila. No hay que escribirlo en la query.</div>
+      <div class="qc-hint">👆 Tocá para ver</div>
+    </div>
+    <div class="quiz-card" onclick="this.classList.toggle('revealed')">
+      <div class="qc-num">Pregunta 03</div>
+      <div class="qc-q">¿Por qué no se puede crear la tabla hija antes que la tabla padre cuando hay FK?</div>
+      <div class="qc-a">Porque la FK referencia a una columna de la tabla padre. Si la tabla padre no existe todavía, MySQL no puede crear la referencia → ERROR 1215.</div>
+      <div class="qc-hint">👆 Tocá para ver</div>
+    </div>
+    <div class="quiz-card" onclick="this.classList.toggle('revealed')">
+      <div class="qc-num">Pregunta 04</div>
+      <div class="qc-q">¿Cuál es la diferencia entre DATE y TIMESTAMP?</div>
+      <div class="qc-a">DATE guarda solo la fecha (YYYY-MM-DD), sin hora. TIMESTAMP guarda fecha + hora y puede completarse automáticamente con DEFAULT CURRENT_TIMESTAMP.</div>
+      <div class="qc-hint">👆 Tocá para ver</div>
+    </div>
+    <div class="quiz-card" onclick="this.classList.toggle('revealed')">
+      <div class="qc-num">Pregunta 05</div>
+      <div class="qc-q">¿Qué pasa si hago UPDATE sin WHERE?</div>
+      <div class="qc-a">Se actualiza TODA la tabla. MySQL no da error, simplemente cambia todos los registros. Es uno de los errores más graves y no tiene deshacer fácil.</div>
+      <div class="qc-hint">👆 Tocá para ver</div>
+    </div>
+    <div class="quiz-card" onclick="this.classList.toggle('revealed')">
+      <div class="qc-num">Pregunta 06</div>
+      <div class="qc-q">¿Qué es ON DELETE CASCADE?</div>
+      <div class="qc-a">Cuando se borra un registro padre, MySQL borra automáticamente todos los registros hijos que lo referencian. Ej: borrar un usuario borra sus publicaciones.</div>
+      <div class="qc-hint">👆 Tocá para ver</div>
+    </div>
+    <div class="quiz-card" onclick="this.classList.toggle('revealed')">
+      <div class="qc-num">Pregunta 07</div>
+      <div class="qc-q">¿Cómo busco registros donde un campo es NULL?</div>
+      <div class="qc-a">SELECT * FROM tabla WHERE campo IS NULL;<br><br>Nunca con = NULL. El operador = no funciona con NULL en SQL.</div>
+      <div class="qc-hint">👆 Tocá para ver</div>
+    </div>
+    <div class="quiz-card" onclick="this.classList.toggle('revealed')">
+      <div class="qc-num">Pregunta 08</div>
+      <div class="qc-q">¿Para qué sirve el INNER JOIN?</div>
+      <div class="qc-a">Para combinar filas de dos tablas según una condición. Devuelve solo las filas que tienen match en AMBAS tablas. Ej: ver proyectos con el nombre del alumno dueño.</div>
+      <div class="qc-hint">👆 Tocá para ver</div>
+    </div>
+  </div>
+
+  <h3>Checklist de consolidación — marcá lo que ya dominás</h3>
+  <ul class="checklist" id="checklist">
+    <li><div class="ck-box" onclick="toggle(this)"></div><span class="ck-text">Sé elegir el tipo de dato correcto para cada campo (VARCHAR, INT, DECIMAL, BOOLEAN, ENUM)</span></li>
+    <li><div class="ck-box" onclick="toggle(this)"></div><span class="ck-text">Entiendo cuándo usar DATE y cuándo usar TIMESTAMP</span></li>
+    <li><div class="ck-box" onclick="toggle(this)"></div><span class="ck-text">Sé qué hace DEFAULT CURRENT_TIMESTAMP y ON UPDATE CURRENT_TIMESTAMP</span></li>
+    <li><div class="ck-box" onclick="toggle(this)"></div><span class="ck-text">Puedo hacer INSERT, SELECT, UPDATE y DELETE sin ayuda</span></li>
+    <li><div class="ck-box" onclick="toggle(this)"></div><span class="ck-text">Nunca hago UPDATE ni DELETE sin WHERE</span></li>
+    <li><div class="ck-box" onclick="toggle(this)"></div><span class="ck-text">Entiendo qué es una Foreign Key y para qué sirve</span></li>
+    <li><div class="ck-box" onclick="toggle(this)"></div><span class="ck-text">Sé crear primero la tabla padre y después la tabla hija</span></li>
+    <li><div class="ck-box" onclick="toggle(this)"></div><span class="ck-text">Puedo hacer un INNER JOIN para combinar dos tablas relacionadas</span></li>
+    <li><div class="ck-box" onclick="toggle(this)"></div><span class="ck-text">Conozco la diferencia entre ON DELETE CASCADE, SET NULL y RESTRICT</span></li>
+    <li><div class="ck-box" onclick="toggle(this)"></div><span class="ck-text">Sé identificar y resolver los errores más comunes (1452, 1062, sin WHERE)</span></li>
+  </ul>
+</div>
+</section>
+
+
+
+<footer>
+  <div>
+    <p>Tecnicatura Superior en Desarrollo de Software · ISFD N°26 · Dolores · 2° Año</p>
+    <p>Clase Especial · Repaso Total MySQL · Para usar mañana en clase 🖥️</p>
+  </div>
+  <button class="btn red" onclick="window.print()">🖨️ Imprimir / PDF</button>
+</footer>
+
+<script>
+function toggle(el) {
+  el.classList.toggle('checked');
+  if (el.classList.contains('checked')) el.textContent = '✓';
+  else el.textContent = '';
+}
+
+function copyPrompt() {
+  const text = document.getElementById('promptText').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.pb-copy-btn');
+    btn.textContent = '✅ Copiado!';
+    setTimeout(() => btn.textContent = '📋 Copiar prompt', 2000);
+  });
+}
+</script>
+  <!-- FLOATING HOME BUTTON -->
+  <a href="../index.html" style="position:fixed; bottom:2rem; left:2rem; width:48px; height:48px; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; z-index:1000; box-shadow:0 8px 16px rgba(0,0,0,0.4); transition:all 0.3s ease; border-color: #34d399;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';">
+    <span style="font-size:1.2rem;">🏠</span>
+  </a>
+
+</body>
+</html>

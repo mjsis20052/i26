@@ -158,6 +158,18 @@
             z-index: -1;
         }
 
+        @keyframes pulse-highlight {
+            0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6); }
+            70% { box-shadow: 0 0 0 15px rgba(52, 211, 153, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+        }
+
+        .highlight-repaso {
+            border-color: #34d399 !important;
+            background: rgba(16, 185, 129, 0.1) !important;
+            animation: pulse-highlight 2s infinite;
+        }
+
         header {
             padding: 4rem 2rem;
             padding-top: 5.5rem;
@@ -1275,7 +1287,136 @@
             box-shadow: 0 15px 30px rgba(6, 182, 212, 0.2);
         }
 
+        /* ─── NEXT LESSON FLOW ─── */
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.08); }
+        }
+
+        @keyframes shimmer {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .next-lesson-section {
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(6, 182, 212, 0.03));
+            border-top: 1px solid rgba(16, 185, 129, 0.2);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+            text-align: center;
+            margin: 5rem 0 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .next-lesson-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.5), transparent);
+        }
+
+        .next-lesson-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--accent-c);
+            margin-bottom: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .next-lesson-dot {
+            width: 8px;
+            height: 8px;
+            background: #34d399;
+            border-radius: 50%;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .next-lesson-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+        }
+
+        .next-lesson-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.2rem 2rem;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.1));
+            border: 2px solid rgba(16, 185, 129, 0.4);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .next-lesson-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(16, 185, 129, 0.1);
+            transition: left 0.4s ease;
+        }
+
+        .next-lesson-link:hover {
+            border-color: rgba(16, 185, 129, 0.8);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(6, 182, 212, 0.15));
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .next-lesson-link::before:hover {
+            left: 100%;
+        }
+
+        .next-lesson-indicator {
+            width: 12px;
+            height: 12px;
+            background: #34d399;
+            border-radius: 50%;
+            animation: shimmer 2.5s ease-in-out infinite;
+            position: relative;
+        }
+
+        .next-lesson-arrow {
+            font-size: 1.4rem;
+            transition: transform 0.3s ease;
+        }
+
+        .next-lesson-link:hover .next-lesson-arrow {
+            transform: translateX(8px);
+        }
+
         @media(max-width: 768px) {
+            .next-lesson-section {
+                padding: 3rem 1.5rem;
+            }
+
+            .next-lesson-title {
+                font-size: 1.4rem;
+            }
+
+            .next-lesson-link {
+                padding: 1rem 1.5rem;
+                flex-direction: column;
+            }
+
             .back-to-top {
                 bottom: 1.5rem;
                 right: 1.5rem;
@@ -1298,6 +1439,12 @@
             <li><a href="2do/clase-php-mysql-I26.html" id="snav-php">
                     <span class="nav-badge yr2">2°</span> <span>PHP & MySQL</span>
                 </a></li>
+            <li><a href="2do/clase_2do_MySQL_CRUD_FK_I26.html" id="snav-fk">
+                    <span class="nav-badge yr2">2°</span> <span>MySQL FK</span>
+                </a></li>
+            <li><a href="2do/clase_2do_REPASO_MySQL_I26.html" id="snav-repaso">
+                    <span class="nav-badge yr2">2°</span> <span>Repaso MySQL</span>
+                </a></li>
             <li><a href="2do/clase_2do_soft_I26_ReactNative.html" id="snav-rn">
                     <span class="nav-badge yr2">2°</span> <span>React Native</span>
                 </a></li>
@@ -1313,7 +1460,7 @@
         <h1>Clases <span>Software</span></h1>
         <p class="sub">Recursos organizados por año y materia · Instituto I26.</p>
         <div style="font-family: 'Space Mono', monospace; font-size: 0.75rem; color: #10b981; margin-top: 1.5rem; border: 1px solid rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1); border-radius: 4px; padding: 0.4rem 0.8rem; display: inline-block;">
-            Última actualización: 29 de Abril de 2026 — 01:50 hs — <strong>MySQL Avanzado (FK & CRUD Relacional)</strong>
+            Última actualización: 04 de Mayo de 2026 — <strong>Repaso Total MySQL · TIMESTAMP · Relaciones · FK · Quiz</strong>
         </div>
     </header>
 
@@ -1364,6 +1511,20 @@
                         <h3 style="color: var(--accent-p);">MySQL Avanzado: FK & CRUD Relacional</h3>
                         <p>Lo que m&aacute;s cost&oacute; entender: c&oacute;mo relacionar tablas de verdad. Claves for&aacute;neas (FK), integridad referencial profunda, UPDATE con fechas autom&aacute;ticas y el CRUD de segundo nivel donde los datos est&aacute;n vivos y conectados.</p>
                         <a href="2do/clase_2do_MySQL_CRUD_FK_I26.html" class="path-link yr2a" style="color: var(--accent-p); border-color: rgba(124, 58, 237, 0.3);">Ir a la clase avanzada →</a>
+                    </div>
+                </div>
+
+                <!-- CLASE ESPECIAL: REPASO TOTAL -->
+                <div class="path-item">
+                    <div class="path-dot yr2a highlight-repaso">📋</div>
+                    <div class="path-body">
+                        <div class="path-meta">
+                            <span class="path-badge yr2">2° Año</span>
+                            CLASE REPASO
+                        </div>
+                        <h3 style="color: #34d399;">Repaso Total MySQL</h3>
+                        <p>Consolidaci&oacute;n completa antes de pasar al frontend m&oacute;vil. Tipos de datos correctos, TIMESTAMP paso a paso, CRUD con una sola tabla, relaciones 1:N y N:M, claves for&aacute;neas, errores comunes y quiz de verificaci&oacute;n interactivo.</p>
+                        <a href="2do/clase_2do_REPASO_MySQL_I26.html" class="path-link yr2b" style="color:#34d399;border-color:rgba(16,185,129,0.3);">Ir al repaso →</a>
                     </div>
                 </div>
 
@@ -1451,6 +1612,19 @@
                     </div>
                 </a>
 
+                <!-- REPASO TOTAL MySQL -->
+                <a href="2do/clase_2do_REPASO_MySQL_I26.html" class="card c" style="border-color:rgba(16,185,129,0.25);">
+                    <div class="card-num">CLASE REPASO</div>
+                    <h2 style="color: #34d399;">Repaso Total MySQL</h2>
+                    <p>Consolidación antes del móvil. Tipos correctos, TIMESTAMP, CRUD, relaciones 1:N y N:M, errores comunes y quiz interactivo de verificación.</p>
+                    <div class="tag-row">
+                        <span class="tag">REPASO</span>
+                        <span class="tag">TIMESTAMP</span>
+                        <span class="tag">RELACIONES</span>
+                        <span class="tag">QUIZ</span>
+                    </div>
+                </a>
+
                 <!-- CLASE 3: REACT NATIVE -->
                 <a href="2do/clase_2do_soft_I26_ReactNative.html" class="card c">
                     <div class="card-num">CLASE 02</div>
@@ -1499,6 +1673,20 @@
             </div>
         </section>
     </main>
+
+    <!-- ═══ NEXT LESSON FLOW ═══ -->
+    <section class="next-lesson-section">
+        <div class="next-lesson-label">
+            <span class="next-lesson-dot"></span>
+            Comienza aquí
+        </div>
+        <h2 class="next-lesson-title">Backend con PHP & MySQL</h2>
+        <a href="2do/clase-php-mysql-I26.html" class="next-lesson-link">
+            <span class="next-lesson-indicator"></span>
+            Ir a la primera clase
+            <span class="next-lesson-arrow">→</span>
+        </a>
+    </section>
 
     <footer>
         <div class="footer-container">
@@ -1570,6 +1758,15 @@
                     color: 'var(--accent-p)',
                 },
                 {
+                    id: 'mysql-repaso',
+                    anio: 2,
+                    emoji: '📋',
+                    titulo: 'Repaso Total MySQL',
+                    meta: '2° Año · Clase Repaso',
+                    href: '2do/clase_2do_REPASO_MySQL_I26.html',
+                    color: '#34d399',
+                },
+                {
                     id: 'react-native',
                     anio: 2,
                     emoji: '📱',
@@ -1596,9 +1793,11 @@
                 { cat: 'JS', term: 'FETCH', def: 'Función para pedir datos a una API de forma asíncrona.' },
                 { cat: 'TECECO', term: 'LATENCIA', def: 'Tiempo que tarda un paquete en llegar a destino.' },
                 { cat: 'MYSQL', term: 'FOREIGN KEY', def: 'Relación entre tablas que garantiza integridad de datos.' },
+                { cat: 'MYSQL', term: 'TIMESTAMP', def: 'Tipo que guarda fecha+hora y se actualiza automáticamente con ON UPDATE.' },
                 { cat: 'BRAIN', term: 'SINAPSIS', def: 'Conexión entre neuronas — como una API entre módulos.' },
             ],
             tips: [
+                '"TIMESTAMP DEFAULT CURRENT_TIMESTAMP: la fecha se completa sola en el INSERT. ON UPDATE: se actualiza sola en el UPDATE. Dos líneas que ahorran cientos de bugs."',
                 '"Nuestro cerebro ama los patrones. 25 min de foco total = 1 hora dispersa. Aplicá Pomodoro cuando estudiás código."',
                 '"PHP procesa en el servidor, React Native en el dispositivo. Son dos extremos del mismo sistema."',
                 '"Una base de datos bien diseñada es el esqueleto del sistema. Sin ella, el frontend es solo apariencia."',

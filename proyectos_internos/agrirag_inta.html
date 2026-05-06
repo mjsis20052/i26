@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriRAG — Ecosistema IA INTA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-glow: rgba(16, 185, 129, 0.2);
+            --bg-dark: #05070a;
+            --surface: #0f172a;
+            --surface-hover: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --glass: rgba(15, 23, 42, 0.8);
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            
+            --green-glow: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+            --teal-glow: radial-gradient(circle at 50% 50%, rgba(20, 184, 166, 0.15) 0%, transparent 70%);
+            --purple-glow: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+            --amber-glow: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.15) 0%, transparent 70%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 10%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(59, 130, 246, 0.08) 0%, transparent 40%);
+            z-index: -1;
+        }
+
+        /* --- APP STRUCTURE --- */
+        .app-container {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 800px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            background: rgba(2, 6, 23, 0.5);
+            border-right: 1px solid var(--border);
+            padding: 2.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        .logo-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .logo-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        .logo-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+        }
+
+        .nav-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            padding-left: 0.75rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            transition: transform 0.3s;
+        }
+
+        .nav-item:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.03);
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            color: var(--text-main);
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.2);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.05);
+        }
+
+        .nav-item.active i {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.03), transparent 40%);
+        }
+
+        .header {
+            padding: 2.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .header-info h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+            color: #fff;
+        }
+
+        .header-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .badge-institutional {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--primary);
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .content-area {
+            padding: 2.5rem;
+            flex: 1;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- CARDS GRID --- */
+        .filter-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            padding: 0.5rem 1.25rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-chip:hover {
+            border-color: var(--text-muted);
+            color: var(--text-main);
+        }
+
+        .filter-chip.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+            font-size: 1.25rem;
+        }
+
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-tag {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .card-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-footer {
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* --- PIPELINE --- */
+        .pipeline {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .step:hover {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .step-num {
+            width: 60px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 800;
+            font-family: 'Syne', sans-serif;
+            font-size: 1.25rem;
+        }
+
+        .step-info {
+            padding: 1.25rem 1.5rem;
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .step-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* --- ANALOGY --- */
+        .analogy-wrap {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .analogy-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 2rem 1.5rem;
+            text-align: center;
+        }
+
+        .analogy-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .analogy-term {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .analogy-def {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .analogy-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0.35rem 0.85rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 100px;
+            color: var(--primary);
+        }
+
+        /* --- MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: var(--surface);
+            width: 90%;
+            max-width: 550px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transform: scale(0.9);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 2rem;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .modal-section {
+            margin-bottom: 1.75rem;
+        }
+
+        .modal-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            display: block;
+            font-weight: 700;
+        }
+
+        .modal-text {
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .example-block {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1.25rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            font-family: 'Inter', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            color: var(--primary);
+        }
+
+        .key-takeaway {
+            background: rgba(16, 185, 129, 0.05);
+            border-left: 3px solid var(--primary);
+            padding: 1.25rem;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            font-size: 0.9rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #fff;
+        }
+
+        /* --- GLOSSARY --- */
+        .search-wrap {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .search-wrap i {
+            position: absolute;
+            left: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            padding: 1rem 1.25rem 1rem 3.25rem;
+            border-radius: 100px;
+            color: #fff;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+
+        .gloss-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .gloss-card {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            align-items: flex-start;
+        }
+
+        .gloss-term {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--primary);
+            padding: 0.35rem 1rem;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+
+        .gloss-def {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* --- ROADMAP --- */
+        .roadmap {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .phase-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .phase-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            background: rgba(16, 185, 129, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .phase-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+
+        .phase-timeline {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .phase-body {
+            padding: 1.25rem;
+        }
+
+        .task-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .task-item {
+            display: flex;
+            gap: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .task-item i {
+            color: var(--primary);
+            font-size: 0.9rem;
+            margin-top: 2px;
+        }
+
+        @media (max-width: 900px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+            body {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo-wrap">
+            <div class="logo-title">AgriRAG</div>
+            <div class="logo-sub">Ecosistema IA Agro</div>
+            <div style="font-size: 0.6rem; color: var(--primary); margin-top: 0.25rem; font-weight: 700; letter-spacing: 0.05em;">I26 DESARROLLO DE SOFTWARE</div>
+        </div>
+
+        <nav class="nav-group">
+            <div class="nav-label">Core</div>
+            <div class="nav-item active" onclick="goTo(this,'conceptos')">
+                <i class="ti ti-brain"></i>
+                Conceptos Clave
+            </div>
+            <div class="nav-item" onclick="goTo(this,'pipeline')">
+                <i class="ti ti-circuit-cell"></i>
+                Arquitectura RAG
+            </div>
+        </nav>
+
+        <nav class="nav-group">
+            <div class="nav-label">Pedagogía</div>
+            <div class="nav-item" onclick="goTo(this,'analogia')">
+                <i class="ti ti-school"></i>
+                Analogía Dual
+            </div>
+            <div class="nav-item" onclick="goTo(this,'hoja')">
+                <i class="ti ti-timeline"></i>
+                Roadmap Técnico
+            </div>
+            <div class="nav-item" onclick="goTo(this,'glosario')">
+                <i class="ti ti-book"></i>
+                Glosario IA
+            </div>
+        </nav>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <header class="header">
+            <div class="header-info">
+                <h1 id="page-title">Conceptos clave del sistema</h1>
+                <p id="page-sub">Explora los pilares fundamentales del motor de inteligencia artificial.</p>
+            </div>
+            <div class="badge-institutional">INTA DOCS · v2.0</div>
+        </header>
+
+        <div class="content-area">
+            
+            <!-- SECCIÓN: CONCEPTOS -->
+            <section class="section active" id="s-conceptos">
+                <div class="filter-row">
+                    <button class="filter-chip active" onclick="filterCards('todos', this)">Todos</button>
+                    <button class="filter-chip" onclick="filterCards('ingesta', this)">Ingesta</button>
+                    <button class="filter-chip" onclick="filterCards('busqueda', this)">Búsqueda</button>
+                    <button class="filter-chip" onclick="filterCards('modelo', this)">Modelado</button>
+                    <button class="filter-chip" onclick="filterCards('validacion', this)">Validación</button>
+                </div>
+                
+                <div class="grid" id="concept-grid">
+                    <!-- CARDS INYECTADAS DINÁMICAMENTE POR JS O MANTENIDAS AQUÍ -->
+                    <div class="card" data-cat="ingesta" onclick="openModal('dataset')">
+                        <div class="card-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="ti ti-database"></i></div>
+                        <span class="card-tag">Ingesta · Activos</span>
+                        <h3 class="card-title">Dataset Propietario</h3>
+                        <p class="card-desc">El núcleo del conocimiento: preguntas, respuestas y correcciones de 30 años de labor institucional.</p>
+                        <div class="card-footer"><i class="ti ti-chevron-right"></i> Ver detalle técnico</div>
+                    </div>
+
+                    <div class="card" data-cat="ingesta" onclick="openModal('chunking')">
+                        <div class="card-icon" style="background: rgba(20, 184, 166, 0.1); color: #14b8a6;"><i class="ti ti-cut"></i></div>
+                        <span class="card-tag">Ingesta · Estructura</span>
+                        <h3 class="card-title">Neural Chunking</h3>
+                        <p class="card-desc">Segmentación inteligente de documentos extensos para una recuperación de contexto ultra-precisa.</p>
+                        <div class="card-footer"><i class="ti ti-chevron-right"></i> Ver detalle técnico</div>
+                    </div>
+
+                    <div class="card" data-cat="busqueda" onclick="openModal('embeddings')">
+                        <div class="card-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;"><i class="ti ti-vector"></i></div>
+                        <span class="card-tag">Búsqueda · Vectores</span>
+                        <h3 class="card-title">Embeddings</h3>
+                        <h3 class="card-title">Semántica Espacial</h3>
+                        <p class="card-desc">Transformación de texto en coordenadas numéricas para encontrar significado en lugar de palabras.</p>
+                        <div class="card-footer"><i class="ti ti-chevron-right"></i> Ver detalle técnico</div>
+                    </div>
+
+                    <div class="card" data-cat="busqueda" onclick="openModal('rag')">
+                        <div class="card-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class="ti ti-books"></i></div>
+                        <span class="card-tag">Búsqueda · RAG</span>
+                        <h3 class="card-title">Recuperación Aumentada</h3>
+                        <p class="card-desc">Arquitectura que impide alucinaciones al forzar al modelo a responder solo con fuentes verídicas.</p>
+                        <div class="card-footer"><i class="ti ti-chevron-right"></i> Ver detalle técnico</div>
+                    </div>
+
+                    <div class="card" data-cat="modelo" onclick="openModal('finetuning')">
+                        <div class="card-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;"><i class="ti ti-adjustments-alt"></i></div>
+                        <span class="card-tag">Modelado · Ajuste</span>
+                        <h3 class="card-title">Fine-Tuning Regional</h3>
+                        <p class="card-desc">Especialización del modelo base para dominar el lenguaje técnico y regional del agro pampeano.</p>
+                        <div class="card-footer"><i class="ti ti-chevron-right"></i> Ver detalle técnico</div>
+                    </div>
+
+                    <div class="card" data-cat="validacion" onclick="openModal('hitl')">
+                        <div class="card-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;"><i class="ti ti-user-check"></i></div>
+                        <span class="card-tag">Validación · Humana</span>
+                        <h3 class="card-title">Human-In-The-Loop</h3>
+                        <p class="card-desc">Cierre del ciclo de confianza: revisión experta de cada respuesta antes de su publicación oficial.</p>
+                        <div class="card-footer"><i class="ti ti-chevron-right"></i> Ver detalle técnico</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: PIPELINE -->
+            <section class="section" id="s-pipeline">
+                <div class="pipeline">
+                    <div class="step">
+                        <div class="step-num">01</div>
+                        <div class="step-info">
+                            <div class="step-title"><i class="ti ti-files"></i> Ingesta de Corpus INTA</div>
+                            <div class="step-desc">Recopilación de 30 años de boletines, ensayos y manuales técnicos.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num" style="background: #14b8a6;">02</div>
+                        <div class="step-info">
+                            <div class="step-title"><i class="ti ti-cut"></i> Fragmentación (Chunking)</div>
+                            <div class="step-desc">División en bloques de 300-500 tokens con preservación de metadatos.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num" style="background: #8b5cf6;">03</div>
+                        <div class="step-info">
+                            <div class="step-title"><i class="ti ti-vector"></i> Vectorización Neural</div>
+                            <div class="step-desc">Conversión a embeddings de alta dimensión y almacenamiento en ChromaDB.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num" style="background: #3b82f6;">04</div>
+                        <div class="step-info">
+                            <div class="step-title"><i class="ti ti-search"></i> Recuperación Semántica</div>
+                            <div class="step-desc">Búsqueda de los fragmentos más relevantes ante la consulta del productor.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num" style="background: #f59e0b;">05</div>
+                        <div class="step-info">
+                            <div class="step-title"><i class="ti ti-cpu"></i> Generación Condicionada</div>
+                            <div class="step-desc">El LLM sintetiza la respuesta basándose estrictamente en el contexto recuperado.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num" style="background: #ef4444;">06</div>
+                        <div class="step-info">
+                            <div class="step-title"><i class="ti ti-shield-check"></i> Auditoría de Expertos</div>
+                            <div class="step-desc">Revisión final por técnicos INTA para garantizar la precisión agronómica.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: ANALOGÍA -->
+            <section class="section" id="s-analogia">
+                <div class="analogy-wrap">
+                    <div class="analogy-card">
+                        <span class="analogy-icon">📚</span>
+                        <h3 class="analogy-term">Dataset</h3>
+                        <p class="analogy-def">Es como la biblioteca personal que el alumno consulta antes de hablar.</p>
+                        <span class="analogy-tag">Base Cognitiva</span>
+                    </div>
+                    <div class="analogy-card">
+                        <span class="analogy-icon">🔍</span>
+                        <h3 class="analogy-term">RAG</h3>
+                        <p class="analogy-def">Es como permitir que el alumno use el libro abierto durante el examen.</p>
+                        <span class="analogy-tag">Freno de Error</span>
+                    </div>
+                    <div class="analogy-card">
+                        <span class="analogy-icon">🎓</span>
+                        <h3 class="analogy-term">Fine-Tuning</h3>
+                        <p class="analogy-def">Es como enviar al alumno a un posgrado de especialización en agronomía.</p>
+                        <span class="analogy-tag">Expertiz Focal</span>
+                    </div>
+                    <div class="analogy-card">
+                        <span class="analogy-icon">👨‍🏫</span>
+                        <h3 class="analogy-term">HITL</h3>
+                        <p class="analogy-def">Es el profesor que corrige el examen antes de entregar la nota final.</p>
+                        <span class="analogy-tag">Garantía Real</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: ROADMAP -->
+            <section class="section" id="s-hoja">
+                <div class="roadmap">
+                    <div class="phase-card">
+                        <div class="phase-header">
+                            <span class="phase-title">Fase 01 · Ingesta</span>
+                            <span class="phase-timeline">Semana 1-4</span>
+                        </div>
+                        <div class="phase-body">
+                            <ul class="task-list">
+                                <li class="task-item"><i class="ti ti-circle-check"></i> Digitalización de corpus</li>
+                                <li class="task-item"><i class="ti ti-circle-check"></i> Diseño de metadatos</li>
+                                <li class="task-item"><i class="ti ti-circle-check"></i> Config ChromaDB</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="phase-card">
+                        <div class="phase-header" style="background: rgba(59, 130, 246, 0.05);">
+                            <span class="phase-title" style="color: #3b82f6;">Fase 02 · RAG</span>
+                            <span class="phase-timeline">Semana 5-8</span>
+                        </div>
+                        <div class="phase-body">
+                            <ul class="task-list">
+                                <li class="task-item"><i class="ti ti-circle-check" style="color: #3b82f6;"></i> Prototipo Mistral 7B</li>
+                                <li class="task-item"><i class="ti ti-circle-check" style="color: #3b82f6;"></i> Interfaz de consulta</li>
+                                <li class="task-item"><i class="ti ti-circle-check" style="color: #3b82f6;"></i> Módulo validador</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="phase-card">
+                        <div class="phase-header" style="background: rgba(245, 158, 11, 0.05);">
+                            <span class="phase-title" style="color: #f59e0b;">Fase 03 · Dataset</span>
+                            <span class="phase-timeline">Semana 9-16</span>
+                        </div>
+                        <div class="phase-body">
+                            <ul class="task-list">
+                                <li class="task-item"><i class="ti ti-circle-check" style="color: #f59e0b;"></i> Despliegue piloto</li>
+                                <li class="task-item"><i class="ti ti-circle-check" style="color: #f59e0b;"></i> Validación masiva</li>
+                                <li class="task-item"><i class="ti ti-circle-check" style="color: #f59e0b;"></i> Limpieza de ruido</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: GLOSARIO -->
+            <section class="section" id="s-glosario">
+                <div class="search-wrap">
+                    <i class="ti ti-search"></i>
+                    <input type="text" class="search-input" id="gloss-search" placeholder="Filtrar términos por nombre o descripción..." oninput="filterGloss(this.value)">
+                </div>
+                <div class="gloss-grid" id="gloss-list">
+                    <div class="gloss-card" data-term="token">
+                        <span class="gloss-term">Token</span>
+                        <p class="gloss-def">Unidad mínima de procesamiento. Un documento de 1000 palabras equivale aproximadamente a 1300 tokens.</p>
+                    </div>
+                    <div class="gloss-card" data-term="vector">
+                        <span class="gloss-term">Vector Neural</span>
+                        <p class="gloss-def">Representación numérica que permite comparar la cercanía de ideas en lugar de la similitud de caracteres.</p>
+                    </div>
+                    <div class="gloss-card" data-term="cuantizacion">
+                        <span class="gloss-term">Cuantización</span>
+                        <p class="gloss-def">Proceso de compresión que permite ejecutar modelos potentes en hardware institucional de bajo costo.</p>
+                    </div>
+                    <div class="gloss-card" data-term="hallucination">
+                        <span class="gloss-term">Alucinación</span>
+                        <p class="gloss-def">Tendencia de las IAs a inventar datos. AgriRAG mitiga esto forzando la consulta al corpus del INTA.</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+</div>
+
+<!-- MODAL OVERLAY -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+    <div class="modal">
+        <div class="modal-header">
+            <div id="modal-title-wrap">
+                <span class="modal-label" id="modal-cat-label">Detalle Técnico</span>
+                <h2 id="modal-title" style="font-family: 'Syne', sans-serif;">Dataset Propietario</h2>
+            </div>
+            <button class="close-btn" onclick="closeModal()"><i class="ti ti-x"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-section">
+                <span class="modal-label">Definición Concepto</span>
+                <p class="modal-text" id="modal-def"></p>
+            </div>
+            <div class="modal-section">
+                <span class="modal-label">Implementación en AgriRAG</span>
+                <p class="modal-text" id="modal-impl"></p>
+            </div>
+            <div class="modal-section">
+                <span class="modal-label">Ejemplo de Flujo</span>
+                <div class="example-block" id="modal-example"></div>
+            </div>
+            <div class="key-takeaway" id="modal-key"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const MODALS_DATA = {
+        dataset: {
+            title: "Dataset Propietario",
+            cat: "Ingesta · Activos",
+            def: "Colección estructurada de pares pregunta-respuesta validados, correcciones de expertos y métricas históricas del INTA.",
+            impl: "Se construye incrementalmente: cada interacción auditada por un técnico se convierte en un nuevo dato de entrenamiento para futuros ciclos.",
+            example: "Pregunta: '¿Qué pastura conviene en otoño en Dolores?'\nRespuesta Validada: 'Mezcla de Festuca + Trébol (INTA 2024)'",
+            key: "La calidad del dataset es el techo de cristal de la inteligencia del sistema."
+        },
+        chunking: {
+            title: "Neural Chunking",
+            cat: "Ingesta · Estructura",
+            def: "Fragmentación de documentos PDF de cientos de páginas en bloques semánticos de 300-500 tokens.",
+            impl: "Utilizamos algoritmos de solapamiento para no perder contexto entre el final de un bloque y el inicio del siguiente.",
+            example: "Manual de Suelos (200 pág) -> 600 bloques temáticos vinculados a su geolocalización original.",
+            key: "Segmentar bien permite que el RAG encuentre la 'aguja' sin traer todo el 'pajar'."
+        },
+        embeddings: {
+            title: "Semántica Espacial",
+            cat: "Búsqueda · Vectores",
+            def: "Transformación de texto en vectores de 1536 dimensiones que capturan la intención del lenguaje.",
+            impl: "Permite que el sistema entienda que 'siembra de maíz' y 'cultivo de Zea mays' son la misma entidad semántica.",
+            example: "Vector['maíz'] <-> Vector['choclo'] => Similitud 0.98",
+            key: "Busca por significado profundo, ignorando las variaciones léxicas del usuario."
+        },
+        rag: {
+            title: "Recuperación Aumentada",
+            cat: "Búsqueda · RAG",
+            def: "Arquitectura que conecta el modelo de lenguaje con una base de datos externa de confianza.",
+            impl: "El modelo no puede usar sus conocimientos previos para dar recomendaciones técnicas; debe citar un documento INTA recuperado.",
+            example: "Consulta -> Recupera 3 PDF de INTA -> LLM escribe: 'Según el informe de 2022...'",
+            key: "Elimina la posibilidad de alucinaciones técnicas críticas en el campo."
+        },
+        finetuning: {
+            title: "Fine-Tuning Regional",
+            cat: "Modelado · Ajuste",
+            def: "Ajuste fino de los parámetros del modelo para adaptarlo al vocabulario técnico del agro regional.",
+            impl: "Se realiza trimestralmente sobre modelos base como Llama 3 o Mistral usando el dataset validado acumulado.",
+            example: "Modelo Base + 1000 correcciones técnicas = Modelo Experto en Agro Pampeano.",
+            key: "Adapta el 'cerebro' generalista de la IA al 'idioma' específico de la región."
+        },
+        hitl: {
+            title: "Human-In-The-Loop",
+            cat: "Validación · Humana",
+            def: "Protocolo de seguridad donde un humano supervisa y corrige las decisiones de la IA.",
+            impl: "Interfaz administrativa donde los ingenieros del INTA aprueban o editan las respuestas antes de ser públicas.",
+            example: "IA propone dosis -> Ingeniero corrige -> Respuesta corregida se envía al productor y se guarda para re-entrenar.",
+            key: "Es lo que transforma un experimento tecnológico en una herramienta institucional seria."
+        }
+    };
+
+    const PAGES_INFO = {
+        conceptos: { title: "Conceptos clave del sistema", sub: "Explora los pilares fundamentales del motor de inteligencia artificial." },
+        pipeline: { title: "Arquitectura RAG", sub: "Flujo de datos desde la documentación cruda hasta la validación experta." },
+        analogia: { title: "Analogía Dual", sub: "Comparativas pedagógicas para facilitar la comprensión del ecosistema." },
+        hoja: { title: "Roadmap Técnico", sub: "Línea de tiempo y fases de implementación del proyecto AgriRAG." },
+        glosario: { title: "Glosario IA", sub: "Diccionario técnico de términos para ingenieros y desarrolladores." }
+    };
+
+    function goTo(el, id) {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        el.classList.add('active');
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById('s-' + id).classList.add('active');
+        
+        const info = PAGES_INFO[id];
+        document.getElementById('page-title').innerText = info.title;
+        document.getElementById('page-sub').innerText = info.sub;
+    }
+
+    function filterCards(cat, btn) {
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.card').forEach(c => {
+            c.style.display = (cat === 'todos' || c.dataset.cat === cat) ? 'block' : 'none';
+        });
+    }
+
+    function openModal(id) {
+        const data = MODALS_DATA[id];
+        if (!data) return;
+        
+        document.getElementById('modal-title').innerText = data.title;
+        document.getElementById('modal-cat-label').innerText = data.cat;
+        document.getElementById('modal-def').innerText = data.def;
+        document.getElementById('modal-impl').innerText = data.impl;
+        document.getElementById('modal-example').innerText = data.example;
+        document.getElementById('modal-key').innerHTML = `<strong>Clave Técnica:</strong> ${data.key}`;
+        
+        document.getElementById('modal-overlay').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('modal-overlay').classList.remove('active');
+    }
+
+    function handleOverlayClick(e) {
+        if (e.target === document.getElementById('modal-overlay')) closeModal();
+    }
+
+    function filterGloss(q) {
+        const query = q.toLowerCase();
+        document.querySelectorAll('.gloss-card').forEach(card => {
+            const text = card.innerText.toLowerCase();
+            card.style.display = text.includes(query) ? 'flex' : 'none';
+        });
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeModal();
+    });
+</script>
+
+</body>
+</html>

@@ -680,47 +680,86 @@
 
         <nav class="nav-group">
             <div class="nav-label">Core Nexus</div>
-            <div class="nav-item active" onclick="goTo(this,'conceptos')">
+            <div class="nav-item active" onclick="goTo(this,'introduccion')">
+                <i class="ti ti-info-circle"></i>
+                Introducción
+            </div>
+            <div class="nav-item" onclick="goTo(this,'conceptos')">
                 <i class="ti ti-brain"></i>
-                Conceptos Clave
+                Arquitectura
             </div>
             <div class="nav-item" onclick="goTo(this,'pipeline')">
                 <i class="ti ti-circuit-cell"></i>
-                Arquitectura RAG
+                Flujo Procesamiento
             </div>
         </nav>
 
         <nav class="nav-group">
-            <div class="nav-label">Pedagogía</div>
+            <div class="nav-label">Pedagogía & Plan</div>
             <div class="nav-item" onclick="goTo(this,'analogia')">
                 <i class="ti ti-school"></i>
-                Analogía Dual
+                Marco Conceptual
             </div>
             <div class="nav-item" onclick="goTo(this,'hoja')">
                 <i class="ti ti-timeline"></i>
-                Roadmap Técnico
+                Hoja de Ruta
+            </div>
+            <div class="nav-item" onclick="goTo(this,'infra')">
+                <i class="ti ti-server"></i>
+                Infraestructura
             </div>
             <div class="nav-item" onclick="goTo(this,'glosario')">
                 <i class="ti ti-book"></i>
-                Glosario IA
+                Glosario Técnico
             </div>
         </nav>
     </aside>
 
-    <!-- MAIN -->
-    <main class="main">
+        <!-- HEADER INSTITUCIONAL -->
+        <div style="background: rgba(16, 185, 129, 0.05); padding: 1rem 2.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em;">
+            <div>VERSIÓN: 1.0 — BORRADOR TÉCNICO</div>
+            <div>FECHA: MAYO 2026</div>
+            <div>CLASIFICACIÓN: USO INTERNO / EQUIPO TÉCNICO</div>
+        </div>
+
         <header class="header">
             <div class="header-info">
-                <h1 id="page-title">Conceptos clave del sistema</h1>
-                <p id="page-sub">Explora los pilares fundamentales del motor de inteligencia artificial INTA-I26.</p>
+                <h1 id="page-title">Documentación Técnica: Agri-Nexus</h1>
+                <p id="page-sub">Arquitectura y flujo de procesamiento sobre base documental de 30 años.</p>
             </div>
-            <div class="badge-institutional">INTA-I26 NEXUS · v2.0</div>
+            <div class="badge-institutional">INTA-I26 NEXUS · v1.0</div>
         </header>
 
         <div class="content-area">
             
+            <!-- SECCIÓN: INTRODUCCIÓN -->
+            <section class="section active" id="s-introduccion">
+                <div style="max-width: 800px; margin-bottom: 3rem;">
+                    <h2 style="font-family: 'Syne', sans-serif; font-size: 1.8rem; margin-bottom: 1.5rem; color: var(--primary);">1. Introducción y Contexto</h2>
+                    <p style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 2rem; line-height: 1.8;">
+                        El presente documento describe la arquitectura técnica de un sistema de inteligencia artificial diseñado para aprovechar la base documental del <strong>INTA</strong> acumulada durante las últimas tres décadas.
+                    </p>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div class="card" style="cursor: default; border-left: 4px solid #ef4444;">
+                            <h3 style="color: #ef4444; margin-bottom: 0.5rem;"><i class="ti ti-alert-circle"></i> 1.1. El Problema</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">
+                                El INTA cuenta con un volumen extraordinario de conocimiento técnico que permanece subutilizado por barreras de acceso. Un productor no tiene forma eficiente de consultar 30 años de ensayos en segundos.
+                            </p>
+                        </div>
+                        <div class="card" style="cursor: default; border-left: 4px solid var(--primary);">
+                            <h3 style="color: var(--primary); margin-bottom: 0.5rem;"><i class="ti ti-bulb"></i> 1.2. La Solución</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">
+                                Un sistema de tipo <strong>RAG (Retrieval-Augmented Generation)</strong> que indexa semánticamente la documentación y responde en lenguaje natural con validación experta.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- SECCIÓN: CONCEPTOS -->
-            <section class="section active" id="s-conceptos">
+            <section class="section" id="s-conceptos">
+                <h2 style="font-family: 'Syne', sans-serif; font-size: 1.8rem; margin-bottom: 2rem; color: var(--primary);">2. Arquitectura Técnica: Componentes Clave</h2>
                 <div class="filter-row">
                     <button class="filter-chip active" onclick="filterCards('todos', this)">Todos</button>
                     <button class="filter-chip" onclick="filterCards('ingesta', this)">Ingesta</button>
@@ -730,100 +769,130 @@
                 </div>
                 
                 <div class="grid" id="concept-grid">
-                    <!-- CARDS INYECTADAS DINÁMICAMENTE POR JS O MANTENIDAS AQUÍ -->
                     <div class="card" data-cat="ingesta" onclick="openModal('dataset')">
                         <div class="card-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="ti ti-database"></i></div>
-                        <span class="card-tag">Ingesta · Activos</span>
-                        <h3 class="card-title">Dataset Propietario</h3>
-                        <p class="card-desc">El núcleo del conocimiento: preguntas, respuestas y correcciones de 30 años de labor institucional INTA.</p>
-                        <div class="card-footer"><i class="ti ti-chevron-right"></i> Ver detalle técnico</div>
+                        <span class="card-tag">2.1. Dataset Institucional</span>
+                        <h3 class="card-title">Base de Activos</h3>
+                        <p class="card-desc">Conjunto estructurado que alimenta el aprendizaje. Incluye pares pregunta-respuesta validados por el INTA.</p>
+                        <div class="card-footer"><i class="ti ti-key"></i> Clave: Activo diferencial</div>
                     </div>
 
                     <div class="card" data-cat="ingesta" onclick="openModal('chunking')">
                         <div class="card-icon" style="background: rgba(20, 184, 166, 0.1); color: #14b8a6;"><i class="ti ti-cut"></i></div>
-                        <span class="card-tag">Ingesta · Estructura</span>
-                        <h3 class="card-title">Neural Chunking</h3>
-                        <p class="card-desc">Segmentación inteligente de documentos extensos para una recuperación de contexto ultra-precisa.</p>
-                        <div class="card-footer"><i class="ti ti-chevron-right"></i> Ver detalle técnico</div>
+                        <span class="card-tag">2.2. Chunking</span>
+                        <h3 class="card-title">Segmentación</h3>
+                        <p class="card-desc">División de PDFs extensos en fragmentos óptimos para máxima precisión de recuperación.</p>
+                        <div class="card-footer"><i class="ti ti-key"></i> Clave: Granularidad semántica</div>
                     </div>
 
                     <div class="card" data-cat="busqueda" onclick="openModal('embeddings')">
                         <div class="card-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;"><i class="ti ti-vector"></i></div>
-                        <span class="card-tag">Búsqueda · Vectores</span>
-                        <h3 class="card-title">Semántica Espacial</h3>
-                        <p class="card-desc">Transformación de texto en coordenadas numéricas para encontrar significado en lugar de palabras.</p>
-                        <div class="card-footer"><i class="ti ti-chevron-right"></i> Ver detalle técnico</div>
+                        <span class="card-tag">2.3. Embeddings</span>
+                        <h3 class="card-title">Vectores Semánticos</h3>
+                        <p class="card-desc">Transformación de texto en coordenadas numéricas de alta dimensión para capturar el significado.</p>
+                        <div class="card-footer"><i class="ti ti-key"></i> Clave: Búsqueda por intención</div>
                     </div>
 
                     <div class="card" data-cat="busqueda" onclick="openModal('rag')">
                         <div class="card-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><i class="ti ti-books"></i></div>
-                        <span class="card-tag">Búsqueda · RAG</span>
+                        <span class="card-tag">2.4. RAG Architecture</span>
                         <h3 class="card-title">Recuperación Aumentada</h3>
-                        <p class="card-desc">Arquitectura que impide alucinaciones al forzar al modelo a responder solo con fuentes verídicas INTA.</p>
-                        <div class="card-footer"><i class="ti ti-chevron-right"></i> Ver detalle técnico</div>
+                        <p class="card-desc">Núcleo de confiabilidad: el modelo responde citando fuentes verídicas INTA en tiempo real.</p>
+                        <div class="card-footer"><i class="ti ti-key"></i> Clave: Cero alucinaciones</div>
                     </div>
 
                     <div class="card" data-cat="modelo" onclick="openModal('finetuning')">
                         <div class="card-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;"><i class="ti ti-adjustments-alt"></i></div>
-                        <span class="card-tag">Modelado · Ajuste</span>
-                        <h3 class="card-title">Fine-Tuning Regional</h3>
-                        <p class="card-desc">Especialización del modelo base para dominar el lenguaje técnico del agro con el respaldo del I26.</p>
-                        <div class="card-footer"><i class="ti ti-chevron-right"></i> Ver detalle técnico</div>
+                        <span class="card-tag">2.5. Fine-tuning</span>
+                        <h3 class="card-title">Ajuste Regional</h3>
+                        <p class="card-desc">Especialización del modelo base para dominar el lenguaje técnico del agro y el vocabulario local.</p>
+                        <div class="card-footer"><i class="ti ti-key"></i> Clave: Especialización posterior</div>
+                    </div>
+
+                    <div class="card" data-cat="busqueda" onclick="openModal('ranking')">
+                        <div class="card-icon" style="background: rgba(20, 184, 166, 0.1); color: #14b8a6;"><i class="ti ti-list-numbers"></i></div>
+                        <span class="card-tag">2.6. Ranking Semántico</span>
+                        <h3 class="card-title">Re-ranking Experto</h3>
+                        <p class="card-desc">Ordenamiento por relevancia geográfica, recencia y jerarquía de fuente institucional.</p>
+                        <div class="card-footer"><i class="ti ti-key"></i> Clave: Calidad de contexto</div>
+                    </div>
+
+                    <div class="card" data-cat="modelo" onclick="openModal('modelo_base')">
+                        <div class="card-icon" style="background: rgba(255, 255, 255, 0.1); color: #fff;"><i class="ti ti-cpu"></i></div>
+                        <span class="card-tag">2.7. Modelo Base</span>
+                        <h3 class="card-title">Motores Open-Source</h3>
+                        <p class="card-desc">Uso de modelos potentes como Mistral o LLaMA 3 desplegables en infraestructura propia.</p>
+                        <div class="card-footer"><i class="ti ti-key"></i> Clave: Soberanía de datos</div>
                     </div>
 
                     <div class="card" data-cat="validacion" onclick="openModal('hitl')">
                         <div class="card-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;"><i class="ti ti-user-check"></i></div>
-                        <span class="card-tag">Validación · Humana</span>
-                        <h3 class="card-title">Human-In-The-Loop</h3>
-                        <p class="card-desc">Cierre del ciclo de confianza: revisión experta INTA antes de la publicación oficial en la plataforma I26.</p>
-                        <div class="card-footer"><i class="ti ti-chevron-right"></i> Ver detalle técnico</div>
+                        <span class="card-tag">2.8. Human-In-The-Loop</span>
+                        <h3 class="card-title">Validación Humana</h3>
+                        <p class="card-desc">Supervisión experta INTA antes de que la respuesta sea pública en la plataforma.</p>
+                        <div class="card-footer"><i class="ti ti-key"></i> Clave: Garantía institucional</div>
                     </div>
                 </div>
             </section>
 
             <!-- SECCIÓN: PIPELINE -->
             <section class="section" id="s-pipeline">
+                <h2 style="font-family: 'Syne', sans-serif; font-size: 1.8rem; margin-bottom: 2rem; color: var(--primary);">3. Flujo Completo de Procesamiento</h2>
                 <div class="pipeline">
                     <div class="step">
-                        <div class="step-num">01</div>
+                        <div class="step-num">1</div>
                         <div class="step-info">
-                            <div class="step-title"><i class="ti ti-files"></i> Ingesta de Corpus INTA</div>
-                            <div class="step-desc">Recopilación de 30 años de boletines, ensayos y manuales técnicos institucionales.</div>
+                            <div class="step-title">Documentación INTA</div>
+                            <div class="step-desc">30 años de anuarios y ensayos digitalizados.</div>
                         </div>
                     </div>
                     <div class="step">
-                        <div class="step-num" style="background: #14b8a6;">02</div>
+                        <div class="step-num">2</div>
                         <div class="step-info">
-                            <div class="step-title"><i class="ti ti-cut"></i> Fragmentación (Chunking)</div>
-                            <div class="step-desc">División en bloques semánticos con preservación de metadatos de origen.</div>
+                            <div class="step-title">Chunking</div>
+                            <div class="step-desc">División en fragmentos semánticos coherentes.</div>
                         </div>
                     </div>
                     <div class="step">
-                        <div class="step-num" style="background: #8b5cf6;">03</div>
+                        <div class="step-num">3</div>
                         <div class="step-info">
-                            <div class="step-title"><i class="ti ti-vector"></i> Vectorización Neural</div>
-                            <div class="step-desc">Conversión a embeddings de alta dimensión procesados por la infraestructura I26.</div>
+                            <div class="step-title">Embeddings</div>
+                            <div class="step-desc">Vectorización y almacenamiento en base de datos.</div>
                         </div>
                     </div>
                     <div class="step">
-                        <div class="step-num" style="background: #3b82f6;">04</div>
+                        <div class="step-num">4</div>
                         <div class="step-info">
-                            <div class="step-title"><i class="ti ti-search"></i> Recuperación Semántica</div>
-                            <div class="step-desc">Búsqueda de los fragmentos más relevantes ante la consulta técnica del usuario.</div>
+                            <div class="step-title">Consulta de Usuario</div>
+                            <div class="step-desc">Ingreso de pregunta en lenguaje natural.</div>
                         </div>
                     </div>
                     <div class="step">
-                        <div class="step-num" style="background: #f59e0b;">05</div>
+                        <div class="step-num" style="background: #3b82f6;">5</div>
                         <div class="step-info">
-                            <div class="step-title"><i class="ti ti-cpu"></i> Generación Condicionada</div>
-                            <div class="step-desc">El LLM sintetiza la respuesta basándose estrictamente en el conocimiento INTA recuperado.</div>
+                            <div class="step-title">RAG – Recuperación</div>
+                            <div class="step-desc">Búsqueda de fragmentos por similitud de coseno.</div>
                         </div>
                     </div>
                     <div class="step">
-                        <div class="step-num" style="background: #ef4444;">06</div>
+                        <div class="step-num" style="background: #f59e0b;">6</div>
                         <div class="step-info">
-                            <div class="step-title"><i class="ti ti-shield-check"></i> Auditoría de Expertos</div>
-                            <div class="step-desc">Revisión final por técnicos INTA para garantizar la precisión en la plataforma I26.</div>
+                            <div class="step-title">Generación de Respuesta</div>
+                            <div class="step-desc">El LLM sintetiza la respuesta basada en contexto.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num" style="background: #ef4444;">7</div>
+                        <div class="step-info">
+                            <div class="step-title">Validación Humana</div>
+                            <div class="step-desc">Revisión, corrección y aprobación por técnicos.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num" style="background: var(--primary);">8</div>
+                        <div class="step-info">
+                            <div class="step-title">Dataset Acumulativo</div>
+                            <div class="step-desc">Alimentación para futuras iteraciones de Fine-tuning.</div>
                         </div>
                     </div>
                 </div>
@@ -831,106 +900,163 @@
 
             <!-- SECCIÓN: ANALOGÍA -->
             <section class="section" id="s-analogia">
+                <h2 style="font-family: 'Syne', sans-serif; font-size: 1.8rem; margin-bottom: 2rem; color: var(--primary);">4. Marco Conceptual: Analogía Pedagógica</h2>
                 <div class="analogy-wrap">
                     <div class="analogy-card">
                         <span class="analogy-icon">📚</span>
-                        <h3 class="analogy-term">Dataset INTA</h3>
-                        <p class="analogy-def">Es como la biblioteca técnica que el sistema consulta antes de emitir un juicio.</p>
+                        <h3 class="analogy-term">Dataset</h3>
+                        <p class="analogy-def">Libros de texto y bibliografía técnica institucional.</p>
                         <span class="analogy-tag">Base Cognitiva</span>
                     </div>
                     <div class="analogy-card">
                         <span class="analogy-icon">🔍</span>
-                        <h3 class="analogy-term">RAG Nexus</h3>
-                        <p class="analogy-def">Es como permitir que el alumno use los manuales del INTA durante el examen I26.</p>
+                        <h3 class="analogy-term">RAG</h3>
+                        <p class="analogy-def">Buscar en la biblioteca antes de emitir una respuesta.</p>
                         <span class="analogy-tag">Freno de Error</span>
                     </div>
                     <div class="analogy-card">
                         <span class="analogy-icon">🎓</span>
-                        <h3 class="analogy-term">Fine-Tuning</h3>
-                        <p class="analogy-def">Es como un entrenamiento intensivo de especialización para el personal del I26.</p>
-                        <span class="analogy-tag">Expertiz Focal</span>
+                        <h3 class="analogy-term">Fine-tuning</h3>
+                        <p class="analogy-def">Estudiar para un examen específico de agronomía regional.</p>
+                        <span class="analogy-tag">Especialización</span>
                     </div>
                     <div class="analogy-card">
                         <span class="analogy-icon">👨‍🏫</span>
                         <h3 class="analogy-term">HITL</h3>
-                        <p class="analogy-def">Es el ingeniero del INTA que corrige el examen antes de dar el diploma final.</p>
+                        <p class="analogy-def">El docente corrigiendo al alumno para asegurar excelencia.</p>
                         <span class="analogy-tag">Garantía Real</span>
                     </div>
+                </div>
+                <div style="margin-top: 4rem; padding: 3rem; background: rgba(16, 185, 129, 0.05); border-radius: var(--radius-lg); text-align: center; border: 1px dashed var(--primary);">
+                    <h2 style="font-family: 'Syne', sans-serif; font-size: 1.5rem; color: #fff; font-style: italic;">
+                        "La IA no sabe del campo. Nosotros le enseñamos con datos del INTA,<br>la controlamos con expertos y la mejoramos con el uso."
+                    </h2>
                 </div>
             </section>
 
             <!-- SECCIÓN: ROADMAP -->
             <section class="section" id="s-hoja">
+                <h2 style="font-family: 'Syne', sans-serif; font-size: 1.8rem; margin-bottom: 2rem; color: var(--primary);">5. Hoja de Ruta Técnica</h2>
                 <div class="roadmap">
                     <div class="phase-card">
                         <div class="phase-header">
-                            <span class="phase-title">Fase 01 · Ingesta INTA</span>
-                            <span class="phase-timeline">Semana 1-4</span>
+                            <span class="phase-title">Fase 1 · Preparación</span>
+                            <span class="phase-timeline">Semanas 1-4</span>
                         </div>
                         <div class="phase-body">
                             <ul class="task-list">
-                                <li class="task-item"><i class="ti ti-circle-check"></i> Digitalización de corpus</li>
+                                <li class="task-item"><i class="ti ti-circle-check"></i> Digitalización de corpus INTA</li>
                                 <li class="task-item"><i class="ti ti-circle-check"></i> Diseño de metadatos</li>
-                                <li class="task-item"><i class="ti ti-circle-check"></i> Config ChromaDB</li>
+                                <li class="task-item"><i class="ti ti-circle-check"></i> Configuración pgvector/Chroma</li>
                             </ul>
                         </div>
                     </div>
                     <div class="phase-card">
                         <div class="phase-header" style="background: rgba(59, 130, 246, 0.05);">
-                            <span class="phase-title" style="color: #3b82f6;">Fase 02 · RAG I26</span>
-                            <span class="phase-timeline">Semana 5-8</span>
+                            <span class="phase-title" style="color: #3b82f6;">Fase 2 · Prototipo</span>
+                            <span class="phase-timeline">Semanas 5-8</span>
                         </div>
                         <div class="phase-body">
                             <ul class="task-list">
-                                <li class="task-item"><i class="ti ti-circle-check" style="color: #3b82f6;"></i> Prototipo de inferencia</li>
-                                <li class="task-item"><i class="ti ti-circle-check" style="color: #3b82f6;"></i> Interfaz de consulta</li>
-                                <li class="task-item"><i class="ti ti-circle-check" style="color: #3b82f6;"></i> Módulo validador</li>
+                                <li class="task-item"><i class="ti ti-circle-check" style="color: #3b82f6;"></i> Integración de Modelo Base</li>
+                                <li class="task-item"><i class="ti ti-circle-check" style="color: #3b82f6;"></i> Pipeline de Recuperación</li>
+                                <li class="task-item"><i class="ti ti-circle-check" style="color: #3b82f6;"></i> Interfaz validadora HITL</li>
                             </ul>
                         </div>
                     </div>
                     <div class="phase-card">
                         <div class="phase-header" style="background: rgba(245, 158, 11, 0.05);">
-                            <span class="phase-title" style="color: #f59e0b;">Fase 03 · Dataset Fusion</span>
-                            <span class="phase-timeline">Semana 9-16</span>
+                            <span class="phase-title" style="color: #f59e0b;">Fase 3 · Evaluación</span>
+                            <span class="phase-timeline">Semanas 9-16</span>
                         </div>
                         <div class="phase-body">
                             <ul class="task-list">
-                                <li class="task-item"><i class="ti ti-circle-check" style="color: #f59e0b;"></i> Despliegue piloto</li>
-                                <li class="task-item"><i class="ti ti-circle-check" style="color: #f59e0b;"></i> Validación masiva</li>
-                                <li class="task-item"><i class="ti ti-circle-check" style="color: #f59e0b;"></i> Limpieza de ruido</li>
+                                <li class="task-item"><i class="ti ti-circle-check" style="color: #f59e0b;"></i> Apertura a usuarios piloto</li>
+                                <li class="task-item"><i class="ti ti-circle-check" style="color: #f59e0b;"></i> Validación sistemática</li>
+                                <li class="task-item"><i class="ti ti-circle-check" style="color: #f59e0b;"></i> Métricas Recall@k & BLEU</li>
                             </ul>
                         </div>
+                    </div>
+                    <div class="phase-card">
+                        <div class="phase-header" style="background: rgba(16, 185, 129, 0.05);">
+                            <span class="phase-title" style="color: var(--primary);">Fase 4 · Escala</span>
+                            <span class="phase-timeline">Semana 17+</span>
+                        </div>
+                        <div class="phase-body">
+                            <ul class="task-list">
+                                <li class="task-item"><i class="ti ti-circle-check" style="color: var(--primary);"></i> Fine-tuning sobre dataset</li>
+                                <li class="task-item"><i class="ti ti-circle-check" style="color: var(--primary);"></i> Evaluación comparativa</li>
+                                <li class="task-item"><i class="ti ti-circle-check" style="color: var(--primary);"></i> Despliegue en producción</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: INFRAESTRUCTURA -->
+            <section class="section" id="s-infra">
+                <h2 style="font-family: 'Syne', sans-serif; font-size: 1.8rem; margin-bottom: 2rem; color: var(--primary);">6. Consideraciones de Infraestructura</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div class="card" style="cursor: default; border-top: 4px solid var(--primary);">
+                        <h3 style="margin-bottom: 1rem;"><i class="ti ti-server"></i> Despliegue Local</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Alta soberanía de datos y control total del hardware.</p>
+                        <ul class="task-list" style="font-size: 0.8rem;">
+                            <li class="task-item"><i class="ti ti-check"></i> GPU NVIDIA (mín. 8GB VRAM)</li>
+                            <li class="task-item"><i class="ti ti-check"></i> 2TB SSD (Corpus + VectorDB)</li>
+                            <li class="task-item"><i class="ti ti-check"></i> Ubuntu Server 22.04 LTS</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="cursor: default; border-top: 4px solid #3b82f6;">
+                        <h3 style="margin-bottom: 1rem;"><i class="ti ti-cloud"></i> Nube Híbrida</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Escalabilidad total con costos operativos variables.</p>
+                        <ul class="task-list" style="font-size: 0.8rem;">
+                            <li class="task-item"><i class="ti ti-check"></i> Pinecone / Weaviate Cloud</li>
+                            <li class="task-item"><i class="ti ti-check"></i> Modelos vía API (Claude/OpenAI)</li>
+                            <li class="task-item"><i class="ti ti-check"></i> Storage S3 Institucional</li>
+                        </ul>
                     </div>
                 </div>
             </section>
 
             <!-- SECCIÓN: GLOSARIO -->
             <section class="section" id="s-glosario">
+                <h2 style="font-family: 'Syne', sans-serif; font-size: 1.8rem; margin-bottom: 2rem; color: var(--primary);">7. Glosario Técnico de Referencia</h2>
                 <div class="search-wrap">
                     <i class="ti ti-search"></i>
-                    <input type="text" class="search-input" id="gloss-search" placeholder="Filtrar términos por nombre o descripción..." oninput="filterGloss(this.value)">
+                    <input type="text" class="search-input" id="gloss-search" placeholder="Filtrar términos técnicos..." oninput="filterGloss(this.value)">
                 </div>
                 <div class="gloss-grid" id="gloss-list">
                     <div class="gloss-card" data-term="token">
                         <span class="gloss-term">Token</span>
-                        <p class="gloss-def">Unidad mínima de procesamiento. Un documento de 1000 palabras equivale aproximadamente a 1300 tokens.</p>
+                        <p class="gloss-def">Unidad básica de texto (aprox. 0.75 palabras). 1000 palabras = ~1300 tokens.</p>
                     </div>
                     <div class="gloss-card" data-term="vector">
-                        <span class="gloss-term">Vector Neural</span>
-                        <p class="gloss-def">Representación numérica que permite comparar la cercanía de ideas en lugar de la similitud de caracteres.</p>
+                        <span class="gloss-term">Embedding</span>
+                        <p class="gloss-def">Representación numérica de texto que captura significado semántico.</p>
+                    </div>
+                    <div class="gloss-card" data-term="vector_db">
+                        <span class="gloss-term">Vector Database</span>
+                        <p class="gloss-def">Sistemas como ChromaDB o pgvector especializados en búsqueda por similitud.</p>
+                    </div>
+                    <div class="gloss-card" data-term="llm">
+                        <span class="gloss-term">LLM</span>
+                        <p class="gloss-def">Large Language Model. Motor capaz de generar, resumir y razonar sobre texto.</p>
                     </div>
                     <div class="gloss-card" data-term="cuantizacion">
                         <span class="gloss-term">Cuantización</span>
-                        <p class="gloss-def">Proceso de compresión que permite ejecutar modelos potentes en hardware institucional de bajo costo.</p>
+                        <p class="gloss-def">Compresión del modelo (ej: 4-bit) para correr en hardware institucional estándar.</p>
                     </div>
-                    <div class="gloss-card" data-term="hallucination">
-                        <span class="gloss-term">Alucinación</span>
-                        <p class="gloss-def">Tendencia de las IAs a inventar datos. El Nexus mitiga esto forzando la consulta al corpus del INTA.</p>
+                    <div class="gloss-card" data-term="coseno">
+                        <span class="gloss-term">Similitud Coseno</span>
+                        <p class="gloss-def">Métrica matemática que mide la cercanía de ideas en el espacio semántico.</p>
                     </div>
                 </div>
             </section>
 
         </div>
+        <footer style="padding: 2.5rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.75rem; font-weight: 600;">
+            INSTITUTO NACIONAL DE TECNOLOGÍA AGROPECUARIA / PROYECTO IA AGROPECUARIA — MAYO 2026
+        </footer>
     </main>
 </div>
 
@@ -965,61 +1091,79 @@
 <script>
     const MODALS_DATA = {
         dataset: {
-            title: "Dataset Institucional",
-            cat: "Ingesta · Activos INTA",
-            def: "Colección estructurada de pares pregunta-respuesta validados, correcciones de expertos y métricas históricas del INTA.",
-            impl: "Se construye incrementalmente: cada interacción auditada por un técnico se convierte en un nuevo dato de entrenamiento para el Nexus.",
-            example: "Pregunta: '¿Qué pastura conviene en otoño en Dolores?'\nRespuesta Validada: 'Mezcla de Festuca + Trébol (INTA 2024)'",
-            key: "La calidad del dataset es el techo de cristal de la inteligencia del Nexus."
+            title: "2.1. Dataset Institucional",
+            cat: "Activos · Datos INTA",
+            def: "Conjunto estructurado que alimenta el aprendizaje y evaluación del sistema. Incluye pares pregunta-respuesta validados.",
+            impl: "Se construye incrementalmente: cada interacción validada por un técnico INTA se incorpora como ejemplo de entrenamiento.",
+            example: "Pregunta: '¿Qué pastura conviene en otoño?'\nRespuesta Validada: 'Festuca + trébol blanco en suelos húmedos (INTA Balcarce, 2018)'",
+            key: "Es el activo más valioso. Su calidad determina la calidad del sistema."
         },
         chunking: {
-            title: "Neural Chunking",
+            title: "2.2. Chunking (Segmentación)",
             cat: "Ingesta · Estructura Nexus",
-            def: "Fragmentación de documentos PDF de cientos de páginas en bloques semánticos de 300-500 tokens.",
-            impl: "Utilizamos algoritmos de solapamiento para no perder contexto entre el final de un bloque y el inicio del siguiente.",
-            example: "Manual de Suelos INTA -> 600 bloques temáticos vinculados a su geolocalización original.",
-            key: "Segmentar bien permite que el RAG encuentre la 'aguja' sin traer todo el 'pajar'."
+            def: "Proceso de división de documentos extensos en fragmentos semánticos de tamaño controlado (300-500 tokens).",
+            impl: "Los anuarios PDF se segmentan en bloques temáticos preservando la referencia bibliográfica original.",
+            example: "Un PDF de 200 páginas se transforma en ~500 fragmentos semánticos coherentes.",
+            key: "La granularidad impacta directamente en la precisión de las respuestas."
         },
         embeddings: {
-            title: "Semántica Espacial",
+            title: "2.3. Embeddings (Vectores)",
             cat: "Búsqueda · Vectores I26",
-            def: "Transformación de texto en vectores de 1536 dimensiones que capturan la intención del lenguaje.",
-            impl: "Permite que el sistema entienda que 'siembra de maíz' y 'cultivo de Zea mays' son la misma entidad semántica.",
-            example: "Vector['maíz'] <-> Vector['choclo'] => Similitud 0.98",
-            key: "Busca por significado profundo, ignorando las variaciones léxicas del usuario."
+            def: "Transformación de texto en vectores numéricos de alta dimensión que capturan el significado real.",
+            impl: "Permite búsqueda por significado. 'Siembra en otoño' e 'Implantación otoñal' producen vectores cercanos.",
+            example: "Vector['maíz'] <-> Vector['choclo'] => Similitud Semántica Alta",
+            key: "Fundamental para capturar la diversidad terminológica del agro."
         },
         rag: {
-            title: "Recuperación Aumentada",
+            title: "2.4. RAG Architecture",
             cat: "Búsqueda · RAG Nexus",
-            def: "Arquitectura que conecta el modelo de lenguaje con la base de datos INTA de confianza.",
-            impl: "El modelo no puede usar sus conocimientos previos para dar recomendaciones técnicas; debe citar un documento INTA recuperado.",
-            example: "Consulta -> Recupera 3 PDF de INTA -> Nexus escribe: 'Según el informe de 2022...'",
-            key: "Elimina la posibilidad de alucinaciones técnicas críticas en la plataforma I26."
+            def: "Arquitectura que combina recuperación de información con generación de texto fundamentada.",
+            impl: "El modelo responde desde documentos recuperados en tiempo real, citando fuentes verídicas del INTA.",
+            example: "Consulta -> Recupera 4 fragmentos de INTA -> Respuesta fundamentada con citas.",
+            key: "Es el núcleo de la confiabilidad. Elimina alucinaciones técnicas."
         },
         finetuning: {
-            title: "Fine-Tuning Regional",
-            cat: "Modelado · Ajuste I26",
-            def: "Ajuste fino de los parámetros del modelo para adaptarlo al vocabulario técnico del agro regional.",
-            impl: "Se realiza trimestralmente sobre modelos base usando el dataset validado acumulado en la plataforma I26.",
-            example: "Modelo Base + 1000 correcciones INTA = Modelo Nexus Experto en Agro Pampeano.",
-            key: "Adapta el 'cerebro' de la IA al 'idioma' específico de la región pampeana."
+            title: "2.5. Fine-Tuning (Ajuste)",
+            cat: "Modelado · Especialización",
+            def: "Reentrenamiento de un modelo base usando datos específicos del dominio agronómico regional.",
+            impl: "Se realiza una vez acumulado un dataset robusto para adaptar el modelo al lenguaje técnico local.",
+            example: "Modelo Base + 1000 pares validados = Modelo experto regional.",
+            key: "Se ejecuta DESPUÉS de construir un dataset robusto."
+        },
+        ranking: {
+            title: "2.6. Ranking Semántico",
+            cat: "Búsqueda · Re-ranking",
+            def: "Ordenamiento de fragmentos por relevancia geográfica, recencia y jerarquía institucional.",
+            impl: "Selecciona los fragmentos más pertinentes para la región y el contexto estacional del usuario.",
+            example: "Se recuperan 15 fragmentos -> Re-ranking selecciona los 4 mejores para la zona.",
+            key: "Determina la calidad del contexto entregado al modelo."
+        },
+        modelo_base: {
+            title: "2.7. Modelo Base",
+            cat: "Modelado · Motor Core",
+            def: "Modelos de lenguaje preentrenados (Mistral, LLaMA 3) que se reutilizan y especializan.",
+            impl: "Elección balanceada entre capacidad de razonamiento y costo de infraestructura local (cuantización).",
+            example: "Mistral 7B corriendo en GPU institucional de 8GB VRAM.",
+            key: "La diferenciación está en el dataset INTA, no en el modelo base."
         },
         hitl: {
-            title: "Human-In-The-Loop",
+            title: "2.8. Human-In-The-Loop",
             cat: "Validación · Humana INTA",
-            def: "Protocolo de seguridad donde un humano experto supervisa y corrige las decisiones de la IA.",
-            impl: "Interfaz administrativa I26 donde los ingenieros del INTA aprueban o editan las respuestas antes de ser públicas.",
-            example: "Nexus propone dosis -> Ingeniero INTA corrige -> Respuesta corregida se publica en la plataforma I26.",
-            key: "Es lo que transforma un experimento tecnológico en una herramienta institucional seria."
+            def: "Incorporación sistemática de revisión experta en el flujo de aprendizaje institucional.",
+            impl: "Interfaz administrativa donde los técnicos aprueban o corrigen respuestas antes de ser públicas.",
+            example: "IA propone dosis -> Técnico INTA corrige umbral regional -> Respuesta validada alimenta el dataset.",
+            key: "Transforma el sistema de experimental a institucional con respaldo científico."
         }
     };
 
     const PAGES_INFO = {
-        conceptos: { title: "Conceptos clave del sistema", sub: "Explora los pilares fundamentales del motor de inteligencia artificial INTA-I26." },
-        pipeline: { title: "Arquitectura RAG Nexus", sub: "Flujo de datos desde la documentación INTA hasta la validación en el I26." },
-        analogia: { title: "Analogía Dual", sub: "Comparativas pedagógicas para facilitar la comprensión del ecosistema Nexus." },
-        hoja: { title: "Roadmap Técnico", sub: "Línea de tiempo y fases de implementación del proyecto INTA-I26 Agri-Nexus." },
-        glosario: { title: "Glosario IA", sub: "Diccionario técnico de términos para ingenieros y desarrolladores del Nexus." }
+        introduccion: { title: "Documentación Técnica: Agri-Nexus", sub: "1. Introducción y contexto del proyecto IA INTA-I26." },
+        conceptos: { title: "2. Arquitectura Técnica", sub: "Componentes fundamentales y activos tecnológicos del sistema." },
+        pipeline: { title: "3. Flujo de Procesamiento", sub: "Secuencia operativa desde la ingesta hasta la validación." },
+        analogia: { title: "4. Marco Conceptual", sub: "Analogía pedagógica y visión institucional del proyecto." },
+        hoja: { title: "5. Hoja de Ruta", sub: "Fases de implementación y cronograma técnico recomendado." },
+        infra: { title: "6. Infraestructura", sub: "Opciones de despliegue local y nube para soberanía de datos." },
+        glosario: { title: "7. Glosario Técnico", sub: "Diccionario de referencia para el equipo de desarrollo." }
     };
 
     function goTo(el, id) {

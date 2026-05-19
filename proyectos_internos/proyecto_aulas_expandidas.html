@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyecto Aulas Expandidas · Articulación Formativa 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --ink2: #2d2d4a;
+    --muted: #6b6b8a;
+    --light: #f4f3f0;
+    --border: #e0dfd8;
+    --purple: #4a3f8f;
+    --purple-light: #ede9fa;
+    --teal: #0f6e56;
+    --teal-light: #e1f5ee;
+    --amber: #8a5f0b;
+    --amber-light: #fef3dc;
+    --coral: #c04828;
+    --coral-light: #fbeae7;
+    --accent: #4a3f8f;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    background: #fff;
+    line-height: 1.7;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 60px 72px;
+    background: var(--ink);
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -120px;
+    width: 480px; height: 480px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,.08);
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -80px;
+    width: 340px; height: 340px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.05);
+  }
+  .cover-top { position: relative; z-index: 2; }
+  .cover-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.5);
+    border: 1px solid rgba(255,255,255,.15);
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 48px;
+  }
+  .cover-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(38px, 5vw, 56px);
+    font-weight: 700;
+    line-height: 1.12;
+    max-width: 640px;
+    margin-bottom: 24px;
+  }
+  .cover-title span { color: #a89fe0; }
+  .cover-sub {
+    font-size: 15px;
+    color: rgba(255,255,255,.55);
+    max-width: 520px;
+    line-height: 1.7;
+  }
+  .cover-middle {
+    position: relative; z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 48px 0;
+  }
+  .cover-card {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .cover-card-label {
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.4);
+    margin-bottom: 6px;
+  }
+  .cover-card-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255,255,255,.9);
+    line-height: 1.5;
+  }
+  .cover-bottom {
+    position: relative; z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-top: 1px solid rgba(255,255,255,.1);
+    padding-top: 24px;
+  }
+  .cover-inst { font-size: 12px; color: rgba(255,255,255,.4); line-height: 1.6; }
+  .cover-year {
+    font-family: 'Playfair Display', serif;
+    font-size: 72px;
+    font-weight: 700;
+    color: rgba(255,255,255,.07);
+    line-height: 1;
+  }
+
+  /* ── LAYOUT ── */
+  .page { max-width: 800px; margin: 0 auto; padding: 64px 72px; }
+  .page-break { page-break-before: always; }
+
+  /* ── SECTION HEADERS ── */
+  .section-eyebrow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--purple);
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.25;
+  }
+  .section-rule {
+    width: 40px;
+    height: 2px;
+    background: var(--purple);
+    margin-bottom: 28px;
+    border-radius: 2px;
+  }
+  .lead {
+    font-size: 16px;
+    color: var(--muted);
+    line-height: 1.75;
+    margin-bottom: 32px;
+    border-left: 3px solid var(--purple-light);
+    padding-left: 18px;
+  }
+  p { color: var(--ink2); line-height: 1.75; margin-bottom: 16px; }
+
+  /* ── DIVIDER ── */
+  .divider { height: 1px; background: var(--border); margin: 48px 0; }
+
+  /* ── INSTITUTIONS ── */
+  .inst-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px; }
+  .inst-card {
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid var(--border);
+  }
+  .inst-card.purple { background: var(--purple-light); border-color: #c5beee; }
+  .inst-card.teal   { background: var(--teal-light);   border-color: #9FE1CB; }
+  .inst-tag {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .inst-card.purple .inst-tag { color: var(--purple); }
+  .inst-card.teal   .inst-tag { color: var(--teal); }
+  .inst-name { font-size: 15px; font-weight: 600; margin-bottom: 6px; color: var(--ink); }
+  .inst-detail { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .inst-detail strong { color: var(--ink2); font-weight: 500; }
+
+  /* ── ROLES ── */
+  .roles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+  .role-card {
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    background: var(--light);
+  }
+  .role-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--ink); }
+  .role-school { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+  .role-list { list-style: none; padding: 0; }
+  .role-list li {
+    font-size: 12px;
+    color: var(--ink2);
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .role-list li:last-child { border-bottom: none; }
+  .role-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+  .role-dot.purple { background: var(--purple); }
+  .role-dot.teal   { background: var(--teal); }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+  .tl-item { display: grid; grid-template-columns: 110px 1fr; gap: 0; }
+  .tl-left {
+    padding: 0 24px 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    position: relative;
+  }
+  .tl-left::after {
+    content: '';
+    position: absolute;
+    right: -1px; top: 8px; bottom: 0;
+    width: 1px;
+    background: var(--border);
+  }
+  .tl-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--purple);
+    position: absolute;
+    right: -5px; top: 5px;
+    z-index: 1;
+  }
+  .tl-month {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--purple);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    padding-top: 2px;
+  }
+  .tl-right { padding: 0 0 32px 24px; }
+  .tl-phase {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .tl-title { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
+  .tl-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tl-col { border-radius: 8px; padding: 12px 14px; }
+  .tl-col.purple { background: var(--purple-light); }
+  .tl-col.teal   { background: var(--teal-light); }
+  .tl-col-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .tl-col.purple .tl-col-label { color: var(--purple); }
+  .tl-col.teal   .tl-col-label { color: var(--teal); }
+  .tl-col-items { font-size: 11px; color: var(--ink2); line-height: 1.7; }
+
+  /* ── TECH STACK ── */
+  .stack-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 32px; }
+  .stack-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    background: #fff;
+  }
+  .stack-layer {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .stack-tech { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .stack-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+  /* ── METHODOLOGY ── */
+  .method-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 32px; }
+  .method-card {
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid var(--border);
+  }
+  .method-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--purple-light);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .method-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+  .method-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  /* ── PRODUCTS ── */
+  .product { border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 20px; }
+  .product-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .product-badge {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+  .product-badge.purple { background: var(--purple-light); color: var(--purple); }
+  .product-badge.teal   { background: var(--teal-light);   color: var(--teal); }
+  .product-title { font-size: 18px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  .product-desc { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 16px; }
+  .modules { display: flex; flex-wrap: wrap; gap: 8px; }
+  .module-chip {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    color: var(--ink2);
+    background: var(--light);
+  }
+
+  /* ── EVALUATION TABLE ── */
+  table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  th {
+    background: var(--ink);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .05em;
+    text-align: left;
+    padding: 10px 14px;
+  }
+  th:first-child { border-radius: 8px 0 0 0; }
+  th:last-child  { border-radius: 0 8px 0 0; }
+  td {
+    font-size: 12px;
+    color: var(--ink2);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.55;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: var(--light); }
+
+  /* ── CERTIF / FOOTER ── */
+  .certif-box {
+    border: 2px solid var(--purple);
+    border-radius: 12px;
+    padding: 24px 28px;
+    background: var(--purple-light);
+    margin-bottom: 32px;
+  }
+  .certif-title { font-size: 14px; font-weight: 600; color: var(--purple); margin-bottom: 8px; }
+  .certif-body { font-size: 13px; color: var(--ink2); line-height: 1.7; }
+
+  .sign-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 48px; }
+  .sign-block { border-top: 1px solid var(--ink); padding-top: 12px; }
+  .sign-name { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .sign-role { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .doc-footer {
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .doc-footer-left { font-size: 11px; color: var(--muted); line-height: 1.5; }
+  .doc-footer-right { font-size: 10px; color: var(--border); font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
+
+  /* ── PRINT ── */
+  @media print {
+    .cover { min-height: 100vh; }
+    .page { padding: 48px 56px; }
+    body { font-size: 13px; }
+    .section-title { font-size: 22px; }
+    .cover-title { font-size: 40px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     PORTADA
+══════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="cover-badge">Programa Aulas Expandidas · Dirección General de Cultura y Educación · PBA</div>
+    <h1 class="cover-title">Plan de Implementación <span>Colaborativo</span> Interinstitucional</h1>
+    <p class="cover-sub">Articulación formativa entre la EES N°1 de Tordillo y el ISFDyT N°26 de Dolores para el co-diseño de tecnología educativa aplicada a la gestión empresarial y financiera escolar.</p>
+  </div>
+
+  <div class="cover-middle">
+    <div class="cover-card">
+      <div class="cover-card-label">Institución secundaria</div>
+      <div class="cover-card-value">EES N°1 "Emilio Conesa"<br>Distrito Tordillo</div>
+    </div>
+    <div class="cover-card">
+      <div class="cover-card-label">Institución terciaria</div>
+      <div class="cover-card-value">ISFDyT N°26<br>Ciudad de Dolores</div>
+    </div>
+    <div class="cover-card">
+      <div class="cover-card-label">Carrera articulante</div>
+      <div class="cover-card-value">Tecnicatura Superior en Diseño de Software</div>
+    </div>
+    <div class="cover-card">
+      <div class="cover-card-label">Período de ejecución</div>
+      <div class="cover-card-value">Mayo — Octubre 2026<br>Modalidad híbrida</div>
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-inst">
+      Responsable ISFDyT N°26: Prof. Mauricio Sisti · Carrera Diseño de Software<br>
+      Responsable EES N°1: Directora Prof. Vanesa Urrizola · Depto. Jurídico Contable
+    </div>
+    <div class="cover-year">2026</div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     1. FUNDAMENTACIÓN
+══════════════════════════════════════════ -->
+<div class="page">
+  <div class="section-eyebrow">01 · Fundamentación</div>
+  <h2 class="section-title">¿Por qué este proyecto?</h2>
+  <div class="section-rule"></div>
+
+  <p class="lead">Este proyecto nace de una necesidad concreta identificada en la Muestra de Tecnología y Ciencias de Tordillo (noviembre 2025): los docentes del área contable de la EES N°1 necesitan herramientas digitales de gestión empresarial que no pueden costear ni implementar solos.</p>
+
+  <p>El programa <strong>Aulas Expandidas</strong> de la Dirección General de Cultura y Educación habilita exactamente este tipo de articulación: una escuela secundaria y una institución de nivel superior trabajando juntas en un proyecto común, donde cada institución aporta lo que sabe y ambas se fortalecen mutuamente.</p>
+
+  <p>La EES N°1 de Tordillo tiene una orientación en Economía y Administración con una propuesta institucional sólida —la <em>Expo Contable</em>— donde los estudiantes simulan empresas reales. Lo que falta es tecnología adecuada: los programas comerciales como Tango son costosos y no están adaptados a contextos educativos.</p>
+
+  <p>El ISFDyT N°26 de Dolores, a través de su Carrera de Diseño de Software, tiene exactamente lo que Tordillo necesita: estudiantes con conocimientos técnicos que aprenden haciendo, y que se enriquecen enormemente cuando el problema que resuelven es real y tiene impacto en otra comunidad educativa.</p>
+
+  <div class="divider"></div>
+
+  <div class="section-eyebrow">02 · Las instituciones</div>
+  <h2 class="section-title">Quiénes somos</h2>
+  <div class="section-rule"></div>
+
+  <div class="inst-grid">
+    <div class="inst-card purple">
+      <div class="inst-tag">Institución usuaria · Secundaria</div>
+      <div class="inst-name">EES N°1 "Emilio Conesa"</div>
+      <div class="inst-detail">
+        <strong>Localidad:</strong> Gral. Conesa, Distrito Tordillo<br>
+        <strong>Fundación:</strong> 1974<br>
+        <strong>Ciclo:</strong> 1° a 6° año — Orientación Economía y Administración<br>
+        <strong>Proyecto institucional:</strong> Expo Contable (simulación empresarial integrada)<br>
+        <strong>Referente:</strong> Directora Prof. Vanesa Urrizola · Dpto. Jurídico Contable
+      </div>
+    </div>
+    <div class="inst-card teal">
+      <div class="inst-tag">Institución desarrolladora · Terciaria</div>
+      <div class="inst-name">ISFDyT N°26 · Dolores</div>
+      <div class="inst-detail">
+        <strong>Localidad:</strong> Ciudad de Dolores<br>
+        <strong>Carrera:</strong> Tecnicatura Superior en Diseño de Software<br>
+        <strong>Alumnos participantes:</strong> 10 a 20 estudiantes de nivel intermedio-avanzado<br>
+        <strong>Carga horaria:</strong> 4 a 8 horas semanales dedicadas al proyecto<br>
+        <strong>Referente:</strong> Prof. Mauricio Sisti
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     3. ROLES
+══════════════════════════════════════════ -->
+<div class="page page-break">
+  <div class="section-eyebrow">03 · Roles y participación</div>
+  <h2 class="section-title">Quién hace qué</h2>
+  <div class="section-rule"></div>
+
+  <p class="lead">La articulación se basa en un principio fundamental: cada institución aporta lo que domina. Los estudiantes de Tordillo no son programadores, y no necesitan serlo. Son expertos en contabilidad, gestión empresarial y finanzas escolares. Eso es exactamente lo que se necesita para construir buen software.</p>
+
+  <div class="roles-grid">
+    <div class="role-card">
+      <div class="role-title">Equipo A — Gestión empresarial</div>
+      <div class="role-school">ISFDyT N°26 · Dolores · 8 a 10 alumnos</div>
+      <ul class="role-list">
+        <li><span class="role-dot purple"></span>Desarrollo del backend (Node.js + Express)</li>
+        <li><span class="role-dot purple"></span>Diseño e implementación de la base de datos</li>
+        <li><span class="role-dot purple"></span>Construcción del frontend en React</li>
+        <li><span class="role-dot purple"></span>Testing técnico y corrección de errores</li>
+        <li><span class="role-dot purple"></span>Documentación del sistema</li>
+        <li><span class="role-dot purple"></span>Capacitación a usuarios finales</li>
+      </ul>
+    </div>
+    <div class="role-card">
+      <div class="role-title">Equipo B — Billetera virtual</div>
+      <div class="role-school">ISFDyT N°26 · Dolores · 5 a 8 alumnos</div>
+      <ul class="role-list">
+        <li><span class="role-dot purple"></span>Desarrollo de la app web progresiva (PWA)</li>
+        <li><span class="role-dot purple"></span>Sistema de pagos por QR</li>
+        <li><span class="role-dot purple"></span>Panel de control parental</li>
+        <li><span class="role-dot purple"></span>Módulo de historial y reportes</li>
+        <li><span class="role-dot purple"></span>Seguridad y privacidad de datos</li>
+        <li><span class="role-dot purple"></span>Deploy y puesta en producción simulada</li>
+      </ul>
+    </div>
+    <div class="role-card">
+      <div class="role-title">Alumnos de 6° año — Analistas y testers</div>
+      <div class="role-school">EES N°1 · Tordillo · grupo completo</div>
+      <ul class="role-list">
+        <li><span class="role-dot teal"></span>Relevamiento: explican cómo funciona la empresa</li>
+        <li><span class="role-dot teal"></span>Validación de pantallas (UX testing)</li>
+        <li><span class="role-dot teal"></span>Carga de datos reales del proyecto empresarial</li>
+        <li><span class="role-dot teal"></span>Beta testing funcional en septiembre</li>
+        <li><span class="role-dot teal"></span>Presentación del software en la Expo Contable</li>
+        <li><span class="role-dot teal"></span>Operación del banco estudiantil con la billetera</li>
+      </ul>
+    </div>
+    <div class="role-card">
+      <div class="role-title">Docentes — Orientadores del proyecto</div>
+      <div class="role-school">Ambas instituciones · coordinación conjunta</div>
+      <ul class="role-list">
+        <li><span class="role-dot teal"></span>Coordinación de encuentros híbridos</li>
+        <li><span class="role-dot teal"></span>Validación pedagógica de cada etapa</li>
+        <li><span class="role-dot teal"></span>Ajuste de requerimientos funcionales</li>
+        <li><span class="role-dot teal"></span>Evaluación continua del proceso</li>
+        <li><span class="role-dot teal"></span>Articulación con inspectores y directivos</li>
+        <li><span class="role-dot teal"></span>Gestión de la certificación de participación</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="certif-box">
+    <div class="certif-title">Certificación de participación — EES N°1 Tordillo</div>
+    <div class="certif-body">Los estudiantes de 6° año que completen el proceso recibirán un certificado del ISFDyT N°26 con la leyenda: <em>"Participó como analista funcional y tester en el desarrollo de un sistema de gestión empresarial y una aplicación de billetera virtual en el marco del Programa Aulas Expandidas 2026."</em> Este certificado tiene valor curricular y puede ser incluido en presentaciones laborales o de estudios superiores.</div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     4. PRODUCTOS
+══════════════════════════════════════════ -->
+<div class="page page-break">
+  <div class="section-eyebrow">04 · Productos a desarrollar</div>
+  <h2 class="section-title">Qué se va a construir</h2>
+  <div class="section-rule"></div>
+
+  <div class="product">
+    <div class="product-header">
+      <div>
+        <div class="product-title">Software de gestión empresarial educativa</div>
+        <div class="product-desc">Simulador de gestión empresarial diseñado específicamente para el contexto educativo de la Expo Contable. Permite a los estudiantes de Tordillo operar sus empresas ficticias con herramientas digitales reales: facturar, gestionar stock, registrar movimientos de caja y visualizar estados contables básicos.</div>
+      </div>
+      <span class="product-badge purple">Producto 1</span>
+    </div>
+    <div class="modules">
+      <span class="module-chip">Alta de empresas y productos</span>
+      <span class="module-chip">Facturación simulada</span>
+      <span class="module-chip">Gestión de stock</span>
+      <span class="module-chip">Módulo de caja / tesorería</span>
+      <span class="module-chip">Compras y proveedores</span>
+      <span class="module-chip">Registro contable básico</span>
+      <span class="module-chip">Dashboard de indicadores</span>
+      <span class="module-chip">Roles y permisos de usuario</span>
+    </div>
+  </div>
+
+  <div class="product">
+    <div class="product-header">
+      <div>
+        <div class="product-title">App billetera virtual escolar</div>
+        <div class="product-desc">Aplicación web progresiva (PWA) para el Banco Estudiantil de la EES N°1. Opera con moneda virtual interna, garantizando seguridad y privacidad de los menores. Permite a los alumnos efectuar pagos, consultar saldo y registrar transacciones; a los padres, supervisar y establecer límites; y a la cantina, cobrar y gestionar.</div>
+      </div>
+      <span class="product-badge teal">Producto 2</span>
+    </div>
+    <div class="modules">
+      <span class="module-chip">Login por roles (alumno / padre / cantina)</span>
+      <span class="module-chip">Pagos por QR</span>
+      <span class="module-chip">Consulta de saldo</span>
+      <span class="module-chip">Historial de transacciones</span>
+      <span class="module-chip">Metas de ahorro</span>
+      <span class="module-chip">Panel de control parental</span>
+      <span class="module-chip">Notificaciones en tiempo real</span>
+      <span class="module-chip">Moneda virtual (sin valor fuera de la escuela)</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-eyebrow">05 · Tecnología</div>
+  <h2 class="section-title">Stack tecnológico</h2>
+  <div class="section-rule"></div>
+
+  <div class="stack-grid">
+    <div class="stack-card">
+      <div class="stack-layer">Frontend</div>
+      <div class="stack-tech">React</div>
+      <div class="stack-desc">Interfaces de usuario modernas y reactivas. Una sola base de código para ambos productos.</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-layer">Backend</div>
+      <div class="stack-tech">Node.js + Express</div>
+      <div class="stack-desc">API REST robusta. Mismo lenguaje que el frontend, facilitando el aprendizaje del equipo.</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-layer">Base de datos</div>
+      <div class="stack-tech">PostgreSQL</div>
+      <div class="stack-desc">Motor relacional gratuito y potente. Ideal para estructuras contables multi-empresa.</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-layer">Autenticación</div>
+      <div class="stack-tech">JWT + Roles</div>
+      <div class="stack-desc">Acceso seguro con perfiles diferenciados: administrador, operador, visualizador.</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-layer">Billetera / QR</div>
+      <div class="stack-tech">PWA + qrcode</div>
+      <div class="stack-desc">App instalable desde el navegador, sin necesidad de tiendas de aplicaciones.</div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-layer">Tiempo real</div>
+      <div class="stack-tech">Socket.io</div>
+      <div class="stack-desc">Notificaciones instantáneas para padres cuando sus hijos realizan transacciones.</div>
+    </div>
+  </div>
+
+  <p style="font-size:12px; color:var(--muted);">Todo el stack es open source, sin costos de licencia, lo que garantiza la continuidad del proyecto más allá del período formativo.</p>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     6. METODOLOGÍA
+══════════════════════════════════════════ -->
+<div class="page page-break">
+  <div class="section-eyebrow">06 · Metodología de trabajo</div>
+  <h2 class="section-title">Cómo vamos a trabajar</h2>
+  <div class="section-rule"></div>
+
+  <p class="lead">El proyecto adopta una metodología ágil adaptada al ritmo escolar, combinando sprints de desarrollo con instancias de retroalimentación presencial en Tordillo. Cada mes tiene un entregable concreto que los alumnos de Tordillo pueden ver, tocar y evaluar.</p>
+
+  <div class="method-grid">
+    <div class="method-card">
+      <div class="method-num">01</div>
+      <div class="method-title">Desarrollo iterativo por sprints</div>
+      <div class="method-desc">Ciclos mensuales con entregables concretos. Al final de cada mes, hay algo que mostrar y probar. No se construye todo junto al final.</div>
+    </div>
+    <div class="method-card">
+      <div class="method-num">02</div>
+      <div class="method-title">Encuentros híbridos</div>
+      <div class="method-desc">Combinación de reuniones virtuales sincrónicas (Google Meet / Discord) y visitas presenciales en momentos clave: inicio, pruebas y presentación final.</div>
+    </div>
+    <div class="method-card">
+      <div class="method-num">03</div>
+      <div class="method-title">Revisión de usuarios reales</div>
+      <div class="method-desc">Los alumnos de Tordillo son los primeros en probar cada nueva función. Su feedback —no el del programador— define si algo está bien hecho.</div>
+    </div>
+    <div class="method-card">
+      <div class="method-num">04</div>
+      <div class="method-title">Documentación continua</div>
+      <div class="method-desc">Cada equipo mantiene un repositorio en GitHub y un registro de decisiones. Los docentes tienen acceso para hacer seguimiento en tiempo real.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-eyebrow">07 · Plan de implementación</div>
+  <h2 class="section-title">Mayo a octubre 2026</h2>
+  <div class="section-rule"></div>
+
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-left">
+        <div class="tl-dot"></div>
+        <div class="tl-month">Abril</div>
+      </div>
+      <div class="tl-right">
+        <div class="tl-phase">Etapa 0 · Acuerdos</div>
+        <div class="tl-title">Formalización y diseño conjunto</div>
+        <div class="tl-cols">
+          <div class="tl-col purple">
+            <div class="tl-col-label">ISFDyT 26 · Dolores</div>
+            <div class="tl-col-items">Conformación de equipos · Elección de roles internos · Setup de repositorios y entornos de desarrollo</div>
+          </div>
+          <div class="tl-col teal">
+            <div class="tl-col-label">EES N°1 · Tordillo</div>
+            <div class="tl-col-items">Presentación del proyecto a alumnos de 6° · Definición de las empresas que se cargarán · Entrevistas de relevamiento</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-left">
+        <div class="tl-dot"></div>
+        <div class="tl-month">Mayo</div>
+      </div>
+      <div class="tl-right">
+        <div class="tl-phase">Etapa 1 · Inicio</div>
+        <div class="tl-title">Diseño y base de datos</div>
+        <div class="tl-cols">
+          <div class="tl-col purple">
+            <div class="tl-col-label">ISFDyT 26 · Dolores</div>
+            <div class="tl-col-items">Modelo entidad-relación · Tablas: empresa, producto, factura, transacción · Primer endpoint de prueba</div>
+          </div>
+          <div class="tl-col teal">
+            <div class="tl-col-label">EES N°1 · Tordillo</div>
+            <div class="tl-col-items">Validación del modelo de datos · Verifican que los campos representen bien la realidad contable · Primer encuentro virtual</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-left">
+        <div class="tl-dot"></div>
+        <div class="tl-month">Junio</div>
+      </div>
+      <div class="tl-right">
+        <div class="tl-phase">Etapa 2 · Desarrollo</div>
+        <div class="tl-title">Backend core y autenticación</div>
+        <div class="tl-cols">
+          <div class="tl-col purple">
+            <div class="tl-col-label">ISFDyT 26 · Dolores</div>
+            <div class="tl-col-items">API REST completa · Login con JWT · CRUD de productos, clientes y proveedores · Sistema de QR para billetera</div>
+          </div>
+          <div class="tl-col teal">
+            <div class="tl-col-label">EES N°1 · Tordillo</div>
+            <div class="tl-col-items">Prueban el login · Verifican que los roles tienen sentido · Prueban el flujo de creación de empresa</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-left">
+        <div class="tl-dot"></div>
+        <div class="tl-month">Julio</div>
+      </div>
+      <div class="tl-right">
+        <div class="tl-phase">Etapa 2 · Desarrollo</div>
+        <div class="tl-title">Facturación, stock y pagos QR</div>
+        <div class="tl-cols">
+          <div class="tl-col purple">
+            <div class="tl-col-label">ISFDyT 26 · Dolores</div>
+            <div class="tl-col-items">Módulo de facturación simulada · Ajuste automático de stock · Flujo de pago por QR · PDF de comprobante</div>
+          </div>
+          <div class="tl-col teal">
+            <div class="tl-col-label">EES N°1 · Tordillo</div>
+            <div class="tl-col-items">Cargan sus primeros productos · Emiten su primera factura de prueba · Reportan lo que no se entiende</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-left">
+        <div class="tl-dot"></div>
+        <div class="tl-month">Agosto</div>
+      </div>
+      <div class="tl-right">
+        <div class="tl-phase">Etapa 2 · Desarrollo</div>
+        <div class="tl-title">Frontend completo y módulos avanzados</div>
+        <div class="tl-cols">
+          <div class="tl-col purple">
+            <div class="tl-col-label">ISFDyT 26 · Dolores</div>
+            <div class="tl-col-items">UI/UX en React · Dashboard de indicadores · Historial visual de gastos en billetera · Notificaciones en tiempo real</div>
+          </div>
+          <div class="tl-col teal">
+            <div class="tl-col-label">EES N°1 · Tordillo</div>
+            <div class="tl-col-items">Prueban la interfaz completa · Validan que sea intuitiva · Identifican problemas de usabilidad · Visita presencial de seguimiento</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-left">
+        <div class="tl-dot"></div>
+        <div class="tl-month">Septiembre</div>
+      </div>
+      <div class="tl-right">
+        <div class="tl-phase">Etapa 3 · Pruebas</div>
+        <div class="tl-title">Beta testing real con datos de Tordillo</div>
+        <div class="tl-cols">
+          <div class="tl-col purple">
+            <div class="tl-col-label">ISFDyT 26 · Dolores</div>
+            <div class="tl-col-items">Corrección de bugs reportados · Ajustes de performance · Documentación de usuario · Preparación de la capacitación</div>
+          </div>
+          <div class="tl-col teal">
+            <div class="tl-col-label">EES N°1 · Tordillo</div>
+            <div class="tl-col-items">Cargan todas sus empresas · Operan el banco estudiantil con la billetera · Documentan errores en planilla compartida</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-left">
+        <div class="tl-dot" style="background:#BA7517;"></div>
+        <div class="tl-month" style="color:#BA7517;">Octubre</div>
+      </div>
+      <div class="tl-right">
+        <div class="tl-phase">Etapa 4 · Presentación</div>
+        <div class="tl-title">Expo Contable y Muestra de Tecnología</div>
+        <div class="tl-cols">
+          <div class="tl-col" style="background:var(--amber-light);">
+            <div class="tl-col-label" style="color:var(--amber);">ISFDyT 26 · Dolores</div>
+            <div class="tl-col-items">Disertación técnica · Explican arquitectura y decisiones de diseño · Entregan documentación final</div>
+          </div>
+          <div class="tl-col" style="background:var(--amber-light);">
+            <div class="tl-col-label" style="color:var(--amber);">EES N°1 · Tordillo</div>
+            <div class="tl-col-items">Operan el software frente a la comunidad · Muestran el banco estudiantil en funcionamiento · Reciben certificación</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     8. EVALUACIÓN
+══════════════════════════════════════════ -->
+<div class="page page-break">
+  <div class="section-eyebrow">08 · Evaluación</div>
+  <h2 class="section-title">Criterios e instrumentos</h2>
+  <div class="section-rule"></div>
+
+  <p style="margin-bottom:24px;">La evaluación es continua, procesual y diferenciada según el rol de cada institución. Se valora tanto el producto final como el proceso de colaboración y los aprendizajes adquiridos en el camino.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Dimensión</th>
+        <th>Indicadores</th>
+        <th>Instrumento</th>
+        <th>Peso</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Funcionalidad del producto</strong></td>
+        <td>El software cumple los requerimientos definidos. Los módulos operan sin errores críticos en la demo final.</td>
+        <td>Demo en vivo · Checklist de requerimientos</td>
+        <td>30%</td>
+      </tr>
+      <tr>
+        <td><strong>Proceso de desarrollo</strong></td>
+        <td>Entregables mensuales completados. Uso de control de versiones. Documentación actualizada.</td>
+        <td>Revisión de repositorio GitHub · Bitácora de avances</td>
+        <td>25%</td>
+      </tr>
+      <tr>
+        <td><strong>Colaboración interinstitucional</strong></td>
+        <td>Participación activa en encuentros. Respuesta a feedback de Tordillo. Comunicación efectiva entre equipos.</td>
+        <td>Rúbrica de trabajo colaborativo · Registro de asistencia</td>
+        <td>20%</td>
+      </tr>
+      <tr>
+        <td><strong>Usabilidad (evaluado por Tordillo)</strong></td>
+        <td>Los alumnos de Tordillo pueden operar el software sin asistencia técnica. La interfaz es intuitiva y clara.</td>
+        <td>Test de usabilidad con usuarios reales · Encuesta de satisfacción</td>
+        <td>15%</td>
+      </tr>
+      <tr>
+        <td><strong>Presentación final</strong></td>
+        <td>Claridad en la exposición. Capacidad de explicar decisiones técnicas y pedagógicas. Material de apoyo.</td>
+        <td>Rúbrica de exposición oral · Observación de la Expo</td>
+        <td>10%</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p style="font-size:12px; color:var(--muted); margin-bottom:32px;">Para los alumnos de la EES N°1 de Tordillo, la evaluación se integra en los espacios curriculares correspondientes (Proyectos Organizacionales, NTIXyC) y queda a criterio de los docentes del Depto. Jurídico Contable, con insumos provistos por el equipo del ISFDyT N°26.</p>
+
+  <div class="divider"></div>
+
+  <div class="section-eyebrow">09 · Aprendizajes esperados</div>
+  <h2 class="section-title">Qué se llevan los estudiantes</h2>
+  <div class="section-rule"></div>
+
+  <div class="roles-grid">
+    <div class="role-card">
+      <div class="role-title">Alumnos ISFDyT N°26 · Dolores</div>
+      <div class="role-school">Diseño de Software</div>
+      <ul class="role-list">
+        <li><span class="role-dot purple"></span>Desarrollo de software con requerimientos reales</li>
+        <li><span class="role-dot purple"></span>Trabajo en equipo con metodología ágil</li>
+        <li><span class="role-dot purple"></span>Stack tecnológico completo (React + Node + PostgreSQL)</li>
+        <li><span class="role-dot purple"></span>Comunicación con usuarios no técnicos</li>
+        <li><span class="role-dot purple"></span>Experiencia de impacto comunitario real</li>
+        <li><span class="role-dot purple"></span>Portfolio con proyecto de producción</li>
+      </ul>
+    </div>
+    <div class="role-card">
+      <div class="role-title">Alumnos EES N°1 · Tordillo</div>
+      <div class="role-school">Orientación Economía y Administración</div>
+      <ul class="role-list">
+        <li><span class="role-dot teal"></span>Operación de sistemas de gestión empresarial digital</li>
+        <li><span class="role-dot teal"></span>Rol de analista funcional y tester de software</li>
+        <li><span class="role-dot teal"></span>Gestión de su empresa ficticia con herramientas reales</li>
+        <li><span class="role-dot teal"></span>Comprensión básica del proceso de desarrollo de software</li>
+        <li><span class="role-dot teal"></span>Educación financiera a través de la billetera virtual</li>
+        <li><span class="role-dot teal"></span>Certificación interinstitucional de participación</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-eyebrow">10 · Compromisos institucionales</div>
+  <h2 class="section-title">Acuerdos y responsabilidades</h2>
+  <div class="section-rule"></div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Responsabilidad</th>
+        <th>ISFDyT N°26 · Dolores</th>
+        <th>EES N°1 · Tordillo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Coordinación general</td>
+        <td>Prof. Mauricio Sisti</td>
+        <td>Directora Prof. Vanesa Urrizola</td>
+      </tr>
+      <tr>
+        <td>Encuentros presenciales</td>
+        <td>Facilitar visitas a Tordillo en etapas clave</td>
+        <td>Recibir al equipo y organizar espacio de trabajo</td>
+      </tr>
+      <tr>
+        <td>Encuentros virtuales</td>
+        <td>Coordinar y convocar reuniones semanales/quincenales</td>
+        <td>Asegurar conectividad y participación de alumnos</td>
+      </tr>
+      <tr>
+        <td>Infraestructura técnica</td>
+        <td>Servidores de desarrollo y producción simulada</td>
+        <td>PCs/dispositivos para testing por parte de alumnos</td>
+      </tr>
+      <tr>
+        <td>Comunicación institucional</td>
+        <td>Informes de avance mensuales a directivos</td>
+        <td>Autorización de alumnos · Comunicación a familias</td>
+      </tr>
+      <tr>
+        <td>Expo final</td>
+        <td>Presencia del equipo en la Expo Contable de octubre</td>
+        <td>Integración del software en el proyecto institucional</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Firmas -->
+  <div class="sign-grid">
+    <div class="sign-block">
+      <div class="sign-name">Prof. Mauricio Sisti</div>
+      <div class="sign-role">Docente responsable · Carrera Diseño de Software<br>ISFDyT N°26 · Dolores</div>
+    </div>
+    <div class="sign-block">
+      <div class="sign-name">Prof. Vanesa Urrizola</div>
+      <div class="sign-role">Directora · EES N°1 "Emilio Conesa"<br>Distrito Tordillo</div>
+    </div>
+    <div class="sign-block" style="margin-top:32px;">
+      <div class="sign-name">Director ISFDyT N°26</div>
+      <div class="sign-role">Director · ISFDyT N°26<br>Ciudad de Dolores</div>
+    </div>
+    <div class="sign-block" style="margin-top:32px;">
+      <div class="sign-name">Inspector Distrital</div>
+      <div class="sign-role">Inspección Distrital<br>Región 18 · Dirección de Tecnología Educativa</div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <div class="doc-footer-left">
+      Proyecto Aulas Expandidas · Articulación ISFDyT N°26 – EES N°1 Tordillo<br>
+      Año 2026 · Dirección General de Cultura y Educación · Provincia de Buenos Aires
+    </div>
+    <div class="doc-footer-right">26</div>
+  </div>
+</div>
+
+</body>
+</html>

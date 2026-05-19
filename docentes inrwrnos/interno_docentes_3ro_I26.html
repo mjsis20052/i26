@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documento Interno · Cátedra Desarrollo de Software · I26</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Karla:wght@300;400;500;700&family=Inconsolata:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:     #fafaf8;
+  --surface:#ffffff;
+  --s2:     #f3f3f0;
+  --border: #e0e0d8;
+  --ink:    #1a1a16;
+  --muted:  #7a7a6a;
+  --red:    #b83c24;
+  --blue:   #1e3a5f;
+  --green:  #1a5c35;
+  --amber:  #92600a;
+  --stamp:  #b83c24;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+
+body{
+  font-family:'Karla',sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  font-size:15px;
+  line-height:1.7;
+}
+
+/* ── COVER PAGE ── */
+.cover{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  justify-content:space-between;
+  padding:4rem;
+  border-bottom:2px solid var(--ink);
+  position:relative;
+  background:var(--surface);
+  overflow:hidden;
+}
+.cover::before{
+  content:'';
+  position:absolute;top:0;right:0;
+  width:35%;height:100%;
+  background:var(--ink);
+  z-index:0;
+}
+.cover-content{position:relative;z-index:1;}
+.cover-top{
+  display:flex;justify-content:space-between;align-items:flex-start;
+}
+.cover-label{
+  font-family:'Inconsolata',monospace;
+  font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--muted);
+  background:var(--s2);border:1px solid var(--border);
+  padding:.25rem .7rem;display:inline-block;
+}
+.cover-stamp{
+  font-family:'Inconsolata',monospace;
+  font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;
+  border:2px solid var(--stamp);color:var(--stamp);
+  padding:.3rem .8rem;transform:rotate(-3deg);
+  display:inline-block;opacity:.7;
+}
+.cover-main{margin-top:auto;padding-top:6rem;}
+.cover-eyebrow{
+  font-family:'Inconsolata',monospace;
+  font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:1.2rem;
+}
+.cover h1{
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(2.8rem,5.5vw,5rem);
+  line-height:.98;letter-spacing:-.02em;
+  max-width:680px;margin-bottom:2rem;
+  font-weight:400;
+}
+.cover h1 em{font-style:italic;color:var(--muted);}
+.cover-meta{
+  display:flex;gap:2rem;flex-wrap:wrap;
+  font-family:'Inconsolata',monospace;
+  font-size:.7rem;color:var(--muted);letter-spacing:.1em;
+  text-transform:uppercase;margin-bottom:2rem;
+}
+.cover-meta span{display:flex;align-items:center;gap:.4rem;}
+.cover-meta span::before{content:'·';color:var(--border);}
+.cover-meta span:first-child::before{content:'';}
+.cover-divider{
+  width:100%;height:1px;background:var(--border);margin-top:3rem;
+}
+.cover-footer-text{
+  font-family:'Inconsolata',monospace;font-size:.68rem;
+  color:var(--muted);letter-spacing:.12em;padding-top:1rem;
+}
+
+/* ── CONFIDENTIAL STRIP ── */
+.conf-strip{
+  background:var(--ink);color:rgba(255,255,255,.7);
+  font-family:'Inconsolata',monospace;
+  font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;
+  text-align:center;padding:.4rem;
+  position:sticky;top:0;z-index:200;
+}
+
+/* ── LAYOUT ── */
+.page{max-width:860px;margin:0 auto;padding:0 3rem;}
+section{padding:4rem 0;}
+section+section{border-top:1px solid var(--border);}
+
+/* ── TYPOGRAPHY ── */
+.s-tag{
+  font-family:'Inconsolata',monospace;
+  font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:.7rem;display:block;
+}
+h2{
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(1.7rem,2.8vw,2.5rem);
+  font-weight:400;line-height:1.1;
+  margin-bottom:1.1rem;letter-spacing:-.01em;
+}
+h2 em{font-style:italic;color:var(--muted);}
+h3{
+  font-family:'Karla',sans-serif;font-weight:700;
+  font-size:1rem;margin:1.8rem 0 .5rem;
+  text-transform:uppercase;letter-spacing:.05em;
+  color:var(--blue);
+}
+h4{
+  font-family:'Inconsolata',monospace;font-size:.8rem;
+  font-weight:500;color:var(--muted);
+  letter-spacing:.08em;text-transform:uppercase;
+  margin:.9rem 0 .25rem;
+}
+p{color:#4a4a3a;font-size:.94rem;margin-bottom:.85rem;line-height:1.8;}
+ul,ol{color:#4a4a3a;padding-left:1.4rem;font-size:.92rem;}
+li{margin-bottom:.4rem;line-height:1.7;}
+strong{color:var(--ink);}
+em.red{font-style:normal;color:var(--red);}
+
+/* ── DIAGNOSTIC TABLE ── */
+.diag{
+  width:100%;border-collapse:collapse;
+  font-size:.87rem;margin:1.2rem 0;
+}
+.diag th{
+  background:var(--ink);color:var(--bg);
+  font-family:'Inconsolata',monospace;
+  font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;
+  padding:.65rem 1rem;text-align:left;
+  border-right:1px solid rgba(255,255,255,.1);
+}
+.diag th:last-child{border-right:none;}
+.diag td{
+  padding:.7rem 1rem;border-bottom:1px solid var(--border);
+  border-right:1px solid var(--border);vertical-align:top;
+}
+.diag td:last-child{border-right:none;}
+.diag tr:last-child td{border-bottom:none;}
+.diag tr:nth-child(even) td{background:var(--s2);}
+.pill{
+  font-family:'Inconsolata',monospace;font-size:.62rem;
+  padding:.15rem .5rem;border-radius:2px;
+  letter-spacing:.06em;text-transform:uppercase;display:inline-block;
+}
+.pill-r{background:rgba(184,60,36,.1);color:var(--red);border:1px solid rgba(184,60,36,.25);}
+.pill-g{background:rgba(26,92,53,.1);color:var(--green);border:1px solid rgba(26,92,53,.25);}
+.pill-a{background:rgba(146,96,10,.1);color:var(--amber);border:1px solid rgba(146,96,10,.25);}
+.pill-b{background:rgba(30,58,95,.1);color:var(--blue);border:1px solid rgba(30,58,95,.25);}
+
+/* ── CALLOUTS / ALERTAS DOCENTE ── */
+.alert{
+  padding:1.1rem 1.4rem;margin:1.2rem 0;
+  border-left:3px solid;display:flex;gap:.9rem;align-items:flex-start;
+}
+.alert.critical{border-color:var(--red);background:rgba(184,60,36,.04);}
+.alert.note{border-color:var(--blue);background:rgba(30,58,95,.04);}
+.alert.action{border-color:var(--green);background:rgba(26,92,53,.04);}
+.alert.amber{border-color:var(--amber);background:rgba(146,96,10,.04);}
+.al-ico{font-size:1rem;flex-shrink:0;margin-top:.1rem;}
+.al-body strong{display:block;font-size:.82rem;margin-bottom:.15rem;color:var(--ink);}
+.al-body p{font-size:.82rem;margin:0;color:#5a5a4a;}
+
+/* ── SCRIPT CARD (qué decir en clase) ── */
+.script-block{
+  background:var(--s2);border:1px solid var(--border);
+  border-left:3px solid var(--blue);
+  padding:1.2rem 1.4rem;margin:1rem 0;
+}
+.sb-label{
+  font-family:'Inconsolata',monospace;font-size:.6rem;
+  letter-spacing:.15em;text-transform:uppercase;
+  color:var(--blue);margin-bottom:.5rem;
+}
+.sb-text{
+  font-family:'Instrument Serif',serif;
+  font-size:1.05rem;font-style:italic;
+  color:var(--ink);line-height:1.55;
+}
+.sb-note{font-size:.78rem;color:var(--muted);margin-top:.5rem;font-style:italic;}
+
+/* ── TIMELINE DOCENTE ── */
+.dt-grid{display:flex;flex-direction:column;gap:0;margin:1.2rem 0;}
+.dt-row{
+  display:grid;grid-template-columns:100px 1fr;
+  gap:0;border-bottom:1px solid var(--border);
+}
+.dt-row:last-child{border-bottom:none;}
+.dt-time{
+  padding:.8rem 1rem;background:var(--s2);
+  font-family:'Inconsolata',monospace;font-size:.72rem;
+  color:var(--muted);letter-spacing:.08em;
+  border-right:1px solid var(--border);
+  display:flex;align-items:center;
+}
+.dt-content{padding:.8rem 1.2rem;}
+.dt-title{font-weight:700;font-size:.9rem;margin-bottom:.2rem;}
+.dt-desc{font-size:.8rem;color:var(--muted);line-height:1.55;}
+.dt-row.active .dt-time{background:var(--ink);color:var(--bg);}
+.dt-row.active .dt-title{color:var(--red);}
+
+/* ── PERFILES ESTUDIANTE ── */
+.perfil-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.2rem 0;}
+.perfil{
+  border:1px solid var(--border);padding:1.2rem;
+  background:var(--surface);
+}
+.perfil-tipo{
+  font-family:'Inconsolata',monospace;font-size:.62rem;
+  letter-spacing:.15em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:.4rem;
+}
+.perfil h4{
+  font-family:'Karla',sans-serif;font-size:.95rem;
+  font-weight:700;color:var(--ink);
+  text-transform:none;letter-spacing:0;
+  margin:.3rem 0 .5rem;
+}
+.perfil p{font-size:.82rem;margin-bottom:.5rem;}
+.perfil .p-accion{
+  font-size:.78rem;color:var(--blue);
+  border-top:1px solid var(--border);
+  padding-top:.5rem;margin-top:.5rem;font-weight:500;
+}
+@media(max-width:600px){.perfil-grid{grid-template-columns:1fr;}}
+
+/* ── COLS ── */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.2rem 0;}
+@media(max-width:600px){.cols{grid-template-columns:1fr;}}
+
+/* ── PREGUNTAS CLAVE (para facilitar) ── */
+.q-list{list-style:none;padding:0;margin:1rem 0;}
+.q-list li{
+  padding:.65rem 0;border-bottom:1px dashed var(--border);
+  font-size:.9rem;display:flex;gap:.7rem;align-items:flex-start;
+}
+.q-list li:last-child{border-bottom:none;}
+.q-num{
+  font-family:'Inconsolata',monospace;font-size:.65rem;
+  color:var(--muted);flex-shrink:0;padding-top:.1rem;
+  min-width:24px;
+}
+
+/* ── SEÑALES DE ALARMA ── */
+.alarm-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin:1.2rem 0;}
+.alarm{
+  border:1px solid var(--border);padding:1rem;
+  background:var(--surface);
+}
+.alarm .a-signal{
+  font-family:'Inconsolata',monospace;font-size:.62rem;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--red);margin-bottom:.3rem;
+}
+.alarm .a-text{font-size:.8rem;color:var(--muted);line-height:1.5;}
+.alarm .a-resp{
+  font-size:.78rem;color:var(--green);margin-top:.4rem;
+  font-weight:500;border-top:1px solid var(--border);padding-top:.4rem;
+}
+@media(max-width:600px){.alarm-grid{grid-template-columns:1fr;}}
+
+/* ── FOOTER ── */
+footer{
+  border-top:2px solid var(--ink);
+  padding:2rem 3rem;
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:1rem;
+  background:var(--surface);
+}
+footer p{font-family:'Inconsolata',monospace;font-size:.65rem;color:var(--muted);margin:0;letter-spacing:.08em;}
+</style>
+</head>
+<body>
+
+<!-- CONFIDENTIAL STRIP -->
+<div class="conf-strip">🔒 Documento interno de cátedra · No distribuir a estudiantes · I26 · 2026</div>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-content">
+    <div class="cover-top">
+      <span class="cover-label">I26 · Tecnicatura en Software · 2026</span>
+      <span class="cover-stamp">Uso interno docente</span>
+    </div>
+    <div class="cover-main">
+      <div class="cover-eyebrow">Análisis pedagógico · 3° año · Desarrollo de Software</div>
+      <h1>Clase:<br><em>"¿Quién sos<br>vos en esto?"</em></h1>
+      <div class="cover-meta">
+        <span>Martes virtual · 18:00–20:00</span>
+        <span>Miércoles presencial · 15:00–21:30</span>
+        <span>3° año · Desarrollo Web</span>
+        <span>Mayo 2026</span>
+      </div>
+      <div class="cover-divider"></div>
+      <div class="cover-footer-text">
+        Diagnóstico del grupo · Fundamentación pedagógica · Guía de facilitación · Señales de alarma · Estrategias de intervención
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── DIAGNÓSTICO ─── -->
+<section id="diagnostico">
+<div class="page">
+  <span class="s-tag">01 · Diagnóstico del grupo</span>
+  <h2>Qué está <em>pasando</em> con este grupo</h2>
+
+  <p>Este documento describe el estado actual del grupo de 3° año y fundamenta las decisiones pedagógicas de la clase de la semana. La información es resultado de observación directa en el aula y no de evaluación formal.</p>
+
+  <div style="overflow-x:auto;margin:1.5rem 0;">
+    <table class="diag">
+      <thead>
+        <tr>
+          <th>Dimensión</th>
+          <th>Observación</th>
+          <th>Nivel</th>
+          <th>Impacto en aprendizaje</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Conocimiento técnico</strong></td>
+          <td>Tienen stack completo: PHP, MySQL, React, React Native, arquitectura. El conocimiento existe.</td>
+          <td><span class="pill pill-g">Alto</span></td>
+          <td>No es el problema. El problema está en otro lugar.</td>
+        </tr>
+        <tr>
+          <td><strong>Conexión con propósito</strong></td>
+          <td>No saben por qué están en la tecnicatura ni hacia dónde van con lo que aprenden.</td>
+          <td><span class="pill pill-r">Crítico</span></td>
+          <td>Sin propósito, el aprendizaje se vuelve mecánico y no se retiene.</td>
+        </tr>
+        <tr>
+          <td><strong>Autonomía creativa</strong></td>
+          <td>Esperan que el docente les diga qué hacer. No proponen, no inician.</td>
+          <td><span class="pill pill-r">Bajo</span></td>
+          <td>Frena el aprendizaje colaborativo y la capacidad de proyecto.</td>
+        </tr>
+        <tr>
+          <td><strong>Trabajo en equipo</strong></td>
+          <td>Trabajan juntos pero no construyen juntos. La colaboración es superficial.</td>
+          <td><span class="pill pill-a">Parcial</span></td>
+          <td>No aprovechan las diferencias de perfil de cada integrante.</td>
+        </tr>
+        <tr>
+          <td><strong>Identidad profesional</strong></td>
+          <td>Están en 3° año pero siguen en "modo secundario": esperan respuestas, no generan preguntas.</td>
+          <td><span class="pill pill-r">No desarrollada</span></td>
+          <td>Es el déficit más profundo. Sin identidad, no hay proyecto real posible.</td>
+        </tr>
+        <tr>
+          <td><strong>Curiosidad activa</strong></td>
+          <td>Algunos muestran interés cuando la clase los sorprende o los conecta con algo tangible.</td>
+          <td><span class="pill pill-a">Latente</span></td>
+          <td>Existe pero no está activada sistemáticamente. Es el punto de palanca.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="alert critical">
+    <div class="al-ico">🔴</div>
+    <div class="al-body">
+      <strong>El problema real no es pedagógico — es de identidad</strong>
+      <p>No falta explicación técnica. Falta que cada estudiante entienda qué lugar ocupa en este campo y por qué le importa. Una clase que intente agregar más contenido técnico sin resolver esto va a tener el mismo resultado que las anteriores.</p>
+    </div>
+  </div>
+
+  <div class="alert action">
+    <div class="al-ico">🟢</div>
+    <div class="al-body">
+      <strong>El punto de palanca: la curiosidad latente</strong>
+      <p>Cuando la clase conecta con algo real — un problema que reconocen, una tecnología que los sorprende, un proyecto que les pertenece — hay movimiento. La estrategia de esta semana es capitalizar exactamente eso.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── FUNDAMENTO PEDAGÓGICO ─── -->
+<section id="fundamento">
+<div class="page">
+  <span class="s-tag">02 · Fundamento pedagógico</span>
+  <h2>Por qué esta clase<br>y no <em>otra</em></h2>
+
+  <p>La decisión de hacer una clase sobre identidad y propósito antes de avanzar en contenido técnico no es caprichosa. Tiene fundamento en tres marcos pedagógicos que aplican directamente a este contexto.</p>
+
+  <h3>1. Aprendizaje Basado en Proyectos (ABP)</h3>
+  <p>El ABP no funciona si los estudiantes no tienen una conexión genuina con el problema que están resolviendo. Cuando el proyecto es asignado o genérico, los estudiantes lo ejecutan mecánicamente. Cuando el proyecto nace de una necesidad que ellos identificaron, el engagement cambia completamente. Esta clase es la condición previa para que el ABP de la tecnicatura funcione.</p>
+
+  <h3>2. Zona de Desarrollo Próximo (Vygotsky)</h3>
+  <p>Estos estudiantes están en un punto de transición: tienen los conocimientos técnicos de nivel junior pero no tienen el andamiaje cognitivo para convertirlos en un sistema real. La brecha no es técnica — es de pensamiento sistémico y propósito. La clase funciona como andamiaje para ese salto.</p>
+
+  <h3>3. Aprendizaje Colaborativo real vs. aparente</h3>
+  <p>Trabajar en grupo no es aprendizaje colaborativo. El aprendizaje colaborativo ocurre cuando los roles son claros, cuando cada integrante tiene algo único para aportar y cuando el equipo construye algo que ninguno podría construir solo. La actividad de identificar el perfil de cada dev es condición para que eso ocurra.</p>
+
+  <div class="alert note">
+    <div class="al-ico">📌</div>
+    <div class="al-body">
+      <strong>Nota para el equipo docente</strong>
+      <p>Esta clase no reemplaza el contenido técnico — lo habilita. Sin este trabajo previo, las próximas semanas van a ser más de lo mismo: alumnos que ejecutan sin entender por qué. Con este trabajo, van a tener un proyecto propio que los va a llevar a buscar las respuestas técnicas solos.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── PERFILES DEL GRUPO ─── -->
+<section id="perfiles">
+<div class="page">
+  <span class="s-tag">03 · Perfiles del grupo</span>
+  <h2>Cómo suelen ser<br>los <em>perfiles</em> en este grupo</h2>
+  <p>En grupos de este tipo se suelen encontrar cuatro perfiles. Es útil identificarlos antes de clase para anticipar dinámicas.</p>
+
+  <div class="perfil-grid">
+    <div class="perfil">
+      <div class="perfil-tipo">Perfil A · El técnico dormido</div>
+      <h4>Sabe pero no conecta</h4>
+      <p>Entiende el código, hace lo que se le pide, pero no muestra interés espontáneo. Parece indiferente pero en realidad está esperando que algo le importe.</p>
+      <div class="p-accion">→ Darle un problema real, concreto, local. Un problema de Dolores. Algo que conozca.</div>
+    </div>
+    <div class="perfil">
+      <div class="perfil-tipo">Perfil B · El que ya despertó</div>
+      <h4>Tiene idea, le falta estructura</h4>
+      <p>Ya tiene una visión vaga de qué quiere construir. Le falta el lenguaje y el framework para articularlo. Es el que va a despegar primero.</p>
+      <div class="p-accion">→ Ponerlo a liderar la presentación de visión del equipo. Darle responsabilidad.</div>
+    </div>
+    <div class="perfil">
+      <div class="perfil-tipo">Perfil C · El secundario</div>
+      <h4>Todavía en modo receptor</h4>
+      <p>Espera que le digan qué hacer en cada paso. No genera preguntas. Trabaja cuando tiene consigna clara. Se pierde si la actividad es abierta.</p>
+      <div class="p-accion">→ Consignas muy concretas con tiempo definido. Nunca una pregunta abierta sin tiempo límite.</div>
+    </div>
+    <div class="perfil">
+      <div class="perfil-tipo">Perfil D · El que lidera sin empujar</div>
+      <h4>Influye pero no impone</h4>
+      <p>El grupo lo escucha naturalmente. No es necesariamente el más técnico. Si se engancha, arrastra al grupo. Si se aburre, los draga hacia abajo.</p>
+      <div class="p-accion">→ Identificarlo en los primeros 10 minutos y darle un rol explícito en la dinámica.</div>
+    </div>
+  </div>
+
+  <div class="alert amber">
+    <div class="al-ico">⚠️</div>
+    <div class="al-body">
+      <strong>Riesgo: el grupo que se queda en la superficie</strong>
+      <p>Si la actividad de reflexión no se toma en serio, los alumnos van a responder lo que creen que el docente quiere escuchar. Hay que bajar la guardia del aula — que sientan que no hay respuesta incorrecta. La autenticidad es el objetivo, no la corrección.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── GUÍA DE FACILITACIÓN ─── -->
+<section id="facilitacion">
+<div class="page">
+  <span class="s-tag">04 · Guía de facilitación · Martes virtual</span>
+  <h2>Qué decir, cómo<br><em>manejar</em> cada momento</h2>
+
+  <h3>Apertura — primeros 10 minutos</h3>
+  <div class="script-block">
+    <div class="sb-label">Decir literalmente esto (o algo cercano)</div>
+    <div class="sb-text">"Hoy no arrancamos con código. Vamos a hacer algo diferente. Les voy a hacer una pregunta y quiero que cada uno la responda solo, sin hablar con el de al lado. No hay respuesta correcta. No se califica. Pero sí les pido que sean honestos."</div>
+    <div class="sb-note">Pausa de 3 segundos. Dejar que el silencio instale. Después hacer la pregunta del hero.</div>
+  </div>
+
+  <h3>La pregunta de arranque</h3>
+  <div class="script-block">
+    <div class="sb-label">Pregunta central — leerla en voz alta</div>
+    <div class="sb-text">"Si mañana dejara de existir toda la tecnología que conocés — React, PHP, MySQL, todo — ¿qué problema del mundo real seguirías queriendo resolver?"</div>
+    <div class="sb-note">Dar 5 minutos de silencio. Que escriban. No circular ni preguntar. Respetar el tiempo.</div>
+  </div>
+
+  <h3>Preguntas para facilitar el debate — no dar las respuestas</h3>
+  <ul class="q-list">
+    <li><span class="q-num">01</span>¿Alguien quiere compartir lo que escribió? No lo que creen que es correcto — lo que escribieron de verdad.</li>
+    <li><span class="q-num">02</span>¿Cuántos de ustedes pueden explicarle a alguien de afuera del ISFD qué van a construir este año?</li>
+    <li><span class="q-num">03</span>[A un alumno específico] — Si tu sistema existiera mañana, ¿quién sería la primera persona que lo usaría?</li>
+    <li><span class="q-num">04</span>¿Qué diferencia hay entre alguien que sabe programar y alguien que es desarrollador?</li>
+    <li><span class="q-num">05</span>¿Cuántos de ustedes usaron en el último mes algo que se parece a lo que quieren construir?</li>
+    <li><span class="q-num">06</span>[Si hay silencio] — No les pregunto qué saben. Les pregunto qué les importa. Son cosas diferentes.</li>
+  </ul>
+
+  <h3>Timeline del martes virtual</h3>
+  <div class="dt-grid">
+    <div class="dt-row active">
+      <div class="dt-time">18:00</div>
+      <div class="dt-content">
+        <div class="dt-title">Apertura + pregunta de arranque</div>
+        <div class="dt-desc">Sin introducción larga. Directo a la pregunta. Silencio de escritura.</div>
+      </div>
+    </div>
+    <div class="dt-row">
+      <div class="dt-time">18:15</div>
+      <div class="dt-content">
+        <div class="dt-title">Compartir en voz alta — voluntario</div>
+        <div class="dt-desc">Que 3 o 4 compartan. No forzar. El docente solo hace preguntas de seguimiento, no evalúa.</div>
+      </div>
+    </div>
+    <div class="dt-row">
+      <div class="dt-time">18:35</div>
+      <div class="dt-content">
+        <div class="dt-title">Conceptos: Visión → Core → MVP</div>
+        <div class="dt-desc">20 minutos de contenido. Usar el HTML de alumnos. No más de 3 ejemplos. Concretos y locales si es posible.</div>
+      </div>
+    </div>
+    <div class="dt-row">
+      <div class="dt-time">19:00</div>
+      <div class="dt-content">
+        <div class="dt-title">Actividad individual en el HTML</div>
+        <div class="dt-desc">Completan las secciones de identidad, visión, core y MVP. El docente no interviene salvo que pidan ayuda.</div>
+      </div>
+    </div>
+    <div class="dt-row active">
+      <div class="dt-time">19:40</div>
+      <div class="dt-content">
+        <div class="dt-title">Cierre del martes — lectura en voz alta</div>
+        <div class="dt-desc">Cada uno lee en voz alta su visión (una oración). Sin comentarios del docente. Solo escuchar.</div>
+      </div>
+    </div>
+    <div class="dt-row">
+      <div class="dt-time">20:00</div>
+      <div class="dt-content">
+        <div class="dt-title">Fin · Consigna para el miércoles</div>
+        <div class="dt-desc">Traer lo escrito. En equipos van a presentar la visión y arrancar la estructura del proyecto.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── MIÉRCOLES PRESENCIAL ─── -->
+<section id="miercoles">
+<div class="page">
+  <span class="s-tag">05 · Guía de facilitación · Miércoles presencial</span>
+  <h2>El día que algo<br>tiene que <em>existir</em></h2>
+
+  <p>El miércoles es el día de conversión: lo que el martes fue reflexión, hoy se convierte en estructura real. El objetivo es que al final de la jornada cada equipo tenga algo que commitear.</p>
+
+  <div class="alert action">
+    <div class="al-ico">🟢</div>
+    <div class="al-body">
+      <strong>Principio del miércoles: presencia sobre perfección</strong>
+      <p>El código puede estar roto. La pantalla puede ser fea. El endpoint puede devolver datos hardcodeados. Lo que no es negociable es que exista y esté en el repo. Un commit real vale más que una presentación perfecta.</p>
+    </div>
+  </div>
+
+  <h3>Dinámica de presentación de visiones (15:00–15:30)</h3>
+  <div class="script-block">
+    <div class="sb-label">Consigna exacta para los alumnos</div>
+    <div class="sb-text">"Cada equipo tiene 3 minutos. Me dicen: quién es su usuario, qué problema tiene, qué hace su sistema y cuál es el core. Después el resto del grupo hace UNA sola pregunta. Solo una."</div>
+    <div class="sb-note">El docente no comenta ni evalúa durante las presentaciones. Toma nota. Interviene solo si una visión es técnicamente imposible de construir en el tiempo disponible.</div>
+  </div>
+
+  <h3>Qué observar durante las presentaciones</h3>
+  <ul style="font-size:.88rem;margin:.8rem 0;">
+    <li>¿El equipo puede explicar su idea en 3 minutos sin código?</li>
+    <li>¿El core que definen realmente es el core o es una feature más?</li>
+    <li>¿El MVP que describen es realmente mínimo o es el sistema completo?</li>
+    <li>¿Los integrantes del equipo acuerdan o hay tensión sobre la dirección?</li>
+    <li>¿Quién habla y quién se queda callado? ¿Por qué?</li>
+  </ul>
+
+  <h3>Timeline del miércoles presencial</h3>
+  <div class="dt-grid">
+    <div class="dt-row active">
+      <div class="dt-time">15:00</div>
+      <div class="dt-content">
+        <div class="dt-title">Presentación de visiones · 3 min/equipo</div>
+        <div class="dt-desc">Todos escuchan. Una pregunta por equipo del resto. Sin tecnología todavía.</div>
+      </div>
+    </div>
+    <div class="dt-row">
+      <div class="dt-time">15:30</div>
+      <div class="dt-content">
+        <div class="dt-title">Estructura de carpetas + README</div>
+        <div class="dt-desc">frontend/, backend/, database/, docs/. README con visión, core y MVP del equipo. Esto es documentación real.</div>
+      </div>
+    </div>
+    <div class="dt-row">
+      <div class="dt-time">16:30</div>
+      <div class="dt-content">
+        <div class="dt-title">Schema SQL · 2 tablas con FK y TIMESTAMP</div>
+        <div class="dt-desc">Aplicar lo del repaso MySQL. Si hay dudas sobre tipos o FK, es el momento de resolverlas en contexto real.</div>
+      </div>
+    </div>
+    <div class="dt-row">
+      <div class="dt-time">17:00</div>
+      <div class="dt-content">
+        <div class="dt-title">Break · 15 minutos</div>
+        <div class="dt-desc">Obligatorio. No negociable. El cerebro necesita cortar.</div>
+      </div>
+    </div>
+    <div class="dt-row active">
+      <div class="dt-time">17:15</div>
+      <div class="dt-content">
+        <div class="dt-title">Primera pantalla React + primer endpoint PHP</div>
+        <div class="dt-desc">El circuito completo aunque sea vacío. Un fetch que funciona ya es un sistema.</div>
+      </div>
+    </div>
+    <div class="dt-row">
+      <div class="dt-time">19:30</div>
+      <div class="dt-content">
+        <div class="dt-title">Demo interna · cada equipo muestra lo que hizo</div>
+        <div class="dt-desc">No presentación — demo. Que corra en la pantalla. Que se vea. Que falle si tiene que fallar.</div>
+      </div>
+    </div>
+    <div class="dt-row">
+      <div class="dt-time">20:30</div>
+      <div class="dt-content">
+        <div class="dt-title">Retrospectiva del equipo · 15 min</div>
+        <div class="dt-desc">¿Qué salió? ¿Qué no salió? ¿Por qué? ¿Qué hacen diferente la próxima semana? Sin excusas — análisis.</div>
+      </div>
+    </div>
+    <div class="dt-row active">
+      <div class="dt-time">21:00</div>
+      <div class="dt-content">
+        <div class="dt-title">Commit & push obligatorio</div>
+        <div class="dt-desc">Todo al repo. Lo que no está en el repo no existe. Aunque esté roto.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── SEÑALES DE ALARMA ─── -->
+<section id="alarmas">
+<div class="page">
+  <span class="s-tag">06 · Señales de alarma y respuestas</span>
+  <h2>Qué puede salir<br><em>mal</em> y cómo responder</h2>
+
+  <div class="alarm-grid">
+    <div class="alarm">
+      <div class="a-signal">🔴 Señal: silencio total</div>
+      <div class="a-text">Nadie responde la pregunta de arranque. El grupo se cierra.</div>
+      <div class="a-resp">→ No presionar. Compartir una respuesta propia primero. "Yo, si no existiera el código, resolvería..." Modelar la vulnerabilidad.</div>
+    </div>
+    <div class="alarm">
+      <div class="a-signal">🔴 Señal: respuestas de relleno</div>
+      <div class="a-text">"No sé", "cualquier cosa", "no se me ocurre nada". Modo mínimo esfuerzo.</div>
+      <div class="a-resp">→ "Está bien no tener la respuesta. Pero 'no sé' no es una respuesta — es una pausa. Tomense 2 minutos más."</div>
+    </div>
+    <div class="alarm">
+      <div class="a-signal">🔴 Señal: el equipo no acuerda</div>
+      <div class="a-text">Dos integrantes quieren proyectos distintos y no pueden definir la visión juntos.</div>
+      <div class="a-resp">→ Es una oportunidad, no un problema. Ayudar a encontrar la visión común o replantear la composición del equipo.</div>
+    </div>
+    <div class="alarm">
+      <div class="a-signal">🟡 Señal: idea demasiado grande</div>
+      <div class="a-text">El MVP que describen es en realidad el sistema completo en un año.</div>
+      <div class="a-resp">→ Pregunta: "¿Qué es lo único que tiene que funcionar para que alguien lo use mañana?" Guiar hacia la reducción.</div>
+    </div>
+    <div class="alarm">
+      <div class="a-signal">🟡 Señal: idea sin usuario</div>
+      <div class="a-text">"Hacemos una app de..." sin poder decir quién la usa o por qué.</div>
+      <div class="a-resp">→ "¿Quién es la primera persona que te llama para decirte que esto le cambió algo?" Si no hay respuesta, la visión no está clara todavía.</div>
+    </div>
+    <div class="alarm">
+      <div class="a-signal">🟡 Señal: el líder acapara</div>
+      <div class="a-text">Un integrante habla por todos. El resto delega todo en esa persona.</div>
+      <div class="a-resp">→ Preguntar directamente a los que están callados. "¿Vos qué agregarías?" Crear espacio explícitamente.</div>
+    </div>
+  </div>
+
+  <div class="alert critical" style="margin-top:1.5rem;">
+    <div class="al-ico">🔴</div>
+    <div class="al-body">
+      <strong>El error docente más común en esta clase: explicar demasiado</strong>
+      <p>La tentación es llenar el silencio con más contenido. No hacerlo. El silencio incómodo después de una buena pregunta es donde ocurre el aprendizaje real. Tolerar el silencio es la habilidad más importante del facilitador hoy.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── SEGUIMIENTO INTER-CLASE ─── -->
+<section id="seguimiento">
+<div class="page">
+  <span class="s-tag">07 · Seguimiento y continuidad</span>
+  <h2>Qué hacer con lo que<br>pase <em>esta semana</em></h2>
+
+  <h3>Al final del martes — registrar</h3>
+  <p>Tomá nota rápida (5 minutos) de:</p>
+  <ul>
+    <li>¿Quién mostró una idea clara y quién está todavía en blanco?</li>
+    <li>¿Qué respuesta a la pregunta de arranque fue más honesta o sorprendente?</li>
+    <li>¿Hay algún alumno que parezca especialmente desconectado?</li>
+    <li>¿Qué visión de proyecto sonó más viable y más potente?</li>
+  </ul>
+
+  <h3>Al final del miércoles — verificar el repo</h3>
+  <p>Antes de cerrar la clase, revisar que cada equipo haya hecho al menos un commit real. No evaluar el código — verificar que existe. El compromiso con el repo es el primer indicador de profesionalismo.</p>
+
+  <h3>Para la semana siguiente</h3>
+  <div class="cols">
+    <div>
+      <h4>Si la clase funcionó</h4>
+      <ul style="font-size:.85rem;">
+        <li>Los alumnos llegan al miércoles con la visión más clara</li>
+        <li>Empiezan a hacerse preguntas técnicas ellos solos</li>
+        <li>Hay discusión intra-equipo sobre prioridades</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Si la clase no funcionó</h4>
+      <ul style="font-size:.85rem;">
+        <li>Repetir la actividad de identidad en otro formato</li>
+        <li>Traer un caso real local: alguien de Dolores que use tecnología</li>
+        <li>Reducir la consigna: una sola pregunta para toda la semana</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="alert note" style="margin-top:1.5rem;">
+    <div class="al-ico">📌</div>
+    <div class="al-body">
+      <strong>Métricas de éxito de esta clase</strong>
+      <p>No son técnicas. Son: (1) ¿Algún alumno preguntó algo que yo no le enseñé? (2) ¿Algún equipo debatió sobre qué va en el MVP sin que yo lo iniciara? (3) ¿Hay un commit real en el repo de cada equipo? Si las tres ocurren, la clase funcionó.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<footer>
+  <div>
+    <p><strong>ISFD N°26 · Dolores, Buenos Aires</strong> · Tecnicatura Superior en Desarrollo de Software · 2026</p>
+    <p>Documento interno de cátedra · Uso exclusivo del equipo docente · No distribuir</p>
+  </div>
+  <button onclick="window.print()" style="font-family:'Inconsolata',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;background:var(--ink);color:var(--bg);border:none;padding:.45rem 1.1rem;cursor:pointer;">Imprimir</button>
+</footer>
+
+</body>
+</html>

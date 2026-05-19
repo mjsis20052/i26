@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase · IA para la Toma de Decisiones · I26</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #0a0a12;
+  --bg2:     #0f0f1a;
+  --bg3:     #13131f;
+  --surface: #16162a;
+  --border:  #1e1e38;
+  --ink:     #ffffff;
+  --muted:   rgba(255,255,255,.45);
+  --dim:     rgba(255,255,255,.25);
+  --violet:  #7c3aed;
+  --violet2: #a855f7;
+  --cyan:    #06b6d4;
+  --green:   #10b981;
+  --amber:   #f59e0b;
+  --red:     #ef4444;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--violet); }
+
+/* ── TOP NAV (brand bar) ── */
+.top-bar {
+  position: fixed; top:0; left:0; right:0; z-index:300;
+  background: rgba(10,10,18,.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items:center; justify-content:space-between;
+  padding: .65rem 2rem;
+}
+.brand {
+  font-family: 'Space Mono', monospace;
+  font-size: .78rem; font-weight:700;
+  letter-spacing: .12em; text-transform:uppercase;
+  color: var(--cyan); text-decoration:none;
+}
+.top-links { display:flex; gap:.4rem; list-style:none; }
+.top-links a {
+  font-family:'Space Mono',monospace;
+  font-size:.6rem; letter-spacing:.1em; text-transform:uppercase;
+  color: var(--muted); text-decoration:none;
+  border:1px solid var(--border);
+  padding:.25rem .6rem; border-radius:3px;
+  transition: all .2s;
+}
+.top-links a:hover { color:var(--ink); border-color:var(--violet); }
+.top-links a.active {
+  color: var(--violet2);
+  border-color: var(--violet);
+  background: rgba(124,58,237,.12);
+}
+
+/* ── SECTION NAV ── */
+.sec-nav {
+  position: sticky; top: 41px; z-index:200;
+  background: rgba(13,13,26,.9);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  display:flex; gap:0; overflow-x:auto;
+  padding: 0 2rem;
+}
+.sec-nav a {
+  font-family:'Space Mono',monospace;
+  font-size:.58rem; letter-spacing:.14em; text-transform:uppercase;
+  color: var(--muted); text-decoration:none;
+  padding:.65rem 1.1rem; white-space:nowrap;
+  border-bottom:2px solid transparent;
+  transition: all .2s;
+}
+.sec-nav a:hover { color:var(--ink); border-bottom-color:var(--violet); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  padding: 8rem 4rem 5rem;
+  position:relative; overflow:hidden;
+  background: radial-gradient(ellipse 80% 60% at 70% 40%, rgba(124,58,237,.18) 0%, transparent 60%),
+              radial-gradient(ellipse 50% 40% at 10% 80%, rgba(6,182,212,.08) 0%, transparent 50%),
+              var(--bg);
+}
+.hero-grid {
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(124,58,237,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124,58,237,.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+}
+.hero-eyebrow {
+  font-family:'Space Mono',monospace;
+  font-size:.7rem; letter-spacing:.2em; text-transform:uppercase;
+  color: var(--cyan); margin-bottom:1.5rem;
+  border: 1px solid rgba(6,182,212,.3);
+  display:inline-block; padding:.3rem .9rem;
+  background: rgba(6,182,212,.05);
+}
+.hero h1 {
+  font-size: clamp(3.5rem, 9vw, 8rem);
+  font-weight:700; line-height:.92;
+  letter-spacing:-.03em;
+  margin-bottom: 1.8rem;
+}
+.hero h1 .accent { color: var(--violet2); }
+.hero-sub {
+  font-size:1.05rem; color:var(--muted);
+  max-width:600px; margin-bottom:2rem; line-height:1.65;
+}
+.hero-tags { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:3rem; }
+.tag {
+  font-family:'Space Mono',monospace;
+  font-size:.58rem; letter-spacing:.1em; text-transform:uppercase;
+  border:1px solid var(--border); color:var(--muted);
+  padding:.28rem .7rem; border-radius:2px;
+  background: rgba(255,255,255,.02);
+}
+.tag.v { border-color:rgba(124,58,237,.4); color:var(--violet2); background:rgba(124,58,237,.08); }
+.tag.c { border-color:rgba(6,182,212,.3); color:var(--cyan); background:rgba(6,182,212,.05); }
+.tag.g { border-color:rgba(16,185,129,.3); color:var(--green); background:rgba(16,185,129,.05); }
+.cta-btn {
+  display:inline-flex; align-items:center; gap:.6rem;
+  font-family:'Space Mono',monospace;
+  font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
+  background: var(--violet); color:#fff;
+  border:none; padding:.75rem 1.8rem; cursor:pointer;
+  text-decoration:none; border-radius:3px;
+  transition: background .2s;
+}
+.cta-btn:hover { background: var(--violet2); }
+.hero-scroll {
+  position:absolute; bottom:2rem; right:4rem;
+  font-family:'Space Mono',monospace;
+  font-size:.55rem; letter-spacing:.2em; color:var(--dim);
+  writing-mode:vertical-rl; text-transform:uppercase;
+}
+
+/* ── LAYOUT ── */
+.page { max-width:900px; margin:0 auto; padding:0 3rem; }
+section { padding:5rem 0; }
+section + section { border-top:1px solid var(--border); }
+
+/* ── SECTION HEADER ── */
+.s-num {
+  font-family:'Space Mono',monospace;
+  font-size:.62rem; letter-spacing:.22em; text-transform:uppercase;
+  color: var(--violet2); margin-bottom:.8rem; display:block;
+}
+h2 {
+  font-size: clamp(2rem,4vw,3.2rem);
+  font-weight:700; line-height:1.05;
+  letter-spacing:-.025em; margin-bottom:1.4rem;
+}
+h2 .acc { color:var(--violet2); }
+h2 .dim { color:var(--muted); font-weight:300; }
+h3 {
+  font-size:.85rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.1em;
+  color:var(--cyan); margin:2.5rem 0 .8rem;
+}
+h4 {
+  font-family:'Space Mono',monospace;
+  font-size:.7rem; font-weight:400;
+  color:var(--muted); letter-spacing:.08em; text-transform:uppercase;
+  margin:.8rem 0 .3rem;
+}
+p { color:rgba(255,255,255,.7); font-size:.95rem; margin-bottom:.9rem; line-height:1.8; }
+ul, ol { color:rgba(255,255,255,.65); padding-left:1.4rem; font-size:.92rem; }
+li { margin-bottom:.45rem; line-height:1.75; }
+strong { color: var(--ink); }
+code {
+  font-family:'Space Mono',monospace; font-size:.82em;
+  background:rgba(124,58,237,.12); color:var(--violet2);
+  padding:.1rem .35rem; border-radius:2px;
+}
+
+/* ── CALLOUTS ── */
+.callout {
+  display:flex; gap:1rem; align-items:flex-start;
+  padding:1.2rem 1.5rem; margin:1.5rem 0;
+  border-left:3px solid; border-radius:0 4px 4px 0;
+}
+.callout.note  { border-color:var(--cyan);   background:rgba(6,182,212,.05); }
+.callout.info  { border-color:var(--violet);  background:rgba(124,58,237,.07); }
+.callout.ok    { border-color:var(--green);   background:rgba(16,185,129,.05); }
+.callout.warn  { border-color:var(--amber);   background:rgba(245,158,11,.05); }
+.callout.crit  { border-color:var(--red);     background:rgba(239,68,68,.05); }
+.c-ico { font-size:1.1rem; flex-shrink:0; margin-top:.1rem; }
+.c-body strong { display:block; font-size:.83rem; margin-bottom:.25rem; color:var(--ink); }
+.c-body p { font-size:.83rem; margin:0; color:rgba(255,255,255,.6); }
+
+/* ── CODE BLOCKS ── */
+.code-wrap { margin:1.4rem 0; }
+.code-header {
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--surface); border:1px solid var(--border);
+  border-bottom:1px solid rgba(124,58,237,.2);
+  padding:.5rem 1rem;
+}
+.code-label {
+  font-family:'Space Mono',monospace; font-size:.58rem;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--violet2);
+}
+.code-lang {
+  font-family:'Space Mono',monospace; font-size:.55rem;
+  color:var(--dim); letter-spacing:.08em; text-transform:uppercase;
+}
+pre {
+  background: var(--bg2); border:1px solid var(--border);
+  border-top:none;
+  font-family:'Space Mono',monospace; font-size:.78rem;
+  color:rgba(255,255,255,.8); line-height:1.7;
+  padding:1.4rem 1.6rem; overflow-x:auto;
+}
+pre .c { color:rgba(255,255,255,.3); }
+pre .k { color:var(--violet2); }
+pre .s { color:var(--green); }
+pre .n { color:var(--cyan); }
+
+/* ── FLOW ── */
+.flow {
+  display:flex; align-items:center; flex-wrap:wrap;
+  gap:.5rem; margin:1.8rem 0;
+}
+.flow-box {
+  background: var(--surface); border:1px solid var(--border);
+  padding:.5rem 1rem;
+  font-family:'Space Mono',monospace; font-size:.62rem;
+  letter-spacing:.06em; text-transform:uppercase;
+  color:rgba(255,255,255,.7); white-space:nowrap;
+}
+.flow-box.hl { background:var(--violet); border-color:var(--violet); color:#fff; }
+.flow-box.v  { border-color:rgba(124,58,237,.5); color:var(--violet2); background:rgba(124,58,237,.1); }
+.flow-box.g  { border-color:rgba(16,185,129,.4); color:var(--green);   background:rgba(16,185,129,.08); }
+.flow-box.c  { border-color:rgba(6,182,212,.4);  color:var(--cyan);    background:rgba(6,182,212,.08); }
+.flow-arrow { color:var(--dim); font-size:.9rem; }
+.flow-x { color:var(--red); font-size:1.1rem; font-weight:700; }
+
+/* ── TABLE ── */
+.tbl { width:100%; border-collapse:collapse; font-size:.87rem; margin:1.4rem 0; }
+.tbl th {
+  background:var(--surface);
+  font-family:'Space Mono',monospace; font-size:.58rem;
+  letter-spacing:.12em; text-transform:uppercase;
+  color:var(--muted); padding:.7rem 1rem; text-align:left;
+  border-bottom:1px solid var(--border);
+  border-right:1px solid var(--border);
+}
+.tbl th:last-child { border-right:none; }
+.tbl td {
+  padding:.7rem 1rem; border-bottom:1px solid var(--border);
+  border-right:1px solid var(--border);
+  color:rgba(255,255,255,.65); vertical-align:top;
+}
+.tbl td:last-child { border-right:none; }
+.tbl tr:last-child td { border-bottom:none; }
+.tbl tr:hover td { background:rgba(124,58,237,.04); }
+
+/* ── PILL ── */
+.pill {
+  font-family:'Space Mono',monospace; font-size:.55rem;
+  padding:.15rem .5rem; border-radius:2px;
+  letter-spacing:.06em; text-transform:uppercase; display:inline-block;
+}
+.pill-g { background:rgba(16,185,129,.12); color:var(--green); border:1px solid rgba(16,185,129,.3); }
+.pill-v { background:rgba(124,58,237,.12); color:var(--violet2); border:1px solid rgba(124,58,237,.3); }
+.pill-r { background:rgba(239,68,68,.1); color:var(--red); border:1px solid rgba(239,68,68,.25); }
+.pill-a { background:rgba(245,158,11,.1); color:var(--amber); border:1px solid rgba(245,158,11,.25); }
+.pill-c { background:rgba(6,182,212,.1); color:var(--cyan); border:1px solid rgba(6,182,212,.25); }
+
+/* ── CARD GRID ── */
+.card-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; margin:1.5rem 0; background:var(--border); }
+.card {
+  background:var(--bg2); padding:1.5rem;
+  transition:background .2s;
+}
+.card:hover { background:var(--bg3); }
+.card-ico { font-size:1.5rem; margin-bottom:.8rem; }
+.card-title {
+  font-size:.83rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.06em;
+  color:var(--ink); margin-bottom:.45rem;
+}
+.card-body { font-size:.8rem; color:rgba(255,255,255,.55); line-height:1.65; }
+@media(max-width:640px){ .card-grid{ grid-template-columns:1fr; } }
+
+/* ── PROMPT BLOCK ── */
+.prompt-block {
+  background:var(--bg2); border:1px solid rgba(124,58,237,.3);
+  border-left:3px solid var(--violet); padding:1.5rem; margin:1.2rem 0;
+}
+.pb-label {
+  font-family:'Space Mono',monospace; font-size:.58rem;
+  letter-spacing:.15em; text-transform:uppercase;
+  color:var(--violet2); margin-bottom:.7rem;
+}
+.pb-text {
+  font-size:.88rem; color:rgba(255,255,255,.75);
+  line-height:1.8; font-style:italic;
+}
+.pb-note { font-size:.75rem; color:var(--muted); margin-top:.6rem; }
+
+/* ── TIMELINE ── */
+.timeline { display:flex; flex-direction:column; gap:0; margin:1.4rem 0; }
+.tl-row {
+  display:grid; grid-template-columns:120px 1fr;
+  border-bottom:1px solid var(--border);
+}
+.tl-row:last-child { border-bottom:none; }
+.tl-time {
+  padding:.9rem 1rem; background:var(--bg2);
+  font-family:'Space Mono',monospace; font-size:.65rem;
+  color:var(--muted); letter-spacing:.06em;
+  border-right:1px solid var(--border);
+  display:flex; align-items:center;
+}
+.tl-content { padding:.9rem 1.3rem; }
+.tl-title { font-weight:700; font-size:.92rem; margin-bottom:.2rem; }
+.tl-desc { font-size:.78rem; color:var(--muted); line-height:1.55; }
+.tl-row.hi .tl-time { background:var(--violet); color:#fff; }
+.tl-row.hi .tl-title { color:var(--violet2); }
+
+/* ── ACTIVITY BOX ── */
+.act-box {
+  border:1px solid var(--border); background:var(--bg2);
+  padding:2rem; margin:1.4rem 0;
+  border-top:3px solid var(--violet);
+}
+.act-num {
+  font-family:'Space Mono',monospace; font-size:.6rem;
+  letter-spacing:.18em; text-transform:uppercase;
+  color:var(--violet2); margin-bottom:.6rem;
+}
+.act-title {
+  font-size:1.3rem; font-weight:700;
+  margin-bottom:.9rem; line-height:1.1;
+}
+.act-body { font-size:.88rem; color:rgba(255,255,255,.65); line-height:1.8; }
+
+/* ── COLS ── */
+.cols { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin:1.2rem 0; }
+@media(max-width:600px){ .cols{ grid-template-columns:1fr; } }
+
+/* ── FOOTER ── */
+footer {
+  border-top:1px solid var(--border);
+  padding:2.5rem 3rem;
+  display:flex; justify-content:space-between; align-items:center;
+  flex-wrap:wrap; gap:1rem;
+  background: var(--bg2);
+}
+footer p {
+  font-family:'Space Mono',monospace; font-size:.6rem;
+  color:var(--dim); margin:0; letter-spacing:.08em;
+}
+.foot-link {
+  font-family:'Space Mono',monospace; font-size:.6rem;
+  letter-spacing:.1em; text-transform:uppercase;
+  color:var(--violet2); text-decoration:none;
+  border:1px solid rgba(124,58,237,.3);
+  padding:.4rem 1rem; border-radius:2px;
+  transition:all .2s;
+}
+.foot-link:hover { background:rgba(124,58,237,.12); }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<nav class="top-bar">
+  <a href="https://mjsis20052.github.io/i26/index.html" class="brand">I26 · Software</a>
+  <ul class="top-links">
+    <li><a href="https://mjsis20052.github.io/i26/index.html">🏠 Home</a></li>
+    <li><a href="https://mjsis20052.github.io/i26/2do/clase-php-mysql-I26.html">2° PHP &amp; MySQL</a></li>
+    <li><a href="https://mjsis20052.github.io/i26/2do/clase_2do_soft_I26_ReactNative.html">2° React Native</a></li>
+    <li><a href="https://mjsis20052.github.io/i26/2do/clase_2do_REPASO_MySQL_I26.html">2° Repaso MySQL</a></li>
+    <li><a href="https://mjsis20052.github.io/i26/3ro/clase-arquitectura-I26.html">3° Arquitectura</a></li>
+    <li><a href="#" class="active">3° IA &amp; Decisiones</a></li>
+  </ul>
+</nav>
+
+<!-- SECTION NAV -->
+<div class="sec-nav">
+  <a href="#problema">El Problema</a>
+  <a href="#conceptos">Conceptos IA</a>
+  <a href="#rag">RAG</a>
+  <a href="#arquitectura">Arquitectura</a>
+  <a href="#codigo">Código</a>
+  <a href="#herramientas">Herramientas</a>
+  <a href="#actividad">Actividad</a>
+  <a href="#refs">Próximos pasos</a>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div style="position:relative;z-index:1;">
+    <div class="hero-eyebrow">IA Aplicada · 2° y 3° año · Desarrollo de Software</div>
+    <h1>
+      De la <span class="accent">idea</span><br>
+      al código<br>
+      <span style="color:var(--muted);font-weight:300;">con IA</span>
+    </h1>
+    <p class="hero-sub">
+      Cómo construir un sistema de toma de decisiones basado en IA usando solo documentación interna. Caso real: 30 años de investigación del INTA.
+    </p>
+    <div class="hero-tags">
+      <span class="tag v">LLM</span>
+      <span class="tag v">RAG</span>
+      <span class="tag c">Embeddings</span>
+      <span class="tag c">Vector DB</span>
+      <span class="tag g">Prompting</span>
+      <span class="tag">Toma de decisiones</span>
+      <span class="tag">Caso real · INTA</span>
+    </div>
+    <a href="#problema" class="cta-btn">Comenzar →</a>
+  </div>
+  <div class="hero-scroll">scroll ↓</div>
+</div>
+
+<!-- ─── 01 EL PROBLEMA ─── -->
+<section id="problema">
+<div class="page">
+  <span class="s-num">01 · El problema real</span>
+  <h2>30 años de conocimiento<br><span class="acc">que no llega</span></h2>
+
+  <p>El INTA acumula tres décadas de investigación científica agropecuaria. Ese conocimiento existe en informes, publicaciones y bases de datos internas. El problema: para llegar al productor, tiene que pasar por un extensionista, y la comunicación se pierde, se simplifica de más, o directamente no ocurre.</p>
+
+  <div class="flow">
+    <div class="flow-box hl">📚 30 años de docs</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box">Científico INTA</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box">Extensionista</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box">Productor</div>
+    <span class="flow-x">✗</span>
+    <div class="flow-box" style="border-color:var(--red);color:var(--red);">Decisión informada</div>
+  </div>
+
+  <div class="callout crit">
+    <div class="c-ico">⚠️</div>
+    <div class="c-body">
+      <strong>El problema no es falta de información — es falta de acceso</strong>
+      <p>La información existe y está documentada. El problema es que el formato, el lenguaje y el canal no permiten que llegue en el momento en que se necesita para tomar una decisión real en el campo.</p>
+    </div>
+  </div>
+
+  <h3>La solución que vamos a construir</h3>
+  <p>Un sistema de IA que funciona <strong>únicamente con la documentación interna del INTA</strong>. No inventa. No alucina datos de internet. Responde preguntas del productor o del extensionista basándose exclusivamente en 30 años de investigación real.</p>
+
+  <div class="flow">
+    <div class="flow-box">Pregunta del productor</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box v">Sistema IA · RAG</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box g">📚 Solo doc. INTA</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box hl">Respuesta precisa + fuente</div>
+  </div>
+
+  <div class="callout ok">
+    <div class="c-ico">💡</div>
+    <div class="c-body">
+      <strong>Por qué este caso importa más allá del INTA</strong>
+      <p>Este patrón aplica a cualquier organización con conocimiento acumulado: clínicas, municipios, cooperativas, juzgados. Lo que aprenden hoy es un patrón de arquitectura reutilizable en decenas de proyectos reales.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 02 CONCEPTOS ─── -->
+<section id="conceptos">
+<div class="page">
+  <span class="s-num">02 · Conceptos clave de IA</span>
+  <h2>Lo que necesitan<br><span class="acc">entender primero</span></h2>
+
+  <p>Antes de escribir una línea de código, hay que tener claro el vocabulario. Estos no son conceptos teóricos — son las piezas del sistema que van a armar.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-ico">🧠</div>
+      <div class="card-title">LLM</div>
+      <div class="card-body">Modelo de Lenguaje Grande. Entiende preguntas en lenguaje natural y genera respuestas. GPT-4, Claude, Llama son ejemplos. <strong style="color:var(--violet2)">No sabe nada de tu empresa</strong> — a menos que le des el contexto.</div>
+    </div>
+    <div class="card">
+      <div class="card-ico">📐</div>
+      <div class="card-title">Embedding</div>
+      <div class="card-body">Transformar texto en números (vectores). <strong style="color:var(--cyan)">"Soja con sequía"</strong> y <strong style="color:var(--cyan)">"cultivo en estrés hídrico"</strong> son frases distintas pero tienen vectores cercanos. Así la búsqueda entiende sinónimos.</div>
+    </div>
+    <div class="card">
+      <div class="card-ico">🗄️</div>
+      <div class="card-title">Vector DB</div>
+      <div class="card-body">Base de datos que guarda y busca embeddings por <strong style="color:var(--violet2)">similitud semántica</strong>, no por texto exacto. Chroma, Pinecone, pgvector. Es la memoria del sistema.</div>
+    </div>
+    <div class="card">
+      <div class="card-ico">🔍</div>
+      <div class="card-title">RAG</div>
+      <div class="card-body"><strong style="color:var(--green)">Retrieval-Augmented Generation.</strong> Buscar los fragmentos relevantes de tus documentos y pasarlos como contexto al LLM. El modelo responde solo con lo que vos le das.</div>
+    </div>
+    <div class="card">
+      <div class="card-ico">✍️</div>
+      <div class="card-title">Prompt</div>
+      <div class="card-body">La instrucción que le das al modelo. No es magia — es ingeniería. Define el rol, el contexto, las restricciones y el formato. <strong style="color:var(--violet2)">Prompt = código que habla.</strong></div>
+    </div>
+    <div class="card">
+      <div class="card-ico">✂️</div>
+      <div class="card-title">Chunk</div>
+      <div class="card-body">Fragmento de documento. Los PDFs del INTA se cortan en piezas de ~500 palabras con overlap. Cada chunk se embeddea por separado. El tamaño del chunk afecta directamente la calidad de las respuestas.</div>
+    </div>
+  </div>
+
+  <h3>Cómo se conectan — el flujo completo</h3>
+
+  <div style="display:flex;flex-direction:column;gap:.8rem;margin:1.5rem 0;">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div class="flow-box" style="min-width:260px;"><strong>1. Ingesta</strong> · PDFs → chunks → embeddings → Vector DB</div>
+      <span class="pill pill-a">Una sola vez</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div class="flow-box" style="min-width:260px;"><strong>2. Query</strong> · Pregunta del usuario → embedding de la pregunta</div>
+      <span class="pill pill-c">Por cada consulta</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div class="flow-box" style="min-width:260px;"><strong>3. Retrieval</strong> · Chunks más similares en la Vector DB</div>
+      <span class="pill pill-c">Por cada consulta</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div class="flow-box" style="min-width:260px;"><strong>4. Augment</strong> · Prompt: contexto + pregunta + restricciones</div>
+      <span class="pill pill-c">Por cada consulta</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div class="flow-box hl" style="min-width:260px;"><strong>5. Generate</strong> · LLM responde SOLO con el contexto dado</div>
+      <span class="pill pill-g">Resultado</span>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <div class="c-ico">📌</div>
+    <div class="c-body">
+      <strong>La restricción más importante del sistema</strong>
+      <p>En el prompt le decimos al modelo: "Si la respuesta no está en los documentos que te doy, respondé que no tenés información suficiente." Esto convierte un LLM genérico en un sistema confiable.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 03 RAG ─── -->
+<section id="rag">
+<div class="page">
+  <span class="s-num">03 · RAG en profundidad</span>
+  <h2>El patrón que<br><span class="acc">resuelve el problema</span></h2>
+
+  <p>RAG no es un producto ni una librería — es un patrón de arquitectura. Como MVC o REST. Podés implementarlo con distintas herramientas. Lo que no cambia es la lógica.</p>
+
+  <h3>Por qué no alcanza con pasarle todos los documentos al LLM</h3>
+  <div class="cols">
+    <div>
+      <h4>El problema del contexto</h4>
+      <p style="font-size:.88rem;">Los LLMs tienen un límite de tokens. 30 años de informes del INTA son millones de palabras — no entran. RAG resuelve esto buscando solo los fragmentos relevantes para cada pregunta.</p>
+    </div>
+    <div>
+      <h4>El problema del costo</h4>
+      <p style="font-size:.88rem;">Cada token que mandás al modelo tiene un costo. Mandar documentos completos cuando solo necesitás un párrafo es ineficiente. RAG manda solo lo necesario.</p>
+    </div>
+  </div>
+
+  <h3>Comparando enfoques</h3>
+  <div style="overflow-x:auto;">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Enfoque</th>
+          <th>Cómo funciona</th>
+          <th>Problema</th>
+          <th>¿Para INTA?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>LLM solo</strong></td>
+          <td>Responde con lo aprendido en entrenamiento</td>
+          <td>No sabe nada del INTA. Puede inventar.</td>
+          <td><span class="pill pill-r">No sirve</span></td>
+        </tr>
+        <tr>
+          <td><strong>Fine-tuning</strong></td>
+          <td>Reentrenar el modelo con docs del INTA</td>
+          <td>Caro, lento, difícil de actualizar.</td>
+          <td><span class="pill pill-a">Excesivo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Búsqueda clásica</strong></td>
+          <td>Buscar por palabras clave en documentos</td>
+          <td>No entiende sinónimos. Devuelve docs, no respuestas.</td>
+          <td><span class="pill pill-a">Parcial</span></td>
+        </tr>
+        <tr>
+          <td><strong>RAG</strong></td>
+          <td>Busca semánticamente + LLM con contexto</td>
+          <td>Requiere infraestructura inicial. Bien implementado: alucinación casi nula.</td>
+          <td><span class="pill pill-g">Ideal ✓</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>El prompt del sistema — la pieza más importante</h3>
+  <div class="prompt-block">
+    <div class="pb-label">System prompt · INTA Decision Engine</div>
+    <div class="pb-text">
+      Sos un asistente técnico del INTA (Instituto Nacional de Tecnología Agropecuaria). Tu única fuente de información son los documentos de investigación que se te proveen como contexto.<br><br>
+      Reglas estrictas:<br>
+      1. Solo respondés basándote en el CONTEXTO que recibís. Nunca en conocimiento general.<br>
+      2. Si la respuesta no está en el contexto, decís: "No tengo información en los documentos del INTA para responder esta pregunta."<br>
+      3. Siempre citás el documento o sección de donde proviene la información.<br>
+      4. Hablás en lenguaje claro, sin jerga técnica, a menos que el usuario sea un investigador.
+    </div>
+    <div class="pb-note">Este prompt es el que diferencia el sistema de una búsqueda de Google o de un chatbot genérico. Las reglas son las que garantizan confiabilidad.</div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 04 ARQUITECTURA ─── -->
+<section id="arquitectura">
+<div class="page">
+  <span class="s-num">04 · Arquitectura del sistema</span>
+  <h2>Cómo se estructura<br><span class="acc">el sistema completo</span></h2>
+
+  <p>El sistema tiene dos pipelines bien distintos. No mezclarlos es clave para entender el diseño.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-label">Estructura del proyecto</span>
+      <span class="code-lang">filesystem</span>
+    </div>
+    <pre>inta-ia/
+├── ingesta/
+│   ├── load_docs.py       <span class="c">← Carga y divide PDFs en chunks</span>
+│   ├── embed_chunks.py    <span class="c">← Convierte chunks a vectores</span>
+│   └── index_vectors.py   <span class="c">← Guarda vectores en la DB</span>
+│
+├── api/
+│   ├── server.js          <span class="c">← Express · punto de entrada</span>
+│   ├── routes/
+│   │   └── query.js       <span class="c">← POST /api/consulta</span>
+│   └── services/
+│       ├── retriever.js   <span class="c">← Busca chunks relevantes</span>
+│       └── llm.js         <span class="c">← Llama al LLM con contexto</span>
+│
+├── frontend/
+│   └── src/
+│       ├── App.jsx
+│       └── components/ChatBox.jsx
+│
+├── database/
+│   └── vector_store/      <span class="c">← ChromaDB local (desarrollo)</span>
+│
+└── docs/                  <span class="c">← Documentación INTA (PDFs)</span></pre>
+  </div>
+
+  <div class="cols">
+    <div>
+      <h4>Opción simple (para empezar)</h4>
+      <ul style="font-size:.85rem;">
+        <li><strong>LLM:</strong> API Anthropic Claude o OpenAI GPT</li>
+        <li><strong>Embeddings:</strong> OpenAI text-embedding-3-small</li>
+        <li><strong>Vector DB:</strong> ChromaDB (local, sin infraestructura)</li>
+        <li><strong>Backend:</strong> Node.js + Express</li>
+        <li><strong>Frontend:</strong> React + fetch</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Opción producción (privacidad total)</h4>
+      <ul style="font-size:.85rem;">
+        <li><strong>LLM:</strong> Modelo local con Ollama</li>
+        <li><strong>Embeddings:</strong> nomic-embed-text (local)</li>
+        <li><strong>Vector DB:</strong> pgvector en PostgreSQL</li>
+        <li><strong>Orquestación:</strong> LangChain o LlamaIndex</li>
+        <li><strong>Deploy:</strong> Docker + servidor INTA</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout note">
+    <div class="c-ico">🔒</div>
+    <div class="c-body">
+      <strong>Privacidad de los datos</strong>
+      <p>Con Ollama podés correr un LLM completamente local. Los documentos del INTA nunca salen del servidor. Para una institución pública con investigación sensible, esta es la opción correcta a mediano plazo.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 05 CÓDIGO ─── -->
+<section id="codigo">
+<div class="page">
+  <span class="s-num">05 · Código base funcionando</span>
+  <h2>Del concepto<br><span class="acc">al código real</span></h2>
+
+  <h3>1. Ingesta — dividir documentos en chunks</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-label">ingesta/load_docs.py</span>
+      <span class="code-lang">python</span>
+    </div>
+    <pre><span class="k">import</span> os
+<span class="k">from</span> langchain.document_loaders <span class="k">import</span> PyPDFLoader
+<span class="k">from</span> langchain.text_splitter <span class="k">import</span> RecursiveCharacterTextSplitter
+
+<span class="k">def</span> <span class="n">cargar_documentos</span>(ruta_docs=<span class="s">"./docs"</span>):
+    documentos = []
+    <span class="k">for</span> archivo <span class="k">in</span> os.listdir(ruta_docs):
+        <span class="k">if</span> archivo.endswith(<span class="s">".pdf"</span>):
+            loader = PyPDFLoader(f<span class="s">"{ruta_docs}/{archivo}"</span>)
+            documentos.extend(loader.load())
+    <span class="k">return</span> documentos
+
+<span class="k">def</span> <span class="n">dividir_en_chunks</span>(documentos):
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=<span class="s">500</span>,    <span class="c"># palabras por chunk</span>
+        chunk_overlap=<span class="s">50</span>,  <span class="c"># overlap para no perder contexto en cortes</span>
+    )
+    <span class="k">return</span> splitter.split_documents(documentos)
+
+<span class="k">if</span> __name__ == <span class="s">"__main__"</span>:
+    docs   = cargar_documentos()
+    chunks = dividir_en_chunks(docs)
+    print(f<span class="s">"Documentos: {len(docs)} · Chunks: {len(chunks)}"</span>)</pre>
+  </div>
+
+  <h3>2. Embeddings — transformar texto en vectores</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-label">ingesta/embed_chunks.py</span>
+      <span class="code-lang">python</span>
+    </div>
+    <pre><span class="k">from</span> langchain.embeddings <span class="k">import</span> OpenAIEmbeddings
+<span class="k">from</span> langchain.vectorstores <span class="k">import</span> Chroma
+<span class="k">from</span> load_docs <span class="k">import</span> cargar_documentos, dividir_en_chunks
+
+<span class="k">def</span> <span class="n">indexar_documentos</span>():
+    docs   = cargar_documentos()
+    chunks = dividir_en_chunks(docs)
+
+    embeddings = OpenAIEmbeddings(model=<span class="s">"text-embedding-3-small"</span>)
+
+    <span class="c"># Chroma guarda los vectores localmente</span>
+    vectorstore = Chroma.from_documents(
+        documents=chunks,
+        embedding=embeddings,
+        persist_directory=<span class="s">"./database/vector_store"</span>
+    )
+    vectorstore.persist()
+    print(<span class="s">"✓ Base de vectores lista."</span>)
+
+indexar_documentos()</pre>
+  </div>
+
+  <h3>3. API — el endpoint de consulta</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-label">api/routes/query.js</span>
+      <span class="code-lang">javascript · express</span>
+    </div>
+    <pre><span class="k">const</span> express = require(<span class="s">'express'</span>);
+<span class="k">const</span> router  = express.Router();
+<span class="k">const</span> { buscarContexto } = require(<span class="s">'../services/retriever'</span>);
+<span class="k">const</span> { consultarLLM }   = require(<span class="s">'../services/llm'</span>);
+
+<span class="c">// POST /api/consulta · Body: { pregunta: "..." }</span>
+router.post(<span class="s">'/'</span>, <span class="k">async</span> (req, res) => {
+  <span class="k">const</span> { pregunta } = req.body;
+  <span class="k">if</span> (!pregunta) <span class="k">return</span> res.status(<span class="s">400</span>).json({ error: <span class="s">'Pregunta requerida'</span> });
+
+  <span class="k">const</span> contexto  = <span class="k">await</span> buscarContexto(pregunta, topK=<span class="s">5</span>);
+  <span class="k">const</span> respuesta = <span class="k">await</span> consultarLLM(pregunta, contexto);
+
+  res.json({
+    respuesta,
+    fuentes:       contexto.map(c => c.metadata.source),
+    chunks_usados: contexto.length
+  });
+});
+
+module.exports = router;</pre>
+  </div>
+
+  <h3>4. Servicio LLM — donde vive el system prompt</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-label">api/services/llm.js</span>
+      <span class="code-lang">javascript · anthropic sdk</span>
+    </div>
+    <pre><span class="k">const</span> Anthropic = require(<span class="s">'@anthropic-ai/sdk'</span>);
+<span class="k">const</span> client    = <span class="k">new</span> Anthropic();
+
+<span class="k">const</span> SYSTEM_PROMPT = <span class="s">`
+Sos un asistente técnico del INTA.
+Tu única fuente de información son los fragmentos que se te proveen.
+
+REGLAS:
+1. Solo respondés con información del CONTEXTO provisto.
+2. Si no encontrás la respuesta, decís exactamente:
+   "No tengo información en los documentos del INTA para esta consulta."
+3. Citás siempre el nombre del documento de origen.
+4. Usás lenguaje claro y directo.
+`</span>;
+
+<span class="k">async function</span> <span class="n">consultarLLM</span>(pregunta, fragmentos) {
+  <span class="k">const</span> contextoTexto = fragmentos
+    .map((f, i) => <span class="s">`[Fragmento ${i+1} · ${f.metadata.source}]\n${f.pageContent}`</span>)
+    .join(<span class="s">'\n\n---\n\n'</span>);
+
+  <span class="k">const</span> response = <span class="k">await</span> client.messages.create({
+    model:   <span class="s">'claude-sonnet-4-20250514'</span>,
+    max_tokens: <span class="s">1024</span>,
+    system:  SYSTEM_PROMPT,
+    messages: [{ role: <span class="s">'user'</span>, content: <span class="s">`CONTEXTO:\n${contextoTexto}\n\nPREGUNTA:\n${pregunta}`</span> }]
+  });
+
+  <span class="k">return</span> response.content[<span class="s">0</span>].text;
+}
+
+module.exports = { consultarLLM };</pre>
+  </div>
+
+  <h3>5. Frontend — la interfaz del extensionista</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-label">frontend/src/components/ChatBox.jsx</span>
+      <span class="code-lang">jsx · react</span>
+    </div>
+    <pre><span class="k">import</span> { useState } <span class="k">from</span> <span class="s">'react'</span>;
+
+<span class="k">export default function</span> <span class="n">ChatBox</span>() {
+  <span class="k">const</span> [pregunta,  setPregunta]  = useState(<span class="s">''</span>);
+  <span class="k">const</span> [respuesta, setRespuesta] = useState(<span class="k">null</span>);
+  <span class="k">const</span> [fuentes,   setFuentes]   = useState([]);
+  <span class="k">const</span> [cargando,  setCargando]  = useState(<span class="k">false</span>);
+
+  <span class="k">const</span> consultar = <span class="k">async</span> () => {
+    <span class="k">if</span> (!pregunta.trim()) <span class="k">return</span>;
+    setCargando(<span class="k">true</span>);
+
+    <span class="k">const</span> res  = <span class="k">await</span> fetch(<span class="s">'/api/consulta'</span>, {
+      method:  <span class="s">'POST'</span>,
+      headers: { <span class="s">'Content-Type'</span>: <span class="s">'application/json'</span> },
+      body:    JSON.stringify({ pregunta })
+    });
+    <span class="k">const</span> data = <span class="k">await</span> res.json();
+
+    setRespuesta(data.respuesta);
+    setFuentes(data.fuentes || []);
+    setCargando(<span class="k">false</span>);
+  };
+
+  <span class="k">return</span> (
+    &lt;div&gt;
+      &lt;h1&gt;Consultor INTA&lt;/h1&gt;
+      &lt;textarea value={pregunta} onChange={e =&gt; setPregunta(e.target.value)}
+        placeholder=<span class="s">"¿Cómo manejar soja en condiciones de sequía?"</span> /&gt;
+      &lt;button onClick={consultar}&gt;{cargando ? <span class="s">'Consultando...'</span> : <span class="s">'Consultar'</span>}&lt;/button&gt;
+      {respuesta &amp;&amp; (
+        &lt;div&gt;
+          &lt;p&gt;{respuesta}&lt;/p&gt;
+          &lt;ul&gt;{fuentes.map((f,i) =&gt; &lt;li key={i}&gt;{f}&lt;/li&gt;)}&lt;/ul&gt;
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</pre>
+  </div>
+
+  <div class="callout ok">
+    <div class="c-ico">🟢</div>
+    <div class="c-body">
+      <strong>El circuito completo en una oración</strong>
+      <p>Pregunta → React hace POST → Express busca 5 chunks similares en Chroma → arma prompt con esos chunks → Claude responde solo con esa información → React muestra respuesta con fuentes.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 06 HERRAMIENTAS ─── -->
+<section id="herramientas">
+<div class="page">
+  <span class="s-num">06 · Herramientas del ecosistema</span>
+  <h2>El stack que<br><span class="acc">necesitan conocer</span></h2>
+
+  <div class="cols">
+    <div>
+      <h4>LangChain</h4>
+      <p style="font-size:.86rem;">El framework más usado para RAG. Tiene abstracciones para loaders, splitters, embeddings, vector stores y chains. Python y JS.</p>
+      <span class="pill pill-g">Recomendado para empezar</span>
+    </div>
+    <div>
+      <h4>LlamaIndex</h4>
+      <p style="font-size:.86rem;">Especializado en RAG. Más opinado que LangChain — menos configuración. Ideal cuando el caso de uso es principalmente "preguntas sobre documentos".</p>
+      <span class="pill pill-v">Alternativa sólida</span>
+    </div>
+  </div>
+
+  <h3>Correr modelos completamente local</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-label">Ollama — setup inicial</span>
+      <span class="code-lang">bash</span>
+    </div>
+    <pre><span class="c"># Instalar Ollama</span>
+curl -fsSL https://ollama.ai/install.sh | sh
+
+<span class="c"># Descargar modelo LLM (llama3 es liviano y capaz)</span>
+ollama pull llama3
+
+<span class="c"># Descargar modelo de embeddings (sin internet, sin API key)</span>
+ollama pull nomic-embed-text
+
+<span class="c"># Levantar el servidor (escucha en localhost:11434)</span>
+ollama serve</pre>
+  </div>
+
+  <h3>Para prototipar sin código</h3>
+  <div class="cols">
+    <div>
+      <h4>AnythingLLM</h4>
+      <p style="font-size:.85rem;">App de escritorio que implementa RAG con interfaz visual. Subís los PDFs del INTA, configurás el modelo y tenés un RAG funcionando en minutos. Perfecto para validar el caso de uso antes de codear.</p>
+    </div>
+    <div>
+      <h4>Open WebUI</h4>
+      <p style="font-size:.85rem;">Interfaz web para Ollama. Permite probar modelos locales con una UI tipo ChatGPT. Útil para mostrarle al ingeniero del INTA cómo se vería el sistema antes de construirlo.</p>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <div class="c-ico">⚠️</div>
+    <div class="c-body">
+      <strong>La trampa de las herramientas</strong>
+      <p>LangChain, LlamaIndex, Ollama son herramientas — no soluciones. El valor está en entender el patrón RAG. Si entienden el flujo, pueden implementarlo con cualquier stack.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 07 ACTIVIDAD ─── -->
+<section id="actividad">
+<div class="page">
+  <span class="s-num">07 · Actividad práctica</span>
+  <h2>Diseñen el sistema<br><span class="acc">para su contexto</span></h2>
+
+  <p>El patrón RAG aplica a cualquier organización con conocimiento acumulado. Elijan un caso real — de Dolores, de la región, de algo que conozcan — y diseñen el sistema.</p>
+
+  <div class="act-box">
+    <div class="act-num">Actividad 01 · Individual · 10 minutos</div>
+    <div class="act-title">Identificar el problema</div>
+    <div class="act-body">
+      <p>Sin hablar con el equipo, respondé en papel:</p>
+      <ul>
+        <li>¿Qué organización conocés que tenga conocimiento acumulado que no llega a quien lo necesita?</li>
+        <li>¿Quién haría la consulta? ¿Con qué urgencia?</li>
+        <li>¿Qué tipo de documentos existentes podrían ser la fuente?</li>
+        <li>¿Qué pasaría si el sistema respondiera algo incorrecto? (pensar el riesgo)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="act-box">
+    <div class="act-num">Actividad 02 · Equipo · 20 minutos</div>
+    <div class="act-title">Diseñar el sistema</div>
+    <div class="act-body">
+      <p>Completen este esquema para su caso:</p>
+      <ul>
+        <li><strong>Usuario:</strong> ¿quién hace la consulta?</li>
+        <li><strong>Problema:</strong> ¿qué no puede resolver hoy sin el sistema?</li>
+        <li><strong>Fuente de documentos:</strong> ¿qué documentación existe y en qué formato?</li>
+        <li><strong>Consulta ejemplo:</strong> 3 preguntas reales que haría el usuario</li>
+        <li><strong>Restricción del sistema:</strong> ¿qué NO debe responder aunque le pregunten?</li>
+        <li><strong>Riesgo principal:</strong> ¿qué puede salir mal y cómo lo mitigás?</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="act-box">
+    <div class="act-num">Actividad 03 · Equipo · 10 minutos</div>
+    <div class="act-title">Escriban el system prompt</div>
+    <div class="act-body">
+      <p>El prompt que usarían para su sistema. Tiene que incluir:</p>
+      <ul>
+        <li>El <strong>rol</strong> del asistente (quién es)</li>
+        <li>La <strong>fuente</strong> de información (de dónde viene el conocimiento)</li>
+        <li>Las <strong>reglas</strong> claras (qué hace si no tiene la respuesta)</li>
+        <li>El <strong>tono</strong> (¿técnico? ¿simple? ¿para quién?)</li>
+      </ul>
+      <br>
+      <p style="color:var(--violet2);font-weight:600;">Un buen prompt de 4 líneas vale más que 100 líneas de feature.</p>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <div class="c-ico">📌</div>
+    <div class="c-body">
+      <strong>Criterio de éxito de esta actividad</strong>
+      <p>No es que tengan el código. Es que puedan explicar el sistema en 3 minutos a alguien que no sabe nada de IA: cuál es el problema, quién lo usa, de dónde viene la información y por qué el sistema no va a inventar respuestas.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 08 PRÓXIMOS PASOS ─── -->
+<section id="refs">
+<div class="page">
+  <span class="s-num">08 · Próximos pasos</span>
+  <h2>La hoja de ruta<br><span class="acc">para construirlo</span></h2>
+
+  <div class="timeline">
+    <div class="tl-row hi">
+      <div class="tl-time">Semana 1</div>
+      <div class="tl-content">
+        <div class="tl-title">Prototipar con AnythingLLM</div>
+        <div class="tl-desc">Sin código. Subir documentos propios, hacer consultas, validar que el patrón RAG funciona para el caso de uso elegido.</div>
+      </div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-time">Semana 2</div>
+      <div class="tl-content">
+        <div class="tl-title">Implementar la ingesta</div>
+        <div class="tl-desc">Script Python para cargar PDFs, generar chunks y guardar embeddings en ChromaDB. Verificar con búsquedas de prueba.</div>
+      </div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-time">Semana 3</div>
+      <div class="tl-content">
+        <div class="tl-title">Conectar el backend</div>
+        <div class="tl-desc">Endpoint Express que recibe la pregunta, llama al retriever y al LLM, devuelve respuesta + fuentes citadas.</div>
+      </div>
+    </div>
+    <div class="tl-row hi">
+      <div class="tl-time">Semana 4</div>
+      <div class="tl-content">
+        <div class="tl-title">Frontend + demo real</div>
+        <div class="tl-desc">Interfaz React. Demo con el ingeniero del INTA. Primer usuario real probando el sistema.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Herramientas para instalar esta semana</h3>
+  <ul>
+    <li><strong>Ollama:</strong> <code>ollama.ai</code> — modelos locales sin API key</li>
+    <li><strong>AnythingLLM:</strong> <code>anythingllm.com</code> — RAG con interfaz visual</li>
+    <li><strong>ChromaDB:</strong> <code>trychroma.com</code> — vector store local para Python</li>
+    <li><strong>LangChain:</strong> <code>python.langchain.com</code> — orquestación de pipelines</li>
+  </ul>
+
+  <div class="callout ok" style="margin-top:2.5rem;">
+    <div class="c-ico">🚀</div>
+    <div class="c-body">
+      <strong>Lo que hace diferente a este proyecto</strong>
+      <p>No es un CRUD. No es un formulario. Es un sistema que convierte conocimiento acumulado en decisiones mejores. Tiene valor real, fuera del aula, para alguien que lo necesita. Eso es lo que hace un desarrollador — no ejecuta consignas, construye cosas que importan.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<footer>
+  <div>
+    <p>ISFD N°26 · DOLORES, BUENOS AIRES · TECNICATURA SUPERIOR EN DESARROLLO DE SOFTWARE · 2026</p>
+    <p style="margin-top:.3rem;">CLASE: IA PARA LA TOMA DE DECISIONES · CASO INTA · 2° Y 3° AÑO · MAYO 2026</p>
+  </div>
+  <a href="https://mjsis20052.github.io/i26/3ro/clase-arquitectura-I26.html" class="foot-link">← Clase anterior</a>
+</footer>
+
+</body>
+</html>

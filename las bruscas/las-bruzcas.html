@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Las Bruzcas — Destino Único · Dolores, Ruta 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tierra: #2C1A0E;
+    --bronce: #8B6534;
+    --oro: #C9A84C;
+    --oro-light: #E8D08A;
+    --crema: #F4EDD8;
+    --crema-light: #FAF6ED;
+    --verde-campo: #3B4A2F;
+    --verde-oliva: #6B7A50;
+    --piedra: #8C8070;
+    --humo: #E8E0D0;
+    --carbon: #1A1208;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--carbon);
+    color: var(--crema);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* ─── NOISE TEXTURE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.6;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 60px;
+    background: linear-gradient(to bottom, rgba(26,18,8,0.95), transparent);
+  }
+
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    color: var(--oro);
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--crema);
+    text-decoration: none;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+  }
+
+  .nav-links a:hover { opacity: 1; color: var(--oro); }
+
+  /* ─── HERO ─── */
+  .hero {
+    height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 60px 80px;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 30% 60%, rgba(139,101,52,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(59,74,47,0.2) 0%, transparent 50%),
+      linear-gradient(135deg, #0D0A04 0%, #1A1208 40%, #0A0804 100%);
+  }
+
+  /* Geometric field lines */
+  .hero-lines {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .hero-lines svg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0.12;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+  }
+
+  .hero-tag {
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--oro);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .hero-tag::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--oro);
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(64px, 9vw, 120px);
+    font-weight: 300;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    margin-bottom: 32px;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--oro);
+  }
+
+  .hero-sub {
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    line-height: 1.8;
+    color: var(--crema);
+    opacity: 0.65;
+    max-width: 480px;
+  }
+
+  .hero-stats {
+    position: absolute;
+    right: 60px;
+    bottom: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    text-align: right;
+    z-index: 2;
+  }
+
+  .hero-stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--oro);
+    line-height: 1;
+  }
+
+  .hero-stat-label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--crema);
+    opacity: 0.5;
+    margin-top: 4px;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 2;
+    opacity: 0.4;
+    animation: scrollHint 2s ease-in-out infinite;
+  }
+
+  @keyframes scrollHint {
+    0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.4; }
+    50% { transform: translateX(-50%) translateY(6px); opacity: 0.7; }
+  }
+
+  .scroll-hint span {
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  /* ─── SECTIONS ─── */
+  section {
+    padding: 120px 60px;
+    position: relative;
+  }
+
+  .section-label {
+    font-size: 9px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--oro);
+    margin-bottom: 60px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--oro), transparent);
+    opacity: 0.3;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(40px, 5vw, 68px);
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+
+  .section-title em { font-style: italic; color: var(--oro); }
+
+  /* ─── CONCEPTO ─── */
+  .concepto {
+    background: var(--carbon);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .concepto-text p {
+    font-size: 15px;
+    line-height: 2;
+    opacity: 0.7;
+    margin-bottom: 20px;
+  }
+
+  .concepto-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--oro);
+    border-left: 1px solid var(--oro);
+    padding-left: 32px;
+    margin: 48px 0;
+    opacity: 0.85;
+  }
+
+  .concepto-visual {
+    position: relative;
+    height: 500px;
+  }
+
+  .concepto-frame {
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .concepto-frame-inner {
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(ellipse at 40% 30%, rgba(139,101,52,0.25) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(59,74,47,0.3) 0%, transparent 50%),
+      linear-gradient(160deg, #1A1208 0%, #0D1008 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .concepto-emblem {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 120px;
+    font-weight: 300;
+    color: var(--oro);
+    opacity: 0.08;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    text-align: center;
+    user-select: none;
+  }
+
+  .corner-mark {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-color: var(--oro);
+    border-style: solid;
+    opacity: 0.4;
+  }
+  .corner-mark.tl { top: -1px; left: -1px; border-width: 1px 0 0 1px; }
+  .corner-mark.tr { top: -1px; right: -1px; border-width: 1px 1px 0 0; }
+  .corner-mark.bl { bottom: -1px; left: -1px; border-width: 0 0 1px 1px; }
+  .corner-mark.br { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
+
+  /* ─── PILARES ─── */
+  .pilares { background: #120E06; }
+
+  .pilares-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-top: 60px;
+  }
+
+  .pilar-card {
+    background: rgba(201,168,76,0.04);
+    border: 0.5px solid rgba(201,168,76,0.12);
+    padding: 48px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.4s;
+    cursor: default;
+  }
+
+  .pilar-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--oro), transparent);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .pilar-card:hover { background: rgba(201,168,76,0.07); }
+  .pilar-card:hover::before { opacity: 1; }
+
+  .pilar-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 64px;
+    font-weight: 300;
+    color: var(--oro);
+    opacity: 0.15;
+    position: absolute;
+    top: 16px;
+    right: 24px;
+    line-height: 1;
+  }
+
+  .pilar-icon {
+    font-size: 28px;
+    margin-bottom: 24px;
+    display: block;
+  }
+
+  .pilar-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 400;
+    margin-bottom: 16px;
+    color: var(--crema);
+  }
+
+  .pilar-desc {
+    font-size: 12px;
+    line-height: 1.9;
+    opacity: 0.55;
+    letter-spacing: 0.02em;
+  }
+
+  /* ─── MASTERPLAN ─── */
+  .masterplan { background: var(--carbon); }
+
+  .mp-layout {
+    margin-top: 60px;
+    position: relative;
+    background: rgba(201,168,76,0.03);
+    border: 0.5px solid rgba(201,168,76,0.12);
+    padding: 60px;
+    overflow: hidden;
+  }
+
+  .mp-ruta {
+    background: rgba(139,101,52,0.2);
+    border: 0.5px solid rgba(139,101,52,0.4);
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--bronce);
+    margin-bottom: 40px;
+    position: relative;
+  }
+
+  .mp-ruta::before, .mp-ruta::after {
+    content: '←——————————————————————————————————————→';
+    display: block;
+    font-size: 8px;
+    opacity: 0.3;
+    letter-spacing: 0;
+    margin: 4px 0 0;
+  }
+
+  .mp-grid {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 0;
+    min-height: 400px;
+  }
+
+  .mp-side {
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .mp-center {
+    background: rgba(59,74,47,0.15);
+    border-left: 0.5px solid rgba(107,122,80,0.3);
+    border-right: 0.5px solid rgba(107,122,80,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--verde-oliva);
+    opacity: 0.6;
+  }
+
+  .mp-zone {
+    background: rgba(201,168,76,0.04);
+    border: 0.5px solid rgba(201,168,76,0.15);
+    padding: 20px 24px;
+    position: relative;
+    transition: border-color 0.3s;
+  }
+
+  .mp-zone:hover { border-color: rgba(201,168,76,0.4); }
+
+  .mp-zone-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--oro);
+    margin-bottom: 8px;
+  }
+
+  .mp-zone-items {
+    font-size: 11px;
+    line-height: 2;
+    opacity: 0.55;
+    letter-spacing: 0.03em;
+  }
+
+  /* ─── HISTORIA ─── */
+  .historia {
+    background: #0A0804;
+    text-align: center;
+    padding: 160px 60px;
+  }
+
+  .historia-year {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 160px;
+    font-weight: 300;
+    color: var(--oro);
+    opacity: 0.06;
+    line-height: 1;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 60px;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .historia .section-title {
+    position: relative;
+    z-index: 2;
+    margin-bottom: 40px;
+  }
+
+  .historia p {
+    font-size: 15px;
+    line-height: 2;
+    opacity: 0.6;
+    max-width: 640px;
+    margin: 0 auto 20px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .historia-line {
+    width: 1px;
+    height: 80px;
+    background: linear-gradient(to bottom, var(--oro), transparent);
+    margin: 60px auto 0;
+    opacity: 0.3;
+  }
+
+  /* ─── INVERSIÓN ─── */
+  .inversion { background: #120E06; }
+
+  .inv-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 60px;
+  }
+
+  .inv-card {
+    padding: 48px 40px;
+    border: 0.5px solid rgba(201,168,76,0.1);
+    background: rgba(201,168,76,0.03);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .inv-card.featured {
+    background: rgba(201,168,76,0.07);
+    border-color: rgba(201,168,76,0.3);
+  }
+
+  .inv-card.featured::before {
+    content: 'Sector ancla';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--oro);
+    border: 0.5px solid var(--oro);
+    padding: 4px 10px;
+    opacity: 0.6;
+  }
+
+  .inv-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    margin-bottom: 12px;
+    color: var(--oro);
+  }
+
+  .inv-amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+
+  .inv-unit {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.4;
+    margin-bottom: 28px;
+  }
+
+  .inv-items {
+    font-size: 11px;
+    line-height: 2.2;
+    opacity: 0.5;
+    border-top: 0.5px solid rgba(201,168,76,0.15);
+    padding-top: 24px;
+  }
+
+  .inv-items li {
+    list-style: none;
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .inv-items li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--oro);
+    opacity: 0.5;
+  }
+
+  /* ─── LOGO SECTION ─── */
+  .logos-section {
+    background: var(--carbon);
+    text-align: center;
+    padding: 120px 60px;
+  }
+
+  .logo-display {
+    margin: 80px auto;
+    max-width: 800px;
+  }
+
+  .logo-main {
+    display: inline-block;
+    position: relative;
+    padding: 60px 80px;
+    border: 0.5px solid rgba(201,168,76,0.2);
+  }
+
+  .logo-main::before, .logo-main::after {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-color: var(--oro);
+    border-style: solid;
+  }
+  .logo-main::before { top: -1px; left: -1px; border-width: 1px 0 0 1px; }
+  .logo-main::after { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
+
+  .logo-symbol {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+  }
+
+  .logo-wordmark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px;
+    font-weight: 300;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--oro);
+    line-height: 1;
+    display: block;
+  }
+
+  .logo-sub-wordmark {
+    font-size: 9px;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--crema);
+    opacity: 0.4;
+    margin-top: 12px;
+    display: block;
+  }
+
+  .logo-variants {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 2px;
+  }
+
+  .logo-var {
+    padding: 48px 32px;
+    border: 0.5px solid rgba(201,168,76,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .logo-var.dark-bg { background: #FAF6ED; }
+  .logo-var.mid-bg { background: #2C1A0E; }
+
+  /* ─── CARTELERÍA ─── */
+  .carteleria { background: #0A0804; }
+
+  .carteles-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 60px;
+  }
+
+  /* Cartel Ruta */
+  .cartel-ruta {
+    aspect-ratio: 3/2;
+    background: var(--carbon);
+    border: 3px solid var(--oro);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 40px;
+  }
+
+  .cartel-ruta::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 0.5px solid rgba(201,168,76,0.3);
+    pointer-events: none;
+  }
+
+  .cartel-ruta-km {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    letter-spacing: 0.3em;
+    color: var(--oro);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0.7;
+  }
+
+  .cartel-ruta-nombre {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 56px;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--crema);
+    line-height: 0.95;
+    text-align: center;
+  }
+
+  .cartel-ruta-nombre em {
+    font-style: italic;
+    color: var(--oro);
+  }
+
+  .cartel-ruta-sub {
+    font-size: 9px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--crema);
+    opacity: 0.45;
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  .cartel-ruta-arrow {
+    position: absolute;
+    right: 32px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--oro);
+  }
+
+  .arrow-line {
+    width: 1px;
+    height: 60px;
+    background: var(--oro);
+    opacity: 0.5;
+  }
+
+  /* Cartel Entrada */
+  .cartel-entrada {
+    aspect-ratio: 2/3;
+    background: #0D0A04;
+    border: 0.5px solid rgba(201,168,76,0.25);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    grid-row: span 2;
+  }
+
+  .cartel-entrada-ornament {
+    width: 100%;
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--oro);
+    opacity: 0.4;
+    margin-bottom: 32px;
+  }
+
+  .cartel-entrada-logo {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .cartel-entrada-nombre {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 72px;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    line-height: 0.9;
+    text-align: center;
+    color: var(--crema);
+  }
+
+  .cartel-entrada-nombre em {
+    display: block;
+    font-style: italic;
+    color: var(--oro);
+    font-size: 56px;
+  }
+
+  .cartel-entrada-divider {
+    width: 60px;
+    height: 1px;
+    background: var(--oro);
+    opacity: 0.4;
+    margin: 28px auto;
+  }
+
+  .cartel-entrada-sub {
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    opacity: 0.45;
+    text-align: center;
+    line-height: 2;
+  }
+
+  .cartel-entrada-year {
+    position: absolute;
+    bottom: 32px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    letter-spacing: 0.4em;
+    color: var(--oro);
+    opacity: 0.35;
+    text-transform: uppercase;
+  }
+
+  /* Cartel interior */
+  .cartel-interior {
+    aspect-ratio: 4/1.5;
+    background: rgba(201,168,76,0.05);
+    border: 0.5px solid rgba(201,168,76,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cartel-interior::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--oro);
+  }
+
+  .cartel-int-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--oro);
+  }
+
+  .cartel-int-sub {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    opacity: 0.45;
+    margin-top: 4px;
+  }
+
+  .cartel-int-arrow {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    color: var(--oro);
+    opacity: 0.6;
+  }
+
+  /* ─── PALETA ─── */
+  .paleta-row {
+    display: flex;
+    gap: 2px;
+    margin-top: 48px;
+  }
+
+  .color-swatch {
+    flex: 1;
+    height: 100px;
+    display: flex;
+    align-items: flex-end;
+    padding: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .color-swatch-label {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    line-height: 1.6;
+  }
+
+  /* ─── TIPOGRAFÍA ─── */
+  .tipo-display {
+    margin-top: 60px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+
+  .tipo-card {
+    padding: 48px;
+    border: 0.5px solid rgba(201,168,76,0.1);
+    background: rgba(201,168,76,0.02);
+  }
+
+  .tipo-name {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--oro);
+    opacity: 0.6;
+    margin-bottom: 20px;
+  }
+
+  .tipo-sample-serif {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 300;
+    line-height: 1.1;
+    font-style: italic;
+  }
+
+  .tipo-sample-sans {
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    line-height: 2.2;
+    opacity: 0.6;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: #080603;
+    padding: 80px 60px 60px;
+    border-top: 0.5px solid rgba(201,168,76,0.1);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 60px;
+  }
+
+  .footer-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: var(--oro);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .footer-tagline {
+    font-size: 11px;
+    line-height: 1.9;
+    opacity: 0.4;
+    letter-spacing: 0.05em;
+  }
+
+  .footer-col-title {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--oro);
+    opacity: 0.5;
+    margin-bottom: 24px;
+  }
+
+  .footer-col-item {
+    font-size: 12px;
+    line-height: 2.2;
+    opacity: 0.4;
+    letter-spacing: 0.05em;
+  }
+
+  .footer-bottom {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 0.5px solid rgba(201,168,76,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    grid-column: 1 / -1;
+  }
+
+  .footer-copy {
+    font-size: 10px;
+    opacity: 0.25;
+    letter-spacing: 0.1em;
+  }
+
+  /* ─── ANIMATIONS ─── */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @keyframes lineGrow {
+    from { scaleX: 0; }
+    to { scaleX: 1; }
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    section { padding: 80px 24px; }
+    .hero { padding: 0 24px 60px; }
+    .hero-stats { display: none; }
+    .concepto, .pilares-grid, .inv-grid, .carteles-grid, .logo-variants { grid-template-columns: 1fr; }
+    .mp-grid { grid-template-columns: 1fr; }
+    .mp-center { display: none; }
+    footer { grid-template-columns: 1fr; gap: 40px; padding: 60px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Las Bruzcas</div>
+  <ul class="nav-links">
+    <li><a href="#concepto">Concepto</a></li>
+    <li><a href="#masterplan">Masterplan</a></li>
+    <li><a href="#identidad">Identidad</a></li>
+    <li><a href="#inversion">Inversión</a></li>
+    <li><a href="#carteleria">Cartelería</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-lines">
+    <svg viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid slice">
+      <!-- Converging perspective lines from horizon -->
+      <line x1="0" y1="500" x2="700" y2="450" stroke="#C9A84C" stroke-width="0.5"/>
+      <line x1="0" y1="600" x2="700" y2="450" stroke="#C9A84C" stroke-width="0.5"/>
+      <line x1="0" y1="700" x2="700" y2="450" stroke="#C9A84C" stroke-width="0.5"/>
+      <line x1="0" y1="800" x2="700" y2="450" stroke="#C9A84C" stroke-width="0.5"/>
+      <line x1="1400" y1="500" x2="700" y2="450" stroke="#C9A84C" stroke-width="0.5"/>
+      <line x1="1400" y1="600" x2="700" y2="450" stroke="#C9A84C" stroke-width="0.5"/>
+      <line x1="1400" y1="700" x2="700" y2="450" stroke="#C9A84C" stroke-width="0.5"/>
+      <line x1="1400" y1="800" x2="700" y2="450" stroke="#C9A84C" stroke-width="0.5"/>
+      <!-- Horizon line -->
+      <line x1="0" y1="450" x2="1400" y2="450" stroke="#C9A84C" stroke-width="0.5"/>
+      <!-- Vertical rhythm -->
+      <line x1="140" y1="0" x2="140" y2="900" stroke="#8B6534" stroke-width="0.3"/>
+      <line x1="700" y1="0" x2="700" y2="900" stroke="#8B6534" stroke-width="0.3"/>
+      <line x1="1260" y1="0" x2="1260" y2="900" stroke="#8B6534" stroke-width="0.3"/>
+      <!-- Field marks -->
+      <circle cx="700" cy="450" r="80" fill="none" stroke="#C9A84C" stroke-width="0.3"/>
+      <circle cx="700" cy="450" r="160" fill="none" stroke="#C9A84C" stroke-width="0.2"/>
+      <circle cx="700" cy="450" r="300" fill="none" stroke="#C9A84C" stroke-width="0.15"/>
+    </svg>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-tag">Dolores · Provincia de Buenos Aires · Ruta 2</div>
+    <h1 class="hero-title">
+      Las<br><em>Bruzcas</em>
+    </h1>
+    <p class="hero-sub">Un destino único que transforma diez hectáreas de historia en una experiencia de campo sofisticada, productiva e irrepetible sobre la Ruta 2.</p>
+  </div>
+
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-num">10</div>
+      <div class="hero-stat-label">Hectáreas</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">4km</div>
+      <div class="hero-stat-label">Frente sobre Ruta 2</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">3M+</div>
+      <div class="hero-stat-label">Turistas anuales de paso</div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <svg width="16" height="24" viewBox="0 0 16 24" fill="none">
+      <rect x="0.5" y="0.5" width="15" height="23" rx="7.5" stroke="currentColor" stroke-opacity="0.4"/>
+      <circle cx="8" cy="7" r="2" fill="currentColor" opacity="0.6">
+        <animate attributeName="cy" values="7;14;7" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+    <span>Explorar</span>
+  </div>
+</section>
+
+<!-- CONCEPTO -->
+<section class="concepto" id="concepto">
+  <div class="concepto-text fade-in">
+    <div class="section-label">El Concepto</div>
+    <h2 class="section-title">Un lugar que<br>una vez encerró,<br><em>hoy libera.</em></h2>
+    <blockquote class="concepto-quote">
+      "Campo, historia y sabor en el corazón de la Ruta 2."
+    </blockquote>
+    <p>Las Bruzcas no es un parque temático ni una feria. Es un destino que se siente real, cuidado y único. La historia de la ex cárcel se convierte en el alma de un espacio donde cada sector conecta al visitante con la tierra, con el origen de los productos que consume y con una experiencia que no puede replicarse en ningún otro lugar de la Provincia.</p>
+    <p>Calidad en cada detalle. Autenticidad en cada historia. Una experiencia diseñada para quedarse en la memoria.</p>
+  </div>
+  <div class="concepto-visual fade-in">
+    <div class="concepto-frame">
+      <div class="concepto-frame-inner">
+        <div class="concepto-emblem">LB</div>
+      </div>
+    </div>
+    <div class="corner-mark tl"></div>
+    <div class="corner-mark tr"></div>
+    <div class="corner-mark bl"></div>
+    <div class="corner-mark br"></div>
+  </div>
+</section>
+
+<!-- PILARES -->
+<section class="pilares" id="pilares">
+  <div class="section-label fade-in">Los Cuatro Pilares</div>
+  <h2 class="section-title fade-in">Una experiencia<br><em>integral.</em></h2>
+  <div class="pilares-grid">
+    <div class="pilar-card fade-in">
+      <span class="pilar-num">I</span>
+      <span class="pilar-icon">🌿</span>
+      <h3 class="pilar-title">Producir</h3>
+      <p class="pilar-desc">Viñedos y olivares sobre el camino central. Apiario propio con extracción a la vista. El visitante ve, aprende y prueba lo que el campo genera. Producción auténtica que se convierte en producto, en historia y en experiencia memorable.</p>
+    </div>
+    <div class="pilar-card fade-in">
+      <span class="pilar-num">II</span>
+      <span class="pilar-icon">🏚️</span>
+      <h3 class="pilar-title">Recordar</h3>
+      <p class="pilar-desc">La Rancha de Las Bruzcas reconstruida. El empedrado original, los muros de historia. La narrativa de lo que fue este lugar se convierte en el diferencial que ningún competidor puede copiar: una identidad que tiene raíces reales.</p>
+    </div>
+    <div class="pilar-card fade-in">
+      <span class="pilar-num">III</span>
+      <span class="pilar-icon">🍽️</span>
+      <h3 class="pilar-title">Disfrutar</h3>
+      <p class="pilar-desc">Comedor en el casco, food trucks seleccionados, dulces, conservas y productos artesanales de primer nivel. La Escuela Agropecuaria Osvaldo Magnasco con su propio puesto. Un paseo gastronómico curado, sin concesiones de calidad.</p>
+    </div>
+    <div class="pilar-card fade-in">
+      <span class="pilar-num">IV</span>
+      <span class="pilar-icon">🎶</span>
+      <h3 class="pilar-title">Vivir</h3>
+      <p class="pilar-desc">Glamping y domes integrados al paisaje. Shows de música electrónica y otros estilos al aire libre. Eventos corporativos y culturales en un espacio único. Un destino que no solo se visita: se habita, se celebra y se recomienda.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MASTERPLAN -->
+<section class="masterplan" id="masterplan">
+  <div class="section-label fade-in">Masterplan</div>
+  <h2 class="section-title fade-in">10 hectáreas<br><em>con propósito.</em></h2>
+
+  <div class="mp-layout fade-in">
+    <div class="mp-ruta">Ruta Nacional 2 — Acceso directo — 4 kilómetros de frente</div>
+    <div class="mp-grid">
+      <!-- Lado izquierdo -->
+      <div class="mp-side">
+        <div class="mp-zone">
+          <div class="mp-zone-title">Zona Productiva</div>
+          <div class="mp-zone-items">
+            Viñedos · producción propia<br>
+            Olivares · aceite artesanal<br>
+            Apiario · extracción a la vista<br>
+            Comercialización integrada
+          </div>
+        </div>
+        <div class="mp-zone">
+          <div class="mp-zone-title">Casco · La Rancha</div>
+          <div class="mp-zone-items">
+            Reconstrucción patrimonial<br>
+            Empedrado histórico<br>
+            Comedor principal · bar<br>
+            Salón de eventos privados
+          </div>
+        </div>
+        <div class="mp-zone">
+          <div class="mp-zone-title">Sector Eventos</div>
+          <div class="mp-zone-items">
+            Escenario al aire libre<br>
+            Música electrónica y cultural<br>
+            Eventos corporativos<br>
+            Fiestas temáticas
+          </div>
+        </div>
+      </div>
+
+      <!-- Centro -->
+      <div class="mp-center">Camino central · Vides y Olivos</div>
+
+      <!-- Lado derecho -->
+      <div class="mp-side">
+        <div class="mp-zone">
+          <div class="mp-zone-title">Paseo de Emprendedores</div>
+          <div class="mp-zone-items">
+            Food trucks curados<br>
+            Dulces · conservas · artesanías<br>
+            Escuela Agropecuaria Magnasco<br>
+            Degustación miel · aceite · vino
+          </div>
+        </div>
+        <div class="mp-zone">
+          <div class="mp-zone-title">Alojamiento</div>
+          <div class="mp-zone-items">
+            Domes · tiny houses · glamping<br>
+            Integrados al paisaje natural<br>
+            Experiencia inmersiva de campo<br>
+            Reserva anticipada premium
+          </div>
+        </div>
+        <div class="mp-zone">
+          <div class="mp-zone-title">Accesos y Circulación</div>
+          <div class="mp-zone-items">
+            Ingreso señalizado desde Ruta 2<br>
+            Estacionamiento organizado<br>
+            Circulación peatonal central<br>
+            Señalética de marca propia
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HISTORIA -->
+<section class="historia" style="position:relative; overflow:hidden;">
+  <div class="historia-year">1890</div>
+  <div class="section-label fade-in" style="justify-content:center;">La Historia</div>
+  <h2 class="section-title fade-in">El alma del lugar<br><em>no se inventa.</em></h2>
+  <p class="fade-in">La ex cárcel de Las Bruzcas en Dolores no es solo un escenario. Es el origen de un relato que da identidad profunda al proyecto. Cada muro restaurado, cada adoquín en su lugar, habla de un pasado que hoy se transforma en destino.</p>
+  <p class="fade-in">En un mercado saturado de propuestas genéricas, Las Bruzcas tiene algo que no se puede comprar ni replicar: una historia real, un lugar con alma propia.</p>
+  <div class="historia-line"></div>
+</section>
+
+<!-- IDENTIDAD -->
+<section id="identidad" style="background: #120E06; padding: 120px 60px;">
+  <div class="section-label fade-in">Sistema de Identidad Visual</div>
+  <h2 class="section-title fade-in">Marca con<br><em>carácter.</em></h2>
+
+  <!-- LOGO PRINCIPAL -->
+  <div class="logo-display fade-in">
+    <div class="logo-main">
+      <div class="corner-mark tl"></div>
+      <div class="corner-mark tr"></div>
+      <div class="corner-mark bl"></div>
+      <div class="corner-mark br"></div>
+      <!-- Isotipo SVG -->
+      <div class="logo-symbol">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Hexágono (panal) + horizonte de campo -->
+          <polygon points="40,6 70,22 70,58 40,74 10,58 10,22" stroke="#C9A84C" stroke-width="1" fill="none" opacity="0.8"/>
+          <polygon points="40,14 62,26 62,54 40,66 18,54 18,26" stroke="#C9A84C" stroke-width="0.5" fill="none" opacity="0.3"/>
+          <!-- Línea de horizonte central -->
+          <line x1="18" y1="40" x2="62" y2="40" stroke="#C9A84C" stroke-width="0.8" opacity="0.6"/>
+          <!-- Sol / luna sobre el horizonte -->
+          <circle cx="40" cy="32" r="6" stroke="#C9A84C" stroke-width="0.8" fill="none"/>
+          <!-- Raíces / viñas bajo el horizonte -->
+          <path d="M28 46 Q34 50 40 46 Q46 50 52 46" stroke="#C9A84C" stroke-width="0.8" fill="none" opacity="0.7"/>
+          <path d="M32 52 Q36 56 40 52 Q44 56 48 52" stroke="#C9A84C" stroke-width="0.6" fill="none" opacity="0.5"/>
+          <!-- Puntos cardinales sutiles -->
+          <circle cx="40" cy="10" r="1.5" fill="#C9A84C" opacity="0.4"/>
+          <circle cx="40" cy="70" r="1.5" fill="#C9A84C" opacity="0.4"/>
+          <circle cx="14" cy="40" r="1.5" fill="#C9A84C" opacity="0.4"/>
+          <circle cx="66" cy="40" r="1.5" fill="#C9A84C" opacity="0.4"/>
+        </svg>
+      </div>
+      <span class="logo-wordmark">Las Bruzcas</span>
+      <span class="logo-sub-wordmark">Dolores · Provincia de Buenos Aires · Est. 2025</span>
+    </div>
+  </div>
+
+  <!-- VARIANTES -->
+  <div class="logo-variants fade-in">
+    <div class="logo-var" style="background: #FAF6ED; border: 0.5px solid rgba(44,26,14,0.1);">
+      <svg viewBox="0 0 80 80" width="48" height="48" fill="none">
+        <polygon points="40,6 70,22 70,58 40,74 10,58 10,22" stroke="#2C1A0E" stroke-width="1" fill="none" opacity="0.6"/>
+        <line x1="18" y1="40" x2="62" y2="40" stroke="#2C1A0E" stroke-width="0.8" opacity="0.5"/>
+        <circle cx="40" cy="32" r="6" stroke="#2C1A0E" stroke-width="0.8" fill="none"/>
+        <path d="M28 46 Q34 50 40 46 Q46 50 52 46" stroke="#2C1A0E" stroke-width="0.8" fill="none" opacity="0.6"/>
+      </svg>
+      <div style="font-family:'Cormorant Garamond',serif; font-size:18px; color:#2C1A0E; letter-spacing:0.15em; text-transform:uppercase; margin-top:8px;">Las Bruzcas</div>
+      <div style="font-size:8px; color:#8C8070; letter-spacing:0.3em; text-transform:uppercase; margin-top:4px;">Versión fondo claro</div>
+    </div>
+    <div class="logo-var" style="background: #2C1A0E; border: 0.5px solid rgba(201,168,76,0.2);">
+      <svg viewBox="0 0 80 80" width="48" height="48" fill="none">
+        <polygon points="40,6 70,22 70,58 40,74 10,58 10,22" stroke="#C9A84C" stroke-width="1" fill="none" opacity="0.8"/>
+        <line x1="18" y1="40" x2="62" y2="40" stroke="#C9A84C" stroke-width="0.8" opacity="0.6"/>
+        <circle cx="40" cy="32" r="6" stroke="#C9A84C" stroke-width="0.8" fill="none"/>
+        <path d="M28 46 Q34 50 40 46 Q46 50 52 46" stroke="#C9A84C" stroke-width="0.8" fill="none" opacity="0.7"/>
+      </svg>
+      <div style="font-family:'Cormorant Garamond',serif; font-size:18px; color:#C9A84C; letter-spacing:0.15em; text-transform:uppercase; margin-top:8px;">Las Bruzcas</div>
+      <div style="font-size:8px; color:#8C8070; letter-spacing:0.3em; text-transform:uppercase; margin-top:4px;">Versión corporativa</div>
+    </div>
+    <div class="logo-var" style="background: #1A1208; border: 0.5px solid rgba(201,168,76,0.15);">
+      <svg viewBox="0 0 80 80" width="48" height="48" fill="none">
+        <polygon points="40,6 70,22 70,58 40,74 10,58 10,22" stroke="#E8D08A" stroke-width="1" fill="none" opacity="0.6"/>
+        <line x1="18" y1="40" x2="62" y2="40" stroke="#E8D08A" stroke-width="0.8" opacity="0.4"/>
+        <circle cx="40" cy="32" r="6" stroke="#E8D08A" stroke-width="0.8" fill="none"/>
+        <path d="M28 46 Q34 50 40 46 Q46 50 52 46" stroke="#E8D08A" stroke-width="0.8" fill="none" opacity="0.5"/>
+      </svg>
+      <div style="font-family:'Cormorant Garamond',serif; font-size:18px; color:#E8D08A; letter-spacing:0.15em; text-transform:uppercase; margin-top:8px;">Las Bruzcas</div>
+      <div style="font-size:8px; color:#8C8070; letter-spacing:0.3em; text-transform:uppercase; margin-top:4px;">Versión nocturna</div>
+    </div>
+  </div>
+
+  <!-- PALETA -->
+  <div style="margin-top: 80px;" class="fade-in">
+    <div class="section-label">Paleta de color</div>
+    <div class="paleta-row">
+      <div class="color-swatch" style="background:#C9A84C;">
+        <div class="color-swatch-label" style="color:#2C1A0E;">
+          <strong style="display:block;font-size:11px;font-weight:500;">Oro Las Bruzcas</strong>
+          #C9A84C
+        </div>
+      </div>
+      <div class="color-swatch" style="background:#1A1208;">
+        <div class="color-swatch-label" style="color:#C9A84C;">
+          <strong style="display:block;font-size:11px;font-weight:500;">Carbón campo</strong>
+          #1A1208
+        </div>
+      </div>
+      <div class="color-swatch" style="background:#2C1A0E;">
+        <div class="color-swatch-label" style="color:#C9A84C;">
+          <strong style="display:block;font-size:11px;font-weight:500;">Tierra</strong>
+          #2C1A0E
+        </div>
+      </div>
+      <div class="color-swatch" style="background:#F4EDD8;">
+        <div class="color-swatch-label" style="color:#2C1A0E;">
+          <strong style="display:block;font-size:11px;font-weight:500;">Crema</strong>
+          #F4EDD8
+        </div>
+      </div>
+      <div class="color-swatch" style="background:#3B4A2F;">
+        <div class="color-swatch-label" style="color:#C9A84C;">
+          <strong style="display:block;font-size:11px;font-weight:500;">Verde campo</strong>
+          #3B4A2F
+        </div>
+      </div>
+      <div class="color-swatch" style="background:#8C8070;">
+        <div class="color-swatch-label" style="color:#F4EDD8;">
+          <strong style="display:block;font-size:11px;font-weight:500;">Piedra</strong>
+          #8C8070
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIPOGRAFÍA -->
+  <div class="tipo-display fade-in">
+    <div class="tipo-card">
+      <div class="tipo-name">Display · Cormorant Garamond</div>
+      <div class="tipo-sample-serif">
+        Las Bruzcas<br>
+        <em>Campo & Historia</em>
+      </div>
+      <div style="font-size:11px; margin-top:20px; opacity:0.35; letter-spacing:0.05em;">Títulos · Marcas · Citaciones · Señalética principal</div>
+    </div>
+    <div class="tipo-card">
+      <div class="tipo-name">Texto · Montserrat Light</div>
+      <div class="tipo-sample-sans">
+        Dolores · Provincia de Buenos Aires<br>
+        Ruta Nacional 2 · Km 205<br>
+        Est. 2025 · 10 Hectáreas<br>
+        Campo · Historia · Sabor
+      </div>
+      <div style="font-size:11px; margin-top:20px; opacity:0.35; letter-spacing:0.05em;">Cuerpo de texto · Tags · Labels · Información técnica</div>
+    </div>
+  </div>
+</section>
+
+<!-- CARTELERÍA -->
+<section class="carteleria" id="carteleria">
+  <div class="section-label fade-in">Sistema de Cartelería</div>
+  <h2 class="section-title fade-in">La marca en<br><em>el territorio.</em></h2>
+
+  <div class="carteles-grid fade-in">
+
+    <!-- Cartel Ruta Principal -->
+    <div>
+      <div style="font-size:9px; letter-spacing:0.3em; text-transform:uppercase; color:var(--piedra); margin-bottom:16px;">Cartel vial · Ruta 2</div>
+      <div class="cartel-ruta">
+        <div class="cartel-ruta-km">A 500 metros</div>
+        <div class="cartel-ruta-nombre">
+          Las<br><em>Bruzcas</em>
+        </div>
+        <div class="cartel-ruta-sub">
+          Campo · Historia · Sabor<br>
+          Próxima salida derecha
+        </div>
+        <div class="cartel-ruta-arrow">
+          <div class="arrow-line"></div>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 0 L8 12 M3 7 L8 12 L13 7" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cartel Entrada -->
+    <div>
+      <div style="font-size:9px; letter-spacing:0.3em; text-transform:uppercase; color:var(--piedra); margin-bottom:16px;">Cartel de entrada · Monolito</div>
+      <div class="cartel-entrada">
+        <div class="cartel-entrada-ornament">· Bienvenidos ·</div>
+        <div class="cartel-entrada-logo">
+          <svg viewBox="0 0 80 80" width="56" height="56" fill="none">
+            <polygon points="40,6 70,22 70,58 40,74 10,58 10,22" stroke="#C9A84C" stroke-width="1" fill="none" opacity="0.8"/>
+            <polygon points="40,14 62,26 62,54 40,66 18,54 18,26" stroke="#C9A84C" stroke-width="0.5" fill="none" opacity="0.25"/>
+            <line x1="18" y1="40" x2="62" y2="40" stroke="#C9A84C" stroke-width="0.8" opacity="0.6"/>
+            <circle cx="40" cy="32" r="6" stroke="#C9A84C" stroke-width="0.8" fill="none"/>
+            <path d="M28 46 Q34 50 40 46 Q46 50 52 46" stroke="#C9A84C" stroke-width="0.8" fill="none" opacity="0.7"/>
+          </svg>
+        </div>
+        <div class="cartel-entrada-nombre">
+          Las<br><em>Bruzcas</em>
+        </div>
+        <div class="cartel-entrada-divider"></div>
+        <div class="cartel-entrada-sub">
+          Campo · Historia · Sabor<br>
+          Dolores · Provincia de Buenos Aires
+        </div>
+        <div class="cartel-entrada-year">Est. 2025</div>
+      </div>
+    </div>
+
+    <!-- Cartel Interior Paseo -->
+    <div>
+      <div style="font-size:9px; letter-spacing:0.3em; text-transform:uppercase; color:var(--piedra); margin-bottom:16px;">Señalética interior · Paseo</div>
+      <div class="cartel-interior">
+        <div>
+          <div class="cartel-int-title">Paseo de Emprendedores</div>
+          <div class="cartel-int-sub">Food trucks · Gastronomía · Artesanías</div>
+        </div>
+        <div class="cartel-int-arrow">→</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Carteles interiores adicionales -->
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-top:16px;" class="fade-in">
+    <div class="cartel-interior" style="flex-direction:column; align-items:flex-start; gap:4px;">
+      <div class="cartel-int-title" style="font-size:24px;">La Rancha</div>
+      <div class="cartel-int-sub">Comedor · Bar · Historia</div>
+    </div>
+    <div class="cartel-interior">
+      <div>
+        <div class="cartel-int-title" style="font-size:24px;">Apiario</div>
+        <div class="cartel-int-sub">Extracción artesanal · Miel propia</div>
+      </div>
+      <div class="cartel-int-arrow">→</div>
+    </div>
+    <div class="cartel-interior">
+      <div>
+        <div class="cartel-int-title" style="font-size:24px;">Glamping</div>
+        <div class="cartel-int-sub">Alojamiento · Reservas</div>
+      </div>
+      <div class="cartel-int-arrow">→</div>
+    </div>
+  </div>
+</section>
+
+<!-- INVERSIÓN -->
+<section class="inversion" id="inversion">
+  <div class="section-label fade-in">Propuesta de Inversión</div>
+  <h2 class="section-title fade-in">Un proyecto<br><em>con retorno.</em></h2>
+  <div class="inv-grid">
+    <div class="inv-card fade-in">
+      <div class="inv-title">Infraestructura</div>
+      <div class="inv-amount">Fase I</div>
+      <div class="inv-unit">Casco · accesos · señalética</div>
+      <ul class="inv-items">
+        <li>Restauración La Rancha</li>
+        <li>Camino central pavimentado</li>
+        <li>Infraestructura de servicios</li>
+        <li>Sistema de cartelería</li>
+        <li>Acceso y estacionamiento</li>
+      </ul>
+    </div>
+    <div class="inv-card featured fade-in">
+      <div class="inv-title">Operación</div>
+      <div class="inv-amount">Fase II</div>
+      <div class="inv-unit">Paseo · producción · alojamiento</div>
+      <ul class="inv-items">
+        <li>Paseo de emprendedores</li>
+        <li>Viñedos y olivares</li>
+        <li>Apiario equipado</li>
+        <li>Glamping / 10 unidades</li>
+        <li>Equipamiento comedor</li>
+      </ul>
+    </div>
+    <div class="inv-card fade-in">
+      <div class="inv-title">Experiencias</div>
+      <div class="inv-amount">Fase III</div>
+      <div class="inv-unit">Eventos · escalado · marca</div>
+      <ul class="inv-items">
+        <li>Escenario para eventos</li>
+        <li>Expansión de alojamiento</li>
+        <li>Branding y comunicación</li>
+        <li>Plataforma digital</li>
+        <li>Posicionamiento regional</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Oportunidad de mercado -->
+  <div style="margin-top: 60px; padding: 60px; border: 0.5px solid rgba(201,168,76,0.15); background: rgba(201,168,76,0.03);" class="fade-in">
+    <div class="section-label">La Oportunidad</div>
+    <div style="display:grid; grid-template-columns: repeat(3,1fr); gap:60px; text-align:center; margin-top: 0;">
+      <div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:64px; font-weight:300; color:var(--oro); line-height:1;">3M+</div>
+        <div style="font-size:9px; letter-spacing:0.2em; text-transform:uppercase; opacity:0.45; margin-top:8px;">Turistas por temporada<br>sobre Ruta 2</div>
+      </div>
+      <div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:64px; font-weight:300; color:var(--oro); line-height:1;">10ha</div>
+        <div style="font-size:9px; letter-spacing:0.2em; text-transform:uppercase; opacity:0.45; margin-top:8px;">Superficie con<br>frente vial único</div>
+      </div>
+      <div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:64px; font-weight:300; color:var(--oro); line-height:1;">0</div>
+        <div style="font-size:9px; letter-spacing:0.2em; text-transform:uppercase; opacity:0.45; margin-top:8px;">Competencia directa<br>en la región</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-brand">Las Bruzcas</div>
+    <p class="footer-tagline">
+      Un destino único que transforma la historia de la ex cárcel de Las Bruzcas en una experiencia de campo sofisticada e irrepetible sobre la Ruta 2. Dolores, Provincia de Buenos Aires.
+    </p>
+  </div>
+  <div>
+    <div class="footer-col-title">El Proyecto</div>
+    <div class="footer-col-item">Concepto y Visión</div>
+    <div class="footer-col-item">Masterplan</div>
+    <div class="footer-col-item">Paseo de Emprendedores</div>
+    <div class="footer-col-item">Casco Histórico</div>
+    <div class="footer-col-item">Alojamiento</div>
+    <div class="footer-col-item">Eventos y Experiencias</div>
+  </div>
+  <div>
+    <div class="footer-col-title">Contacto</div>
+    <div class="footer-col-item">Dolores, Provincia de Buenos Aires</div>
+    <div class="footer-col-item">Ruta Nacional 2</div>
+    <div class="footer-col-item">lasbruzcas@dolores.com</div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 Las Bruzcas · Todos los derechos reservados</div>
+    <div class="footer-copy">Campo · Historia · Sabor · Dolores · Ruta 2</div>
+  </div>
+</footer>
+
+<script>
+  // Intersection observer for fade-in animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // Stagger siblings
+  document.querySelectorAll('.pilares-grid, .inv-grid').forEach(grid => {
+    grid.querySelectorAll('.fade-in').forEach((el, i) => {
+      el.style.transitionDelay = (i * 0.12) + 's';
+    });
+  });
+
+  // Nav scroll effect
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    if (window.scrollY > 60) {
+      nav.style.background = 'rgba(26,18,8,0.97)';
+      nav.style.backdropFilter = 'blur(12px)';
+    } else {
+      nav.style.background = 'linear-gradient(to bottom, rgba(26,18,8,0.95), transparent)';
+      nav.style.backdropFilter = 'none';
+    }
+  });
+</script>
+</body>
+</html>

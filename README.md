@@ -12,6 +12,12 @@ Repositorio con material de clases de desarrollo web.
 ## Uso
 Abre los archivos HTML en tu navegador.
 
+## Línea de tiempo de actualizaciones
+- **20 de Mayo de 2026**: Se agregó documentación conceptual a la clase de IA y Decisiones. Repositorio actualizado.
+
+## Fecha del Repositorio
+**Última actualización:** 20 de Mayo de 2026
+
 ## Autor
 [Tu nombre aquí]
 

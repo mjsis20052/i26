@@ -179,6 +179,27 @@
             animation: pulse-highlight 2s infinite;
         }
 
+        @keyframes pulse-highlight-ui {
+            0% { box-shadow: 0 0 0 0 rgba(200, 241, 53, 0.6); }
+            70% { box-shadow: 0 0 0 15px rgba(200, 241, 53, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(200, 241, 53, 0); }
+        }
+
+        .highlight-ui-pulse {
+            border-color: #c8f135 !important;
+            background: rgba(200, 241, 53, 0.05) !important;
+            animation: pulse-highlight-ui 2s infinite;
+        }
+
+        .card.highlight-ui-pulse:hover {
+            border-color: #c8f135 !important;
+            box-shadow: 0 20px 40px rgba(200, 241, 53, 0.15) !important;
+        }
+
+        .card.highlight-ui-pulse:hover h2 {
+            color: #c8f135 !important;
+        }
+
         header {
             padding: 4rem 2rem;
             padding-top: 5.5rem;
@@ -1464,6 +1485,9 @@
             <li><a href="3ro/clase-ia-decisiones-I26.html" id="snav-ia">
                     <span class="nav-badge yr3">3°</span> <span>IA & Decisiones</span>
                 </a></li>
+            <li><a href="3ro/clase-disenio-ui-I26.html" id="snav-ui">
+                    <span class="nav-badge yr3">3°</span> <span>Diseño UI</span>
+                </a></li>
         </ul>
     </nav>
 
@@ -1472,7 +1496,7 @@
         <h1>Clases <span>Software</span></h1>
         <p class="sub">Recursos organizados por año y materia · Instituto I26.</p>
         <div style="font-family: 'Space Mono', monospace; font-size: 0.75rem; color: #10b981; margin-top: 1.5rem; border: 1px solid rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1); border-radius: 4px; padding: 0.4rem 0.8rem; display: inline-block;">
-            Última actualización: 20 de Mayo de 2026 — <strong>Recursos en IA & Decisiones · Documentación Las Bruzcas</strong>
+            Última actualización: 22 de Mayo de 2026 — <strong>Clase de Diseño UI & Componentes Modernos</strong>
         </div>
     </header>
 
@@ -1616,6 +1640,29 @@
                     </div>
                 </div>
 
+                <!-- CONEXIÓN 4→5 -->
+                <div class="path-connector">
+                    <div class="path-connector-line"></div>
+                    <div class="path-connector-msg">
+                        <p>🎨 El backend y la IA necesitan una <strong>interfaz extraordinaria</strong>.
+                            Uso de Tailwind CSS, animaciones fluidas y co-diseño con IA para impactar desde la pantalla.</p>
+                    </div>
+                </div>
+
+                <!-- CLASE 5: 3RO (DISEÑO UI) -->
+                <div class="path-item">
+                    <div class="path-dot yr3a highlight-ui-pulse" style="border-color: #c8f135; background: rgba(200, 241, 53, 0.08); box-shadow: 0 0 0 4px rgba(200, 241, 53, 0.08);">🎨</div>
+                    <div class="path-body">
+                        <div class="path-meta">
+                            <span class="path-badge yr3">3° Año</span>
+                            CLASE 03
+                        </div>
+                        <h3 style="color: #c8f135;">Diseño de Interfaces de Usuario (UI) con IA</h3>
+                        <p>Cómo elevar la estética de cualquier aplicación a nivel producción. Integración de Tailwind CSS, animaciones interactivas y frameworks modernos guiados por Inteligencia Artificial.</p>
+                        <a href="3ro/clase-disenio-ui-I26.html" class="path-link yr3a" style="color: #c8f135; border-color: rgba(200, 241, 53, 0.3);">Ir a la clase →</a>
+                    </div>
+                </div>
+
             </div>
         </section>
 
@@ -1718,6 +1765,18 @@
                         <span class="tag">VECTOR DB</span>
                     </div>
                 </a>
+
+                <!-- CLASE 3: DISEÑO UI -->
+                <a href="3ro/clase-disenio-ui-I26.html" class="card highlight-ui-pulse">
+                    <div class="card-num">CLASE 03</div>
+                    <h2 style="color: #c8f135;">Diseño de Interfaces (UI)</h2>
+                    <p>Uso de IA, Tailwind CSS, Framer Motion y componentes modernos para elevar sistemas a nivel producción.</p>
+                    <div class="tag-row">
+                        <span class="tag">TAILWIND</span>
+                        <span class="tag">UI/UX</span>
+                        <span class="tag">ANIMACIONES</span>
+                    </div>
+                </a>
             </div>
         </section>
 
@@ -1725,11 +1784,12 @@
         <section class="year-section" style="margin-top: 4rem; border-top: 1px solid var(--border); padding-top: 4rem;">
             <h2 class="year-title" style="color: var(--accent-a);">Línea de tiempo de actualizaciones</h2>
             <div style="color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 0.9rem; line-height: 1.8;">
+                <p><strong>22 de Mayo, 2026:</strong> Nueva clase de <strong>Diseño de Interfaces (UI) con IA</strong> agregada al programa de 3° año (<a href="3ro/clase-disenio-ui-I26.html" style="color:var(--accent-p);text-decoration:none;">ver clase de UI</a>).</p>
                 <p><strong>20 de Mayo, 2026:</strong> Se incorporó material conceptual de refuerzo a la clase de <strong>IA & Decisiones</strong> 
                    (<a href="https://www.youtube.com/watch?v=T-D1OfcDW1M" target="_blank" style="color:var(--accent-c);text-decoration:none;">ver video de RAG</a>, 
                     <a href="https://www.youtube.com/watch?v=wjZofJX0v4M" target="_blank" style="color:var(--accent-c);text-decoration:none;">video de Redes Neuronales</a>, 
                     <a href="3ro/clase-ia-decisiones-I26.html#refs" style="color:var(--accent-p);text-decoration:none;">ver todos en la clase</a>).</p>
-                <p><strong>20 de Mayo, 2026:</strong> Documentación del proyecto <strong>Las Bruzcas</strong> añadida al repositorio.</p>
+                <p><strong>20 de Mayo, 2026:</strong> Documentación del proyecto <strong>Las Bruscas</strong> añadida al repositorio.</p>
             </div>
         </section>
     </main>
@@ -1765,7 +1825,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>Tecnicatura Superior en Software &bull; Actualizado: 20 de Mayo de 2026 &bull; <span class="relaxed">Hecho con el código en mente.</span></p>
+                <p>Tecnicatura Superior en Software &bull; Actualizado: 22 de Mayo de 2026 &bull; <span class="relaxed">Hecho con el código en mente.</span></p>
             </div>
         </div>
     </footer>
@@ -1851,6 +1911,15 @@
                     meta: '3° Año · Clase 02',
                     href: '3ro/clase-ia-decisiones-I26.html',
                     color: 'var(--accent-c)',
+                },
+                {
+                    id: 'disenio-ui',
+                    anio: 3,
+                    emoji: '🎨',
+                    titulo: 'Diseño de Interfaces (UI)',
+                    meta: '3° Año · Clase 03',
+                    href: '3ro/clase-disenio-ui-I26.html',
+                    color: '#c8f135',
                 },
             ],
             glosario: [

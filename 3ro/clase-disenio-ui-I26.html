@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase · Diseño con IA · I26 Software</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        display: ['Syne', 'sans-serif'],
+        body: ['DM Sans', 'sans-serif'],
+        mono: ['DM Mono', 'monospace'],
+      }
+    }
+  }
+}
+</script>
+
+<style>
+  /* ── CSS CUSTOM VARS & BASE ── */
+  :root {
+    --lime:    #c8f135;
+    --lime2:   #a8d420;
+    --orange:  #ff5c1a;
+    --blue:    #0a1628;
+    --blue2:   #0d1f3c;
+    --surface: #111827;
+    --glass:   rgba(255,255,255,.04);
+    --border:  rgba(255,255,255,.08);
+    --text:    rgba(255,255,255,.85);
+    --muted:   rgba(255,255,255,.4);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #080e1a;
+    color: var(--text);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ── CUSTOM CURSOR ── */
+  .cursor {
+    position: fixed; pointer-events:none; z-index:9999;
+    width: 10px; height: 10px;
+    background: var(--lime);
+    border-radius: 50%;
+    transform: translate(-50%,-50%);
+    transition: transform .1s;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    position: fixed; pointer-events:none; z-index:9998;
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--lime);
+    border-radius: 50%;
+    transform: translate(-50%,-50%);
+    transition: all .15s ease;
+    opacity: .5;
+    mix-blend-mode: difference;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    position: fixed; top:0; left:0; right:0; z-index:200;
+    display: flex; align-items:center; justify-content:space-between;
+    padding: .7rem 2.5rem;
+    background: rgba(8,14,26,.8);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-brand {
+    font-family: 'DM Mono', monospace;
+    font-size: .7rem; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--lime); text-decoration: none;
+  }
+  .topbar-links { display:flex; gap:.3rem; list-style:none; }
+  .topbar-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: .58rem; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); text-decoration: none;
+    padding: .28rem .65rem; border-radius: 3px;
+    border: 1px solid transparent;
+    transition: all .2s;
+  }
+  .topbar-links a:hover { color: var(--lime); border-color: rgba(200,241,53,.2); }
+  .topbar-links a.active {
+    color: #080e1a; background: var(--lime);
+    font-weight: 700;
+  }
+
+  /* ── SECTION NAV ── */
+  .sec-nav {
+    position: sticky; top: 41px; z-index:100;
+    background: rgba(8,14,26,.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display:flex; overflow-x:auto; gap:0; padding: 0 2.5rem;
+    scrollbar-width: none;
+  }
+  .sec-nav::-webkit-scrollbar { display:none; }
+  .sec-nav a {
+    font-family: 'DM Mono', monospace;
+    font-size: .58rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted); text-decoration: none;
+    padding: .65rem 1rem; white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all .2s;
+  }
+  .sec-nav a:hover { color: var(--lime); border-bottom-color: var(--lime); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display:flex; flex-direction:column; justify-content:flex-end;
+    padding: 8rem 4rem 5rem;
+    position: relative; overflow: hidden;
+  }
+
+  /* noise texture overlay */
+  .hero::before {
+    content:'';
+    position: absolute; inset:0; z-index:0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: .4;
+    pointer-events: none;
+  }
+
+  /* gradient orbs */
+  .orb {
+    position: absolute; border-radius: 50%;
+    filter: blur(80px); pointer-events:none;
+  }
+  .orb-1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(200,241,53,.15), transparent 70%);
+    top: -100px; right: -100px;
+    animation: orbFloat 8s ease-in-out infinite;
+  }
+  .orb-2 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,92,26,.1), transparent 70%);
+    bottom: 0; left: -80px;
+    animation: orbFloat 11s ease-in-out infinite reverse;
+  }
+  .orb-3 {
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(99,102,241,.12), transparent 70%);
+    top: 40%; left: 40%;
+    animation: orbFloat 14s ease-in-out infinite;
+  }
+  @keyframes orbFloat {
+    0%,100% { transform: translate(0,0) scale(1); }
+    33% { transform: translate(30px,-20px) scale(1.05); }
+    66% { transform: translate(-20px,30px) scale(.95); }
+  }
+
+  .hero-content { position:relative; z-index:1; }
+  .hero-badge {
+    display: inline-flex; align-items:center; gap:.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: .65rem; letter-spacing: .2em; text-transform: uppercase;
+    color: #080e1a; background: var(--lime);
+    padding: .35rem 1rem; margin-bottom: 2rem;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%);
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(4rem,10vw,9.5rem);
+    font-weight: 800; line-height: .88;
+    letter-spacing: -.04em;
+    margin-bottom: 2.5rem;
+  }
+  .hero h1 .outline {
+    -webkit-text-stroke: 2px rgba(255,255,255,.25);
+    color: transparent;
+  }
+  .hero h1 .lime { color: var(--lime); }
+  .hero-sub {
+    font-size: 1.1rem; color: var(--muted);
+    max-width: 520px; line-height: 1.7;
+    margin-bottom: 2.5rem;
+  }
+  .hero-meta {
+    display:flex; gap:2rem; flex-wrap:wrap;
+    font-family: 'DM Mono', monospace;
+    font-size: .62rem; color: var(--muted);
+    letter-spacing: .1em; text-transform: uppercase;
+  }
+  .hero-meta span { display:flex; align-items:center; gap:.4rem; }
+  .hero-meta span::before { content:'◆'; color:var(--lime); font-size:.4rem; }
+
+  /* animated tags */
+  .tag-belt {
+    display:flex; gap:.6rem; flex-wrap:nowrap;
+    overflow:hidden; margin:2rem 0;
+    mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+  }
+  .tag-belt-inner {
+    display:flex; gap:.6rem; flex-shrink:0;
+    animation: beltScroll 20s linear infinite;
+  }
+  @keyframes beltScroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .tbelt-item {
+    flex-shrink:0;
+    font-family:'DM Mono',monospace; font-size:.6rem;
+    letter-spacing:.1em; text-transform:uppercase;
+    padding:.3rem .9rem; white-space:nowrap;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 100px;
+  }
+  .tbelt-item.hl { border-color: rgba(200,241,53,.4); color:var(--lime); background:rgba(200,241,53,.06); }
+
+  /* ── LAYOUT ── */
+  .wrap { max-width: 960px; margin:0 auto; padding:0 3rem; }
+  section { padding: 6rem 0; }
+
+  /* ── SECTION HEADER ── */
+  .s-eyebrow {
+    font-family:'DM Mono',monospace;
+    font-size:.62rem; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--lime); margin-bottom:.8rem; display:block;
+  }
+  h2 {
+    font-family:'Syne',sans-serif;
+    font-size:clamp(2rem,4vw,3.5rem);
+    font-weight:800; line-height:1; letter-spacing:-.03em;
+    margin-bottom:1.5rem;
+  }
+  h2 .dim { color:var(--muted); font-weight:400; }
+  h3 {
+    font-family:'DM Mono',monospace;
+    font-size:.72rem; font-weight:500;
+    text-transform:uppercase; letter-spacing:.1em;
+    color:var(--lime); margin:2.5rem 0 .9rem;
+    display:flex; align-items:center; gap:.5rem;
+  }
+  h3::before { content:''; display:block; width:20px; height:2px; background:var(--lime); flex-shrink:0; }
+  h4 {
+    font-size:.82rem; font-weight:600; color:rgba(255,255,255,.8);
+    margin:.8rem 0 .3rem; letter-spacing:.02em;
+  }
+  p { color:rgba(255,255,255,.6); font-size:.95rem; line-height:1.8; margin-bottom:.9rem; }
+  ul,ol { color:rgba(255,255,255,.6); padding-left:1.4rem; font-size:.92rem; }
+  li { margin-bottom:.4rem; line-height:1.75; }
+  strong { color:rgba(255,255,255,.95); }
+  a { color:var(--lime); }
+
+  /* ── GRID DIVIDER ── */
+  .grid-line { width:100%; height:1px; background:var(--border); }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    display:flex; gap:1rem; align-items:flex-start;
+    padding:1.3rem 1.5rem; margin:1.5rem 0;
+    border:1px solid; border-radius:6px;
+  }
+  .callout.lime  { border-color:rgba(200,241,53,.25); background:rgba(200,241,53,.04); }
+  .callout.orange { border-color:rgba(255,92,26,.3); background:rgba(255,92,26,.05); }
+  .callout.blue  { border-color:rgba(99,102,241,.3); background:rgba(99,102,241,.05); }
+  .callout.warn  { border-color:rgba(245,158,11,.3); background:rgba(245,158,11,.05); }
+  .c-ico { font-size:1.1rem; flex-shrink:0; margin-top:.05rem; }
+  .c-body strong { display:block; font-size:.83rem; margin-bottom:.2rem; color:rgba(255,255,255,.95); }
+  .c-body p { font-size:.82rem; margin:0; color:rgba(255,255,255,.55); }
+
+  /* ── CODE BLOCKS ── */
+  .code-wrap { margin:1.4rem 0; }
+  .code-header {
+    display:flex; justify-content:space-between; align-items:center;
+    background:#0d1117; border:1px solid var(--border);
+    border-bottom:1px solid rgba(200,241,53,.15);
+    padding:.5rem 1rem;
+  }
+  .code-filename {
+    font-family:'DM Mono',monospace; font-size:.6rem;
+    color:var(--lime); letter-spacing:.1em;
+  }
+  .code-lang {
+    font-family:'DM Mono',monospace; font-size:.55rem;
+    color:var(--muted); letter-spacing:.08em; text-transform:uppercase;
+  }
+  pre {
+    background:#0a0e18; border:1px solid var(--border); border-top:none;
+    font-family:'DM Mono',monospace; font-size:.77rem;
+    color:rgba(255,255,255,.75); line-height:1.7;
+    padding:1.4rem 1.5rem; overflow-x:auto;
+  }
+  pre .c  { color:rgba(255,255,255,.28); }
+  pre .k  { color:#f472b6; }
+  pre .s  { color:#86efac; }
+  pre .n  { color:#7dd3fc; }
+  pre .p  { color:var(--lime); }
+  code { font-family:'DM Mono',monospace; font-size:.84em; color:var(--lime); background:rgba(200,241,53,.08); padding:.1rem .35rem; border-radius:3px; }
+
+  /* ── LIBRARY CARDS ── */
+  .lib-grid {
+    display:grid; grid-template-columns:repeat(3,1fr);
+    gap:1px; background:var(--border); margin:1.5rem 0;
+    border:1px solid var(--border);
+  }
+  .lib-card {
+    background:#080e1a; padding:1.8rem;
+    transition:background .2s;
+    position:relative; overflow:hidden;
+  }
+  .lib-card::after {
+    content:'';
+    position:absolute; bottom:0; left:0; right:0;
+    height:2px; background:var(--lime);
+    transform:scaleX(0); transform-origin:left;
+    transition:transform .3s ease;
+  }
+  .lib-card:hover { background:#0d1525; }
+  .lib-card:hover::after { transform:scaleX(1); }
+  .lib-icon { font-size:1.8rem; margin-bottom:.8rem; }
+  .lib-name {
+    font-family:'Syne',sans-serif; font-weight:700;
+    font-size:1.1rem; margin-bottom:.3rem; color:rgba(255,255,255,.9);
+  }
+  .lib-desc { font-size:.78rem; color:var(--muted); line-height:1.6; margin-bottom:.8rem; }
+  .lib-tags { display:flex; gap:.3rem; flex-wrap:wrap; }
+  .lib-tag {
+    font-family:'DM Mono',monospace; font-size:.52rem;
+    padding:.15rem .45rem; border-radius:3px;
+    letter-spacing:.06em; text-transform:uppercase;
+  }
+  .lt-lime { background:rgba(200,241,53,.1); color:var(--lime); border:1px solid rgba(200,241,53,.2); }
+  .lt-orange { background:rgba(255,92,26,.1); color:#ff7a47; border:1px solid rgba(255,92,26,.2); }
+  .lt-blue { background:rgba(99,102,241,.1); color:#818cf8; border:1px solid rgba(99,102,241,.2); }
+  .lt-pink { background:rgba(244,114,182,.1); color:#f472b6; border:1px solid rgba(244,114,182,.2); }
+  .lt-cyan { background:rgba(34,211,238,.1); color:#22d3ee; border:1px solid rgba(34,211,238,.2); }
+  .lib-link {
+    display:inline-flex; align-items:center; gap:.3rem; margin-top:.8rem;
+    font-family:'DM Mono',monospace; font-size:.6rem;
+    letter-spacing:.08em; text-transform:uppercase;
+    color:var(--lime); text-decoration:none;
+    border-bottom:1px solid rgba(200,241,53,.3);
+    padding-bottom:.1rem; transition:all .2s;
+  }
+  .lib-link:hover { border-bottom-color:var(--lime); }
+  @media(max-width:700px){ .lib-grid{ grid-template-columns:1fr; } }
+
+  /* ── VIDEO CARDS ── */
+  .vid-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--border); border:1px solid var(--border); margin:1.5rem 0; }
+  .vid-card {
+    background:#080e1a; padding:1.4rem;
+    display:flex; flex-direction:column; gap:.6rem;
+    transition:background .2s; text-decoration:none;
+  }
+  .vid-card:hover { background:#0d1525; }
+  .vid-thumb {
+    width:100%; aspect-ratio:16/9;
+    background:linear-gradient(135deg, #0d1f3c, #1a1a2e);
+    border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    font-size:2rem; position:relative; overflow:hidden;
+  }
+  .vid-thumb::before {
+    content:''; position:absolute; inset:0;
+    background: linear-gradient(135deg, rgba(200,241,53,.05), transparent);
+  }
+  .vid-play {
+    width:44px; height:44px;
+    background:var(--lime); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    color:#080e1a; font-size:.9rem;
+    position:relative; z-index:1;
+    transition:transform .2s;
+  }
+  .vid-card:hover .vid-play { transform:scale(1.1); }
+  .vid-platform {
+    font-family:'DM Mono',monospace; font-size:.55rem;
+    letter-spacing:.1em; text-transform:uppercase;
+    color:var(--muted);
+  }
+  .vid-title {
+    font-family:'Syne',sans-serif; font-weight:700;
+    font-size:.92rem; color:rgba(255,255,255,.9);
+    line-height:1.2;
+  }
+  .vid-meta { font-family:'DM Mono',monospace; font-size:.58rem; color:var(--muted); letter-spacing:.06em; }
+  @media(max-width:600px){ .vid-grid{ grid-template-columns:1fr; } }
+
+  /* ── BEFORE / AFTER ── */
+  .ba-wrap {
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:1px; background:var(--border);
+    border:1px solid var(--border); margin:1.5rem 0;
+  }
+  .ba-side { background:#080e1a; padding:1.5rem; }
+  .ba-label {
+    font-family:'DM Mono',monospace; font-size:.6rem;
+    letter-spacing:.14em; text-transform:uppercase;
+    margin-bottom:1rem; display:flex; align-items:center; gap:.5rem;
+  }
+  .ba-label.before { color:#ef4444; }
+  .ba-label.after  { color:var(--lime); }
+  .ba-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .dot-r { background:#ef4444; }
+  .dot-g { background:var(--lime); }
+  @media(max-width:600px){ .ba-wrap{ grid-template-columns:1fr; } }
+
+  /* ── PROMPT BLOCK ── */
+  .prompt-block {
+    background:#080e1a; border:1px solid rgba(200,241,53,.2);
+    border-left:3px solid var(--lime); padding:1.5rem; margin:1.2rem 0;
+  }
+  .pb-eyebrow {
+    font-family:'DM Mono',monospace; font-size:.58rem;
+    letter-spacing:.15em; text-transform:uppercase;
+    color:var(--lime); margin-bottom:.6rem;
+  }
+  .pb-text { font-size:.9rem; color:rgba(255,255,255,.7); line-height:1.8; font-style:italic; }
+  .pb-note { font-size:.75rem; color:var(--muted); margin-top:.5rem; }
+
+  /* ── WORKFLOW STEPS ── */
+  .steps { display:flex; flex-direction:column; gap:0; margin:1.5rem 0; }
+  .step {
+    display:grid; grid-template-columns:48px 1fr;
+    gap:0; border-bottom:1px solid var(--border);
+  }
+  .step:last-child { border-bottom:none; }
+  .step-num {
+    padding:1rem; background:#0d1117;
+    border-right:1px solid var(--border);
+    font-family:'Syne',sans-serif; font-weight:800;
+    font-size:1.1rem; color:var(--lime);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .step-body { padding:1rem 1.3rem; }
+  .step-title { font-weight:700; font-size:.92rem; margin-bottom:.2rem; }
+  .step-desc { font-size:.8rem; color:var(--muted); line-height:1.55; }
+  .step.active { background:rgba(200,241,53,.03); }
+
+  /* ── ACTIVITY BOX ── */
+  .act-box {
+    border:1px solid var(--border); background:#0a0f1c;
+    padding:2rem; margin:1.5rem 0;
+    position:relative; overflow:hidden;
+  }
+  .act-box::before {
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:3px;
+    background:linear-gradient(90deg, var(--lime), var(--orange));
+  }
+  .act-num {
+    font-family:'DM Mono',monospace; font-size:.6rem;
+    letter-spacing:.18em; text-transform:uppercase;
+    color:var(--lime); margin-bottom:.5rem;
+  }
+  .act-title {
+    font-family:'Syne',sans-serif; font-weight:800;
+    font-size:1.4rem; margin-bottom:.9rem; line-height:1;
+  }
+  .act-body { font-size:.88rem; color:rgba(255,255,255,.6); line-height:1.8; }
+
+  /* ── COLS ── */
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin:1.2rem 0; }
+  @media(max-width:600px){ .cols{ grid-template-columns:1fr; } }
+
+  /* ── PILL ── */
+  .pill {
+    font-family:'DM Mono',monospace; font-size:.55rem;
+    padding:.18rem .55rem; border-radius:100px;
+    letter-spacing:.06em; text-transform:uppercase; display:inline-block;
+  }
+  .p-lime   { background:rgba(200,241,53,.12); color:var(--lime); border:1px solid rgba(200,241,53,.3); }
+  .p-orange { background:rgba(255,92,26,.1); color:#ff7a47; border:1px solid rgba(255,92,26,.25); }
+  .p-red    { background:rgba(239,68,68,.1); color:#ef4444; border:1px solid rgba(239,68,68,.25); }
+  .p-blue   { background:rgba(99,102,241,.1); color:#818cf8; border:1px solid rgba(99,102,241,.25); }
+
+  /* ── TABLE ── */
+  .tbl { width:100%; border-collapse:collapse; font-size:.85rem; margin:1.4rem 0; }
+  .tbl th {
+    background:#0d1117;
+    font-family:'DM Mono',monospace; font-size:.58rem;
+    letter-spacing:.1em; text-transform:uppercase;
+    color:var(--muted); padding:.7rem 1rem; text-align:left;
+    border-bottom:1px solid rgba(200,241,53,.2);
+    border-right:1px solid var(--border);
+  }
+  .tbl th:last-child { border-right:none; }
+  .tbl td {
+    padding:.7rem 1rem; border-bottom:1px solid var(--border);
+    border-right:1px solid var(--border);
+    color:rgba(255,255,255,.6); vertical-align:top;
+  }
+  .tbl td:last-child { border-right:none; }
+  .tbl tr:last-child td { border-bottom:none; }
+  .tbl tr:hover td { background:rgba(200,241,53,.02); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top:1px solid var(--border);
+    padding:2.5rem 3rem;
+    background:#050a13;
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap:wrap; gap:1rem;
+  }
+  footer p { font-family:'DM Mono',monospace; font-size:.6rem; color:var(--muted); margin:0; letter-spacing:.08em; }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal { opacity:0; transform:translateY(24px); }
+
+  /* ── TICKER ── */
+  .ticker-wrap {
+    border-top:1px solid var(--border);
+    border-bottom:1px solid var(--border);
+    overflow:hidden; padding:.5rem 0;
+    background:#0d1117;
+  }
+  .ticker-inner {
+    display:flex; gap:3rem;
+    animation:tickerScroll 25s linear infinite;
+    white-space:nowrap;
+  }
+  @keyframes tickerScroll {
+    from { transform:translateX(0); }
+    to   { transform:translateX(-50%); }
+  }
+  .ticker-item {
+    font-family:'DM Mono',monospace; font-size:.6rem;
+    letter-spacing:.14em; text-transform:uppercase;
+    color:var(--muted); flex-shrink:0;
+  }
+  .ticker-item.accent { color:var(--lime); }
+  .ticker-sep { color:rgba(255,255,255,.15); }
+</style>
+</head>
+<body>
+
+<!-- CUSTOM CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <a href="https://mjsis20052.github.io/i26/index.html" class="topbar-brand">I26 · Software</a>
+  <ul class="topbar-links">
+    <li><a href="https://mjsis20052.github.io/i26/index.html">🏠 Home</a></li>
+    <li><a href="https://mjsis20052.github.io/i26/2do/clase-php-mysql-I26.html">2° PHP &amp; MySQL</a></li>
+    <li><a href="https://mjsis20052.github.io/i26/2do/clase_2do_soft_I26_ReactNative.html">2° React Native</a></li>
+    <li><a href="https://mjsis20052.github.io/i26/3ro/clase-arquitectura-I26.html">3° Arquitectura</a></li>
+    <li><a href="./clase-ia-decisiones-I26.html">3° IA &amp; Decisiones</a></li>
+    <li><a href="#" class="active">3° UI · Diseño</a></li>
+  </ul>
+</nav>
+
+<!-- SECTION NAV -->
+<div class="sec-nav">
+  <a href="#por-que">¿Por qué importa?</a>
+  <a href="#ai-arquitecto">AI como arquitecto</a>
+  <a href="#tailwind">Tailwind</a>
+  <a href="#librerias">Librerías</a>
+  <a href="#framer">Framer Motion</a>
+  <a href="#prompts">Prompts de diseño</a>
+  <a href="#recursos">Videos &amp; Refs</a>
+  <a href="#actividad">Actividad</a>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge">✦ Diseño moderno con IA</div>
+    <h1>
+      Diseño que<br>
+      <span class="lime">impacta</span><br>
+      <span class="outline">desde el código</span>
+    </h1>
+    <p class="hero-sub">Cómo usar IA, Tailwind, Framer Motion y librerías modernas para elevar cualquier proyecto de software a nivel producción — sin ser diseñador.</p>
+
+    <div class="tag-belt">
+      <div class="tag-belt-inner">
+        <span class="tbelt-item hl">Tailwind CSS</span>
+        <span class="tbelt-item">Framer Motion</span>
+        <span class="tbelt-item hl">shadcn/ui</span>
+        <span class="tbelt-item">Radix UI</span>
+        <span class="tbelt-item hl">GSAP</span>
+        <span class="tbelt-item">Aceternity UI</span>
+        <span class="tbelt-item hl">Magic UI</span>
+        <span class="tbelt-item">Motion</span>
+        <span class="tbelt-item hl">Headless UI</span>
+        <span class="tbelt-item">Mantine</span>
+        <span class="tbelt-item hl">daisyUI</span>
+        <span class="tbelt-item">Rive</span>
+        <!-- duplicar para loop continuo -->
+        <span class="tbelt-item hl">Tailwind CSS</span>
+        <span class="tbelt-item">Framer Motion</span>
+        <span class="tbelt-item hl">shadcn/ui</span>
+        <span class="tbelt-item">Radix UI</span>
+        <span class="tbelt-item hl">GSAP</span>
+        <span class="tbelt-item">Aceternity UI</span>
+        <span class="tbelt-item hl">Magic UI</span>
+        <span class="tbelt-item">Motion</span>
+        <span class="tbelt-item hl">Headless UI</span>
+        <span class="tbelt-item">Mantine</span>
+        <span class="tbelt-item hl">daisyUI</span>
+        <span class="tbelt-item">Rive</span>
+      </div>
+    </div>
+
+    <div class="hero-meta">
+      <span>3° año · Tecnicatura en Software</span>
+      <span>Mayo 2026</span>
+      <span>I26 · Dolores, Buenos Aires</span>
+    </div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-inner">
+    <span class="ticker-item accent">Diseño</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">UI/UX</span><span class="ticker-sep">·</span>
+    <span class="ticker-item accent">Tailwind</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">Framer Motion</span><span class="ticker-sep">·</span>
+    <span class="ticker-item accent">AI como co-diseñador</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">Component Libraries</span><span class="ticker-sep">·</span>
+    <span class="ticker-item accent">shadcn/ui</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">Motion Design</span><span class="ticker-sep">·</span>
+    <span class="ticker-item accent">Micro-interacciones</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">Design Systems</span><span class="ticker-sep">·</span>
+    <!-- duplicar -->
+    <span class="ticker-item accent">Diseño</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">UI/UX</span><span class="ticker-sep">·</span>
+    <span class="ticker-item accent">Tailwind</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">Framer Motion</span><span class="ticker-sep">·</span>
+    <span class="ticker-item accent">AI como co-diseñador</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">Component Libraries</span><span class="ticker-sep">·</span>
+    <span class="ticker-item accent">shadcn/ui</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">Motion Design</span><span class="ticker-sep">·</span>
+  </div>
+</div>
+
+<!-- ─── 01 POR QUÉ IMPORTA ─── -->
+<section id="por-que">
+<div class="wrap reveal">
+  <span class="s-eyebrow">01 · Por qué el diseño importa en software</span>
+  <h2>El código que<br><span class="dim">no se ve, no existe</span></h2>
+
+  <p>Un sistema puede tener la mejor arquitectura del mundo y fallar porque el usuario no entiende la interfaz, no confía en lo que ve, o simplemente lo abandona por algo que "se ve mejor". El diseño no es cosmético — <strong>es parte de la funcionalidad.</strong></p>
+
+  <div class="callout orange">
+    <div class="c-ico">🔥</div>
+    <div class="c-body">
+      <strong>Lo que aprendieron haciendo la app con AntiGravity</strong>
+      <p>La misma funcionalidad, con Tailwind bien aplicado + Framer Motion + componentes modernos, pasó de "prototipo de clase" a "demo que podrías mostrar en una entrevista". El código no cambió — cambió cómo se presenta.</p>
+    </div>
+  </div>
+
+  <h3>El gap entre funcional y memorable</h3>
+  <div class="ba-wrap">
+    <div class="ba-side">
+      <div class="ba-label before"><div class="ba-dot dot-r"></div>App estándar (antes)</div>
+      <ul style="font-size:.85rem;">
+        <li>Formularios sin estilos o con Bootstrap default</li>
+        <li>Colores grises, tipografía sin jerarquía</li>
+        <li>Sin feedback visual al interactuar</li>
+        <li>Diseño que dice "hecho en clase"</li>
+        <li>Loading sin indicador, errores sin formato</li>
+      </ul>
+    </div>
+    <div class="ba-side">
+      <div class="ba-label after"><div class="ba-dot dot-g"></div>Con diseño moderno (después)</div>
+      <ul style="font-size:.85rem;">
+        <li>Componentes con identidad visual clara</li>
+        <li>Paleta de colores intencional, tipografía en escala</li>
+        <li>Micro-animaciones en hover, focus, transición</li>
+        <li>Diseño que dice "sé lo que estoy haciendo"</li>
+        <li>Skeletons, toasts, estados de carga animados</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout lime">
+    <div class="c-ico">💡</div>
+    <div class="c-body">
+      <strong>El arquitecto también es diseñador</strong>
+      <p>Con las herramientas de hoy, la IA cierra la brecha entre "sé cómo funciona" y "sé cómo se ve". El arquitceto que sabe diseñar tiene una ventaja competitiva enorme — y es lo que los diferencia de un dev que solo sabe hacer CRUDs.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 02 AI COMO ARQUITECTO/DISEÑADOR ─── -->
+<section id="ai-arquitecto">
+<div class="wrap reveal">
+  <span class="s-eyebrow">02 · IA como co-diseñador</span>
+  <h2>GPT como<br><span class="dim">arquitecto de diseño</span></h2>
+
+  <p>La IA no reemplaza el criterio — lo amplifica. Cuando le das un contexto claro y una dirección estética, genera código de diseño que tomaría horas investigar y probar manualmente.</p>
+
+  <h3>Cómo funciona el workflow con IA</h3>
+  <div class="steps">
+    <div class="step active">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Definir la visión del producto</div>
+        <div class="step-desc">Antes de pedir código, tenés que saber qué querés transmitir. ¿Es una app seria y corporativa? ¿Playful y colorida? ¿Minimalista y técnica? La IA necesita dirección, no solo un componente.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Investigar referencias (awwwards, dribbble, siteinspire)</div>
+        <div class="step-desc">Antes de codear, mirar. Awwwards.com, Dribbble, Siteinspire, Refero.design. Capturás lenguaje visual, te inspira y podés describírselo a la IA con precisión.</div>
+      </div>
+    </div>
+    <div class="step active">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Prompt de diseño específico</div>
+        <div class="step-desc">No "haceme un botón bonito". Sí: "Haceme un botón en Tailwind estilo editorial oscuro, tipografía monoespaciada, hover con borde que se rellena de izquierda a derecha". La especificidad genera calidad.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Iterar y refinar</div>
+        <div class="step-desc">El primer resultado rara vez es el final. Le decís "más minimalista", "más contraste", "sacale el borde, agregá sombra sutil", "rehacé con Framer Motion para el hover". Así se esculpe.</div>
+      </div>
+    </div>
+    <div class="step active">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="step-title">Construir el design system</div>
+        <div class="step-desc">Una vez que encontraste la estética que funciona, pedile que lo sistematice: colores CSS variables, escala tipográfica, espaciado consistente. Ese es el punto de partida del design system del proyecto.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Prompts de diseño que funcionan</h3>
+
+  <div class="prompt-block">
+    <div class="pb-eyebrow">Prompt · Definir sistema de diseño</div>
+    <div class="pb-text">
+      "Soy desarrollador y estoy construyendo una app web para [DESCRIPCIÓN]. El tono visual tiene que ser [ADJETIVOS: moderno/oscuro/minimalista/etc]. Dame: un sistema de colores con CSS variables (primario, fondo, superficie, acento, texto, muted), una escala tipográfica en Tailwind usando [FUENTE], y 3 componentes base (botón, card, input) que sean consistentes con esa identidad visual."
+    </div>
+    <div class="pb-note">El contexto del proyecto + los adjetivos de tono son lo más importante del prompt. Sin eso, la IA genera diseño genérico.</div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="pb-eyebrow">Prompt · Refactorizar componente existente</div>
+    <div class="pb-text">
+      "Tengo este componente [PEGAR CÓDIGO]. Está funcional pero el diseño es básico. Refactorizalo con Tailwind para que sea visualmente más sofisticado. Quiero: mejor jerarquía tipográfica, estados de hover con transición, paleta de colores más intencional. Mantené toda la lógica igual, solo mejorá el diseño."
+    </div>
+    <div class="pb-note">Separar la lógica del diseño en el prompt da mejores resultados. La IA entiende que no debe tocar la funcionalidad.</div>
+  </div>
+
+  <div class="callout blue">
+    <div class="c-ico">🎯</div>
+    <div class="c-body">
+      <strong>Sitios para investigar y nutrirse de referencias</strong>
+      <p><strong>awwwards.com</strong> — los mejores sitios del mundo premiados por diseño · <strong>dribbble.com</strong> — UI shots de diseñadores · <strong>siteinspire.com</strong> — curaduría editorial · <strong>refero.design</strong> — mockups reales de apps · <strong>land-book.com</strong> — landing pages de referencia</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 03 TAILWIND ─── -->
+<section id="tailwind">
+<div class="wrap reveal">
+  <span class="s-eyebrow">03 · Tailwind CSS</span>
+  <h2>El framework que<br><span class="dim">cambió todo</span></h2>
+
+  <p>Tailwind no es "CSS inline con más pasos". Es un sistema de utilidades que, bien usado, te permite construir interfaces consistentes y sofisticadas más rápido que cualquier otro approach. La clave está en entender sus poderes reales.</p>
+
+  <h3>Lo que la mayoría no usa de Tailwind</h3>
+  <div class="cols">
+    <div>
+      <h4>Arbitrary values</h4>
+      <p style="font-size:.86rem;">Podés salirte de la escala cuando necesitás: <code>w-[37px]</code>, <code>bg-[#c8f135]</code>, <code>grid-cols-[1fr_2fr]</code>. Tailwind no te limita — te da la escala y te deja romperla cuando tiene sentido.</p>
+    </div>
+    <div>
+      <h4>Group y peer</h4>
+      <p style="font-size:.86rem;"><code>group</code> + <code>group-hover:</code> permite que un elemento hijo responda al hover del padre. <code>peer</code> hace lo mismo entre hermanos. Son la base de animaciones de hover sofisticadas sin JS.</p>
+    </div>
+    <div>
+      <h4>@layer y @apply</h4>
+      <p style="font-size:.86rem;">Cuando tenés estilos que se repiten, los podés extraer a una clase en <code>@layer components</code> usando <code>@apply</code>. Mantiene los beneficios de Tailwind sin repetir 15 clases por componente.</p>
+    </div>
+    <div>
+      <h4>Variantes modernas</h4>
+      <p style="font-size:.86rem;"><code>dark:</code>, <code>focus-visible:</code>, <code>has-[]:</code>, <code>supports-[]:</code>, <code>data-[]:</code>. Tailwind v3+ tiene variantes para casi cualquier estado. Son la clave del diseño interactivo sin JavaScript.</p>
+    </div>
+  </div>
+
+  <h3>Ejemplo — card antes y después</h3>
+  <div class="ba-wrap">
+    <div class="ba-side">
+      <div class="ba-label before"><div class="ba-dot dot-r"></div>Sin sistema de diseño</div>
+      <div class="code-wrap" style="margin-top:.5rem;">
+        <pre style="font-size:.72rem;padding:1rem;"><span class="c">// Bootstrap o CSS plano</span>
+&lt;div class=<span class="s">"card"</span>&gt;
+  &lt;h3&gt;Título&lt;/h3&gt;
+  &lt;p&gt;Descripción genérica&lt;/p&gt;
+  &lt;button class=<span class="s">"btn btn-primary"</span>&gt;
+    Acción
+  &lt;/button&gt;
+&lt;/div&gt;</pre>
+      </div>
+    </div>
+    <div class="ba-side">
+      <div class="ba-label after"><div class="ba-dot dot-g"></div>Con Tailwind intencional</div>
+      <div class="code-wrap" style="margin-top:.5rem;">
+        <pre style="font-size:.72rem;padding:1rem;"><span class="c">// Tailwind con diseño</span>
+&lt;div class=<span class="s">"group relative bg-neutral-900
+  border border-neutral-800 p-6 rounded-xl
+  hover:border-lime-400/40 transition-all
+  hover:-translate-y-1 duration-300"</span>&gt;
+  &lt;h3 class=<span class="s">"font-bold text-white text-lg mb-2"</span>&gt;
+    Título
+  &lt;/h3&gt;
+  &lt;p class=<span class="s">"text-neutral-400 text-sm leading-relaxed mb-4"</span>&gt;
+    Descripción con jerarquía visual
+  &lt;/p&gt;
+  &lt;button class=<span class="s">"bg-lime-400 text-black font-bold
+    text-xs px-4 py-2 uppercase tracking-wider
+    hover:bg-lime-300 transition-colors"</span>&gt;
+    Acción
+  &lt;/button&gt;
+&lt;/div&gt;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout lime">
+    <div class="c-ico">⚡</div>
+    <div class="c-body">
+      <strong>v4 ya está disponible</strong>
+      <p>Tailwind CSS v4 (2025) cambia completamente la configuración — se hace desde CSS puro con <code>@import "tailwindcss"</code>, sin tailwind.config.js. Más rápido y con variables CSS nativas. Vale la pena empezar a leer la migración.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 04 LIBRERÍAS ─── -->
+<section id="librerias">
+<div class="wrap reveal">
+  <span class="s-eyebrow">04 · Librerías de componentes y estilos</span>
+  <h2>El ecosistema<br><span class="dim">que tienen que conocer</span></h2>
+
+  <p>No hay que inventar desde cero. Existe un ecosistema de librerías de altísima calidad, la mayoría open source, que aceleran el desarrollo y elevan el nivel visual automáticamente.</p>
+
+  <h3>Librerías de componentes</h3>
+  <div class="lib-grid">
+    <div class="lib-card">
+      <div class="lib-icon">🧩</div>
+      <div class="lib-name">shadcn/ui</div>
+      <div class="lib-desc">No es una librería instalable — son componentes que copiás a tu proyecto. Accesibles, personalizables, sin dependencias ocultas. El estándar actual en React.</div>
+      <div class="lib-tags">
+        <span class="lib-tag lt-lime">React</span>
+        <span class="lib-tag lt-cyan">Radix UI</span>
+        <span class="lib-tag lt-lime">Tailwind</span>
+      </div>
+      <a href="https://ui.shadcn.com" target="_blank" class="lib-link">ui.shadcn.com ↗</a>
+    </div>
+    <div class="lib-card">
+      <div class="lib-icon">✨</div>
+      <div class="lib-name">Aceternity UI</div>
+      <div class="lib-desc">Componentes con efectos visuales impactantes: glows, sparkles, grids animadas, cards 3D. Para cuando querés que algo se vea "de otra galaxia".</div>
+      <div class="lib-tags">
+        <span class="lib-tag lt-pink">Efectos</span>
+        <span class="lib-tag lt-lime">React</span>
+        <span class="lib-tag lt-blue">Framer</span>
+      </div>
+      <a href="https://ui.aceternity.com" target="_blank" class="lib-link">ui.aceternity.com ↗</a>
+    </div>
+    <div class="lib-card">
+      <div class="lib-icon">🪄</div>
+      <div class="lib-name">Magic UI</div>
+      <div class="lib-desc">Componentes de alta calidad para landing pages y dashboards. Animaciones de entrada, efectos de texto, números que cuentan. Fácil de integrar.</div>
+      <div class="lib-tags">
+        <span class="lib-tag lt-lime">React</span>
+        <span class="lib-tag lt-pink">Animaciones</span>
+        <span class="lib-tag lt-orange">Landing</span>
+      </div>
+      <a href="https://magicui.design" target="_blank" class="lib-link">magicui.design ↗</a>
+    </div>
+    <div class="lib-card">
+      <div class="lib-icon">🌸</div>
+      <div class="lib-name">HeroUI (ex NextUI)</div>
+      <div class="lib-desc">Sistema de componentes moderno con diseño muy refinado. Incluye dark mode, accesibilidad y personalización total. Excelente para apps productivas.</div>
+      <div class="lib-tags">
+        <span class="lib-tag lt-cyan">Next.js</span>
+        <span class="lib-tag lt-lime">Tailwind</span>
+        <span class="lib-tag lt-blue">DX Pro</span>
+      </div>
+      <a href="https://www.heroui.com" target="_blank" class="lib-link">heroui.com ↗</a>
+    </div>
+    <div class="lib-card">
+      <div class="lib-icon">🌼</div>
+      <div class="lib-name">daisyUI</div>
+      <div class="lib-desc">Plugin de Tailwind que agrega clases semánticas (btn, card, badge). Tiene 30+ themes y es el puente perfecto entre aprender Tailwind y usar un sistema de componentes.</div>
+      <div class="lib-tags">
+        <span class="lib-tag lt-lime">Tailwind</span>
+        <span class="lib-tag lt-orange">Themes</span>
+        <span class="lib-tag lt-cyan">Simple</span>
+      </div>
+      <a href="https://daisyui.com" target="_blank" class="lib-link">daisyui.com ↗</a>
+    </div>
+    <div class="lib-card">
+      <div class="lib-icon">💎</div>
+      <div class="lib-name">Mantine</div>
+      <div class="lib-desc">Más de 100 componentes con hooks incluidos. Muy completo para apps con tablas, formularios complejos, dashboards. Alternativa fuerte a Material UI pero mucho más moderna.</div>
+      <div class="lib-tags">
+        <span class="lib-tag lt-blue">React</span>
+        <span class="lib-tag lt-pink">Hooks</span>
+        <span class="lib-tag lt-lime">Full system</span>
+      </div>
+      <a href="https://mantine.dev" target="_blank" class="lib-link">mantine.dev ↗</a>
+    </div>
+  </div>
+
+  <h3>Herramientas para motion y animación</h3>
+  <div class="lib-grid" style="grid-template-columns:repeat(3,1fr);">
+    <div class="lib-card">
+      <div class="lib-icon">🎬</div>
+      <div class="lib-name">Framer Motion</div>
+      <div class="lib-desc">La librería de animación más usada en React. Declarativa, poderosa, fácil para casos simples y muy capaz para casos complejos. AnimatePresence para transiciones entre rutas.</div>
+      <div class="lib-tags">
+        <span class="lib-tag lt-blue">React</span>
+        <span class="lib-tag lt-pink">Animations</span>
+      </div>
+      <a href="https://www.framer.com/motion" target="_blank" class="lib-link">framer.com/motion ↗</a>
+    </div>
+    <div class="lib-card">
+      <div class="lib-icon">🌀</div>
+      <div class="lib-name">GSAP</div>
+      <div class="lib-desc">El estándar profesional para animaciones complejas en la web. Timelines, ScrollTrigger, morphing de SVG. Usado en los sitios que ganan premios de diseño.</div>
+      <div class="lib-tags">
+        <span class="lib-tag lt-lime">Vanilla JS</span>
+        <span class="lib-tag lt-orange">React</span>
+        <span class="lib-tag lt-cyan">Pro</span>
+      </div>
+      <a href="https://gsap.com" target="_blank" class="lib-link">gsap.com ↗</a>
+    </div>
+    <div class="lib-card">
+      <div class="lib-icon">🎭</div>
+      <div class="lib-name">Rive</div>
+      <div class="lib-desc">Animaciones vectoriales interactivas. Diseñás estados en la app de Rive y los montás en React/HTML con el runtime. Para onboardings, ilustraciones, iconos animados.</div>
+      <div class="lib-tags">
+        <span class="lib-tag lt-pink">Vectorial</span>
+        <span class="lib-tag lt-blue">Interactivo</span>
+      </div>
+      <a href="https://rive.app" target="_blank" class="lib-link">rive.app ↗</a>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 05 FRAMER MOTION ─── -->
+<section id="framer">
+<div class="wrap reveal">
+  <span class="s-eyebrow">05 · Framer Motion en profundidad</span>
+  <h2>Animaciones que<br><span class="dim">se sienten bien</span></h2>
+
+  <p>La diferencia entre una app que "funciona" y una que "se siente viva" está en las micro-animaciones. Framer Motion hace eso simple en React.</p>
+
+  <h3>Los 4 conceptos que resuelven el 90% de los casos</h3>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-filename">motion-basics.jsx</span>
+      <span class="code-lang">jsx · framer motion</span>
+    </div>
+    <pre><span class="k">import</span> { motion, AnimatePresence } <span class="k">from</span> <span class="s">'framer-motion'</span>
+
+<span class="c">// 1. FADE IN AL MONTAR — el más común</span>
+<span class="k">function</span> <span class="n">FadeInCard</span>() {
+  <span class="k">return</span> (
+    &lt;motion.div
+      initial={{ opacity: <span class="p">0</span>, y: <span class="p">20</span> }}
+      animate={{ opacity: <span class="p">1</span>, y: <span class="p">0</span> }}
+      transition={{ duration: <span class="p">0.4</span>, ease: <span class="s">'easeOut'</span> }}
+      className=<span class="s">"bg-neutral-900 p-6 rounded-xl"</span>
+    &gt;
+      Contenido
+    &lt;/motion.div&gt;
+  )
+}
+
+<span class="c">// 2. STAGGER — lista de items que entran uno por uno</span>
+<span class="k">const</span> container = {
+  hidden:  { opacity: <span class="p">0</span> },
+  visible: { opacity: <span class="p">1</span>, transition: { staggerChildren: <span class="p">0.08</span> } }
+}
+<span class="k">const</span> item = {
+  hidden:  { opacity: <span class="p">0</span>, x: <span class="p">-16</span> },
+  visible: { opacity: <span class="p">1</span>, x: <span class="p">0</span> }
+}
+
+<span class="k">function</span> <span class="n">StaggerList</span>({ items }) {
+  <span class="k">return</span> (
+    &lt;motion.ul variants={container} initial=<span class="s">"hidden"</span> animate=<span class="s">"visible"</span>&gt;
+      {items.map(i => (
+        &lt;motion.li key={i.id} variants={item}&gt;{i.name}&lt;/motion.li&gt;
+      ))}
+    &lt;/motion.ul&gt;
+  )
+}
+
+<span class="c">// 3. HOVER + TAP — feedback táctil en botones</span>
+<span class="k">function</span> <span class="n">AnimatedButton</span>() {
+  <span class="k">return</span> (
+    &lt;motion.button
+      whileHover={{ scale: <span class="p">1.03</span>, y: <span class="p">-2</span> }}
+      whileTap={{   scale: <span class="p">0.97</span>           }}
+      transition={{ type: <span class="s">'spring'</span>, stiffness: <span class="p">400</span>, damping: <span class="p">20</span> }}
+      className=<span class="s">"bg-lime-400 text-black font-bold px-6 py-3"</span>
+    &gt;
+      Click con efecto
+    &lt;/motion.button&gt;
+  )
+}
+
+<span class="c">// 4. ANIMATE PRESENCE — transición al desmontar un componente</span>
+<span class="k">function</span> <span class="n">Modal</span>({ isOpen, onClose }) {
+  <span class="k">return</span> (
+    &lt;AnimatePresence&gt;
+      {isOpen &amp;&amp; (
+        &lt;motion.div
+          initial={{ opacity: <span class="p">0</span>, scale: <span class="p">0.9</span> }}
+          animate={{ opacity: <span class="p">1</span>, scale: <span class="p">1</span>   }}
+          exit={{    opacity: <span class="p">0</span>, scale: <span class="p">0.9</span> }}
+          className=<span class="s">"fixed inset-0 flex items-center justify-center"</span>
+        &gt;
+          &lt;div onClick={onClose}&gt;Modal content&lt;/div&gt;
+        &lt;/motion.div&gt;
+      )}
+    &lt;/AnimatePresence&gt;
+  )
+}</pre>
+  </div>
+
+  <h3>Scroll animations — lo que los sorprendió</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-filename">scroll-reveal.jsx</span>
+      <span class="code-lang">jsx · whileInView</span>
+    </div>
+    <pre><span class="k">import</span> { motion } <span class="k">from</span> <span class="s">'framer-motion'</span>
+
+<span class="c">// whileInView — se activa cuando el elemento entra en el viewport</span>
+<span class="k">function</span> <span class="n">RevealOnScroll</span>({ children }) {
+  <span class="k">return</span> (
+    &lt;motion.div
+      initial={{ opacity: <span class="p">0</span>, y: <span class="p">40</span> }}
+      whileInView={{ opacity: <span class="p">1</span>, y: <span class="p">0</span> }}
+      viewport={{ once: <span class="k">true</span>, margin: <span class="s">'-80px'</span> }}
+      transition={{ duration: <span class="p">0.5</span>, ease: [<span class="p">0.25</span>, <span class="p">0.46</span>, <span class="p">0.45</span>, <span class="p">0.94</span>] }}
+    &gt;
+      {children}
+    &lt;/motion.div&gt;
+  )
+}
+
+<span class="c">// Usarlo es trivial — envolver cualquier sección:</span>
+<span class="k">function</span> <span class="n">Page</span>() {
+  <span class="k">return</span> (
+    &lt;div&gt;
+      &lt;RevealOnScroll&gt;&lt;HeroSection /&gt;&lt;/RevealOnScroll&gt;
+      &lt;RevealOnScroll&gt;&lt;FeaturesSection /&gt;&lt;/RevealOnScroll&gt;
+      &lt;RevealOnScroll&gt;&lt;PricingSection /&gt;&lt;/RevealOnScroll&gt;
+    &lt;/div&gt;
+  )
+}</pre>
+  </div>
+
+  <div class="callout lime">
+    <div class="c-ico">🎯</div>
+    <div class="c-body">
+      <strong>Regla de oro del motion design</strong>
+      <p>Las animaciones tienen que <strong>comunicar algo</strong>, no existir por existir. Feedback táctil → spring rápido. Aparición de contenido → fade + slide suave. Transición entre páginas → fade + scale. Si una animación no comunica nada, sacarla.</p>
+    </div>
+  </div>
+
+  <h3>useScroll + useTransform — efectos parallax</h3>
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-filename">parallax-header.jsx</span>
+      <span class="code-lang">jsx · advanced</span>
+    </div>
+    <pre><span class="k">import</span> { useScroll, useTransform, motion } <span class="k">from</span> <span class="s">'framer-motion'</span>
+
+<span class="k">function</span> <span class="n">ParallaxHero</span>() {
+  <span class="k">const</span> { scrollY }   = useScroll()
+  <span class="k">const</span> y             = useTransform(scrollY, [<span class="p">0</span>, <span class="p">500</span>], [<span class="p">0</span>, <span class="p">-150</span>])
+  <span class="k">const</span> opacity       = useTransform(scrollY, [<span class="p">0</span>, <span class="p">300</span>], [<span class="p">1</span>,   <span class="p">0</span>])
+  <span class="k">const</span> scale         = useTransform(scrollY, [<span class="p">0</span>, <span class="p">300</span>], [<span class="p">1</span>, <span class="p">0.85</span>])
+
+  <span class="k">return</span> (
+    &lt;div className=<span class="s">"h-screen overflow-hidden"</span>&gt;
+      &lt;motion.div style={{ y, opacity, scale }}&gt;
+        &lt;h1 className=<span class="s">"text-[12vw] font-black"</span>&gt;
+          TÍTULO QUE SE MUEVE
+        &lt;/h1&gt;
+      &lt;/motion.div&gt;
+    &lt;/div&gt;
+  )
+}</pre>
+  </div>
+</div>
+</section>
+
+<!-- ─── 06 PROMPTS ─── -->
+<section id="prompts">
+<div class="wrap reveal">
+  <span class="s-eyebrow">06 · Prompts de diseño con IA</span>
+  <h2>Cómo pedirle<br><span class="dim">diseño a la IA</span></h2>
+
+  <p>La diferencia entre recibir código genérico y recibir algo que se ve profesional está completamente en cómo se formula el prompt. Acá están los patrones que funcionan.</p>
+
+  <div style="overflow-x:auto;">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Objetivo</th>
+          <th>Prompt genérico (mal)</th>
+          <th>Prompt específico (bien)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Botón</strong></td>
+          <td>haceme un botón bonito con Tailwind</td>
+          <td>"Botón Tailwind: bg negro, texto blanco monoespaciado uppercase, hover con borde lime que se rellena de izquierda a derecha con CSS, active con scale 0.97"</td>
+        </tr>
+        <tr>
+          <td><strong>Card</strong></td>
+          <td>una card moderna con sombra</td>
+          <td>"Card React: fondo neutral-900, border neutral-800, hover eleva con shadow y border-lime/30, imagen encima, etiqueta superior izquierda, badge de estado superior derecha, CTA en el footer de la card"</td>
+        </tr>
+        <tr>
+          <td><strong>Hero section</strong></td>
+          <td>una hero section para mi app</td>
+          <td>"Hero section Tailwind + Framer Motion: fondo oscuro con gradiente radial violeta, h1 huge font-black con una palabra en color acento, subtítulo con fade-in delay 200ms, dos CTAs (primary filled + ghost), ticker horizontal con las features del producto"</td>
+        </tr>
+        <tr>
+          <td><strong>Formulario</strong></td>
+          <td>un form de login</td>
+          <td>"Form de login dark mode: inputs con border inferior only (no border-box), label que sube y se achica al focus como floating label, botón submit con loading state animado, manejo de error con shake animation"</td>
+        </tr>
+        <tr>
+          <td><strong>Sistema de colores</strong></td>
+          <td>dame colores para mi app</td>
+          <td>"Design system para app de finanzas: paleta seria pero moderna, color primario que transmita confianza, acento para CTAs y datos positivos, color de superficie para dark mode, definilo como CSS variables y como extend en tailwind.config"</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout orange">
+    <div class="c-ico">🚀</div>
+    <div class="c-body">
+      <strong>El prompt meta — pedirle que diseñe el sistema completo</strong>
+      <p>Cuando empiezan un proyecto nuevo, lo primero que hay que hacer con la IA es pedirle que defina el design system antes de cualquier componente. Una vez que tienen variables, tipografía y paleta definidas, todos los componentes son coherentes automáticamente.</p>
+    </div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="pb-eyebrow">Prompt maestro · Design system desde cero</div>
+    <div class="pb-text">
+      "Voy a construir [DESCRIPCIÓN DE LA APP]. El stack es React + Tailwind CSS v3. Quiero que me definas el design system base del proyecto:<br><br>
+      1. Paleta de colores como CSS variables (--color-background, --color-surface, --color-primary, --color-accent, --color-text, --color-muted, --color-border)<br>
+      2. Configuración de tailwind.config.js con esos colores como extend.colors<br>
+      3. Escala tipográfica usando [FUENTE DE GOOGLE FONTS] con tamaños semánticos (display, heading, body, caption, mono)<br>
+      4. Tres componentes base: Button (con variantes primary/ghost/danger), Card y Input (con label flotante y estados error/success)<br><br>
+      El tono visual es: [ADJETIVOS]. Referencia de estilo: [AWWWARDS/DRIBBBLE URL si tenés]."
+    </div>
+    <div class="pb-note">Este es el prompt de la primera hora de cada proyecto nuevo. Lo que devuelve la IA es el cimiento sobre el que construye todo el equipo.</div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 07 RECURSOS Y VIDEOS ─── -->
+<section id="recursos">
+<div class="wrap reveal">
+  <span class="s-eyebrow">07 · Videos, docs y referencias</span>
+  <h2>Para seguir<br><span class="dim">aprendiendo</span></h2>
+
+  <h3>Videos imprescindibles</h3>
+  <div class="vid-grid">
+    <a href="https://www.youtube.com/watch?v=n4R2E7O-Ngo" target="_blank" class="vid-card">
+      <div class="vid-thumb">
+        <div class="vid-play">▶</div>
+      </div>
+      <div class="vid-platform">YouTube · Fireship</div>
+      <div class="vid-title">Tailwind CSS in 100 Seconds</div>
+      <div class="vid-meta">2 min · El mejor intro al concepto</div>
+    </a>
+    <a href="https://www.youtube.com/watch?v=T-Zv73yZ_QI" target="_blank" class="vid-card">
+      <div class="vid-thumb">
+        <div class="vid-play">▶</div>
+      </div>
+      <div class="vid-platform">YouTube · Theo / t3.gg</div>
+      <div class="vid-title">Tailwind CSS is the best way to CSS</div>
+      <div class="vid-meta">15 min · Por qué funciona realmente</div>
+    </a>
+    <a href="https://www.youtube.com/watch?v=znbCa4Rr054" target="_blank" class="vid-card">
+      <div class="vid-thumb">
+        <div class="vid-play">▶</div>
+      </div>
+      <div class="vid-platform">YouTube · Framer</div>
+      <div class="vid-title">Framer Motion — Official Tutorial</div>
+      <div class="vid-meta">20 min · Desde cero hasta useScroll</div>
+    </a>
+    <a href="https://www.youtube.com/watch?v=FdrFeNjMGD4" target="_blank" class="vid-card">
+      <div class="vid-thumb">
+        <div class="vid-play">▶</div>
+      </div>
+      <div class="vid-platform">YouTube · developedbyed</div>
+      <div class="vid-title">Build a Stunning Landing Page with Framer Motion</div>
+      <div class="vid-meta">45 min · Proyecto completo con animaciones</div>
+    </a>
+    <a href="https://www.youtube.com/watch?v=EZajJGOMWas" target="_blank" class="vid-card">
+      <div class="vid-thumb">
+        <div class="vid-play">▶</div>
+      </div>
+      <div class="vid-platform">YouTube · shadcn</div>
+      <div class="vid-title">shadcn/ui — Everything You Need to Know</div>
+      <div class="vid-meta">12 min · Cómo integrar shadcn en tu proyecto</div>
+    </a>
+    <a href="https://www.youtube.com/watch?v=dXh7m57M29s" target="_blank" class="vid-card">
+      <div class="vid-thumb">
+        <div class="vid-play">▶</div>
+      </div>
+      <div class="vid-platform">YouTube · Kevin Powell</div>
+      <div class="vid-title">CSS that doesn't suck</div>
+      <div class="vid-meta">25 min · Fundamentos de diseño en CSS</div>
+    </a>
+  </div>
+
+  <h3>Canales que vale seguir</h3>
+  <div class="cols">
+    <ul style="font-size:.86rem;">
+      <li><strong>Fireship</strong> — cortos de 100s, siempre actualizados</li>
+      <li><strong>Kevin Powell</strong> — el mejor en CSS avanzado</li>
+      <li><strong>Theo / t3.gg</strong> — opiniones sobre el ecosistema moderno</li>
+      <li><strong>Sonny Sangha</strong> — proyectos completos paso a paso</li>
+    </ul>
+    <ul style="font-size:.86rem;">
+      <li><strong>Jack Herrington</strong> — React avanzado, patterns</li>
+      <li><strong>The Primeagen</strong> — performance, fundamentals</li>
+      <li><strong>UI.Dev</strong> — animaciones y UI patterns</li>
+      <li><strong>Developedbyed</strong> — landing pages con motion</li>
+    </ul>
+  </div>
+
+  <h3>Documentaciones de cabecera</h3>
+  <div class="cols">
+    <div>
+      <h4>Diseño y componentes</h4>
+      <ul style="font-size:.83rem; line-height:2;">
+        <li><a href="https://tailwindcss.com/docs" target="_blank">tailwindcss.com/docs</a> — la ref de Tailwind</li>
+        <li><a href="https://ui.shadcn.com" target="_blank">ui.shadcn.com</a> — componentes copiables</li>
+        <li><a href="https://www.framer.com/motion/introduction" target="_blank">framer.com/motion</a> — todo sobre motion</li>
+        <li><a href="https://ui.aceternity.com" target="_blank">ui.aceternity.com</a> — efectos avanzados</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Inspiración y referencias</h4>
+      <ul style="font-size:.83rem; line-height:2;">
+        <li><a href="https://awwwards.com" target="_blank">awwwards.com</a> — los mejores sitios premiados</li>
+        <li><a href="https://dribbble.com" target="_blank">dribbble.com</a> — shots de UI</li>
+        <li><a href="https://siteinspire.com" target="_blank">siteinspire.com</a> — curaduría editorial</li>
+        <li><a href="https://lapa.ninja" target="_blank">lapa.ninja</a> — landing pages de referencia</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout blue">
+    <div class="c-ico">🛠️</div>
+    <div class="c-body">
+      <strong>Herramientas de exploración inmediata</strong>
+      <p><strong>v0.dev (Vercel)</strong> — generá componentes React/Tailwind con IA · <strong>bolt.new (StackBlitz)</strong> — app completa generada con IA, deployada en segundos · <strong>Lovable.dev</strong> — prototipos fullstack con IA. Son las mejores herramientas para investigar y probar ideas rápido.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ─── 08 ACTIVIDAD ─── -->
+<section id="actividad">
+<div class="wrap reveal">
+  <span class="s-eyebrow">08 · Actividad práctica</span>
+  <h2>Refactorizar con<br><span class="dim">intención visual</span></h2>
+
+  <div class="act-box">
+    <div class="act-num">Actividad 01 · Individual · 10 minutos</div>
+    <div class="act-title">Elegir una referencia</div>
+    <div class="act-body">
+      <p>Entrar a <strong>awwwards.com</strong>, <strong>dribbble.com</strong> o <strong>lapa.ninja</strong> y encontrar un sitio o componente que les guste. Captura de pantalla. Responder:</p>
+      <ul>
+        <li>¿Qué tiene que lo hace visualmente interesante?</li>
+        <li>¿Qué colores y tipografía usa?</li>
+        <li>¿Qué animaciones o micro-interacciones tiene?</li>
+        <li>¿Podrían replicar eso con Tailwind + Framer Motion? ¿Qué necesitarían?</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="act-box">
+    <div class="act-num">Actividad 02 · Equipo · 25 minutos</div>
+    <div class="act-title">Refactorizar con IA</div>
+    <div class="act-body">
+      <p>Tomar el componente más feo de la app que construyeron. Abrir v0.dev o Claude. Usar el prompt maestro de la sección anterior y:</p>
+      <ul>
+        <li>Definir el design system del proyecto (colores, tipo, espaciado)</li>
+        <li>Refactorizar el componente elegido con Tailwind intencional</li>
+        <li>Agregar al menos un efecto de hover y una animación de entrada con Framer Motion</li>
+        <li>Documentar qué prompts usaron y qué iteraciones hicieron</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="act-box">
+    <div class="act-num">Actividad 03 · Equipo · 15 minutos</div>
+    <div class="act-title">Explorar una librería nueva</div>
+    <div class="act-body">
+      <p>Elegir una librería que no conocían antes (Aceternity, Magic UI, daisyUI, Mantine). Instalarla, montar un componente de ejemplo y responder:</p>
+      <ul>
+        <li>¿Qué problema resuelve esta librería?</li>
+        <li>¿Para qué tipo de proyecto la usarían?</li>
+        <li>¿Cuál es su limitación principal?</li>
+        <li>Mostrar el componente funcionando al resto de la clase.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout lime">
+    <div class="c-ico">🎯</div>
+    <div class="c-body">
+      <strong>El criterio de éxito</strong>
+      <p>No es tener algo perfecto. Es poder decirle a alguien: "Esta app la empecé sin diseño, acá está la referencia visual que elegí, acá está el prompt que usé, y acá está el resultado." Ese proceso de investigar → decidir → ejecutar → iterar es el loop que hace crecer como desarrollador.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<footer>
+  <div>
+    <p>ISFD N°26 · DOLORES, BUENOS AIRES · TECNICATURA SUPERIOR EN DESARROLLO DE SOFTWARE · 2026</p>
+    <p style="margin-top:.3rem;">CLASE: DISEÑO MODERNO CON IA · TAILWIND + FRAMER MOTION · 3° AÑO · MAYO 2026</p>
+  </div>
+  <a href="./clase-ia-decisiones-I26.html" style="font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--lime);text-decoration:none;border:1px solid rgba(200,241,53,.3);padding:.4rem 1rem;">← Clase anterior</a>
+</footer>
+
+<script>
+// ── CURSOR ──
+const cursor     = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e=>{
+  mx=e.clientX; my=e.clientY;
+  cursor.style.left     = mx+'px';
+  cursor.style.top      = my+'px';
+});
+function animRing(){
+  rx += (mx-rx)*.12;
+  ry += (my-ry)*.12;
+  cursorRing.style.left = rx+'px';
+  cursorRing.style.top  = ry+'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+document.querySelectorAll('a,button,.lib-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    cursorRing.style.width='60px'; cursorRing.style.height='60px'; cursorRing.style.opacity='.3';
+    cursor.style.transform='translate(-50%,-50%) scale(2)';
+  });
+  el.addEventListener('mouseleave',()=>{
+    cursorRing.style.width='36px'; cursorRing.style.height='36px'; cursorRing.style.opacity='.5';
+    cursor.style.transform='translate(-50%,-50%) scale(1)';
+  });
+});
+
+// ── GSAP SCROLL REVEALS ──
+gsap.registerPlugin(ScrollTrigger);
+document.querySelectorAll('.reveal').forEach(el=>{
+  gsap.fromTo(el,
+    { opacity:0, y:32 },
+    { opacity:1, y:0, duration:.7, ease:'power2.out',
+      scrollTrigger:{ trigger:el, start:'top 88%', once:true }
+    }
+  );
+});
+
+// stagger lib cards
+gsap.utils.toArray('.lib-card').forEach((card,i)=>{
+  gsap.fromTo(card,
+    { opacity:0, y:20 },
+    { opacity:1, y:0, duration:.5, delay:i*.07, ease:'power2.out',
+      scrollTrigger:{ trigger:card, start:'top 92%', once:true }
+    }
+  );
+});
+
+// stagger steps
+gsap.utils.toArray('.step').forEach((s,i)=>{
+  gsap.fromTo(s,
+    { opacity:0, x:-20 },
+    { opacity:1, x:0, duration:.45, delay:i*.06, ease:'power2.out',
+      scrollTrigger:{ trigger:s, start:'top 92%', once:true }
+    }
+  );
+});
+
+// hero entrance
+gsap.fromTo('.hero-badge', { opacity:0, y:12 }, { opacity:1, y:0, duration:.6, delay:.15 });
+gsap.fromTo('.hero h1',    { opacity:0, y:30 }, { opacity:1, y:0, duration:.8, delay:.3, ease:'power3.out' });
+gsap.fromTo('.hero-sub',   { opacity:0       }, { opacity:1,      duration:.6, delay:.6 });
+gsap.fromTo('.hero-meta',  { opacity:0       }, { opacity:1,      duration:.6, delay:.8 });
+</script>
+</body>
+</html>

@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase Full Stack — Sistema de Reservas · ISFDyT N°26</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080B10;
+  --bg2: #0D1117;
+  --bg3: #161B24;
+  --bg4: #1C2333;
+  --border: #21283A;
+  --border2: #2D3748;
+  --text: #E2E8F0;
+  --muted: #64748B;
+  --muted2: #8A9BB0;
+  --react: #00D8FF;
+  --next: #00E5A0;
+  --amber: #F5B93E;
+  --purple: #A78BFA;
+  --coral: #FB7185;
+  --mint: #34D399;
+  --code-bg: #0D1117;
+  --code-border: #21283A;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:400;line-height:1.7;overflow-x:hidden}
+
+/* GRID BG */
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:56px 56px;opacity:.3;pointer-events:none;z-index:0}
+
+/* SIDEBAR NAV */
+.sidebar{position:fixed;left:0;top:0;width:220px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);z-index:100;overflow-y:auto;padding:1.5rem 0}
+.sidebar-logo{padding:.75rem 1.25rem 1.25rem;border-bottom:1px solid var(--border);margin-bottom:.75rem}
+.sidebar-logo-title{font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;color:var(--text)}
+.sidebar-logo-sub{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);margin-top:2px}
+.nav-section{padding:.25rem 1.25rem .1rem;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:.5rem}
+.nav-item{display:block;padding:.4rem 1.25rem;font-size:.78rem;color:var(--muted2);text-decoration:none;transition:all .15s;border-left:2px solid transparent}
+.nav-item:hover{color:var(--text);background:var(--bg3);border-left-color:var(--next)}
+.nav-item.active{color:var(--next);border-left-color:var(--next);background:rgba(0,229,160,.06)}
+
+/* MAIN */
+.main{margin-left:220px;position:relative;z-index:1}
+
+/* HERO */
+.hero{padding:4rem 3rem 3rem;border-bottom:1px solid var(--border);background:linear-gradient(160deg,rgba(0,229,160,.04) 0%,transparent 50%)}
+.hero-eyebrow{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:10px}
+.hero-eyebrow::before{content:'';width:28px;height:1px;background:var(--muted);display:inline-block}
+.hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2rem,4vw,3.2rem);line-height:1.05;letter-spacing:-.03em;margin-bottom:.75rem}
+.hero h1 em{font-style:normal;color:var(--next)}
+.hero-sub{font-size:1rem;color:var(--muted2);max-width:640px;margin-bottom:2rem;font-weight:300}
+.hero-tags{display:flex;flex-wrap:wrap;gap:.5rem}
+.htag{font-family:'DM Mono',monospace;font-size:.68rem;padding:4px 10px;border-radius:4px;border:1px solid var(--border2);color:var(--muted2);background:var(--bg3)}
+.htag.hi{border-color:var(--next);color:var(--next);background:rgba(0,229,160,.07)}
+
+/* PROGRESS BAR */
+.progress-bar{height:2px;background:linear-gradient(90deg,var(--react),var(--next),var(--purple));position:fixed;top:0;left:220px;right:0;z-index:200;transform-origin:left;transform:scaleX(0);transition:transform .1s}
+
+/* CONTENT */
+.content{padding:0 3rem 4rem;max-width:900px}
+
+/* SECTIONS */
+.section{margin-top:4rem;padding-top:2rem;border-top:1px solid var(--border)}
+.section-num{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem}
+.section h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.7rem;letter-spacing:-.02em;margin-bottom:.75rem;line-height:1.2}
+.section-intro{font-size:.95rem;color:var(--muted2);margin-bottom:1.75rem;line-height:1.8;max-width:680px}
+
+/* SUBSECTIONS */
+h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;color:var(--text);margin:2rem 0 .75rem}
+h4{font-family:'Syne',sans-serif;font-weight:600;font-size:.95rem;color:var(--muted2);margin:1.5rem 0 .5rem;letter-spacing:.02em}
+p{font-size:.9rem;color:var(--muted2);line-height:1.8;margin-bottom:.75rem}
+strong{color:var(--text);font-weight:500}
+
+/* CODE BLOCKS */
+.code-block{background:var(--code-bg);border:1px solid var(--code-border);border-radius:10px;overflow:hidden;margin:1rem 0 1.5rem}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:.625rem 1rem;background:var(--bg3);border-bottom:1px solid var(--border)}
+.code-lang{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.code-label{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted2)}
+.code-copy{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);cursor:pointer;padding:2px 8px;border-radius:4px;border:1px solid var(--border);background:transparent;transition:all .15s}
+.code-copy:hover{color:var(--next);border-color:var(--next)}
+pre{padding:1.25rem 1.25rem;overflow-x:auto;font-family:'DM Mono',monospace;font-size:.8rem;line-height:1.8}
+.kw{color:#FF79C6}
+.fn{color:#50FA7B}
+.str{color:#F1FA8C}
+.cm{color:#6272A4;font-style:italic}
+.ty{color:#8BE9FD}
+.num{color:#BD93F9}
+.op{color:#FF79C6}
+.prop{color:#FFB86C}
+.tag{color:#FF79C6}
+.attr{color:#50FA7B}
+.val{color:#F1FA8C}
+.cmd-prompt{color:var(--next)}
+.cmd-comment{color:#6272A4;font-style:italic}
+
+/* INLINE CODE */
+code{font-family:'DM Mono',monospace;font-size:.8rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:1px 6px;color:var(--amber)}
+
+/* CARDS GRID */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.875rem;margin:1rem 0 1.5rem}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem;transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-2px)}
+.card.c-react{border-top:2px solid var(--react)}
+.card.c-next{border-top:2px solid var(--next)}
+.card.c-purple{border-top:2px solid var(--purple)}
+.card.c-amber{border-top:2px solid var(--amber)}
+.card.c-coral{border-top:2px solid var(--coral)}
+.card.c-mint{border-top:2px solid var(--mint)}
+.card-icon{font-size:1.5rem;margin-bottom:.75rem}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;margin-bottom:.4rem;color:var(--text)}
+.card-desc{font-size:.78rem;color:var(--muted);line-height:1.6}
+
+/* CALLOUTS */
+.callout{border-radius:10px;padding:1.1rem 1.25rem;margin:1rem 0 1.5rem;display:flex;gap:.875rem;align-items:flex-start}
+.callout-tip{background:rgba(0,229,160,.07);border:1px solid rgba(0,229,160,.2)}
+.callout-warn{background:rgba(245,185,62,.07);border:1px solid rgba(245,185,62,.2)}
+.callout-info{background:rgba(0,216,255,.07);border:1px solid rgba(0,216,255,.2)}
+.callout-error{background:rgba(251,113,133,.07);border:1px solid rgba(251,113,133,.2)}
+.callout-icon{font-size:1rem;flex-shrink:0;margin-top:1px}
+.callout-body{flex:1}
+.callout-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;margin-bottom:.25rem}
+.callout-tip .callout-title{color:var(--next)}
+.callout-warn .callout-title{color:var(--amber)}
+.callout-info .callout-title{color:var(--react)}
+.callout-error .callout-title{color:var(--coral)}
+.callout-text{font-size:.82rem;color:var(--muted2);line-height:1.7}
+
+/* TABLE */
+.diff-table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.diff-table th{padding:.75rem 1rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;text-align:left;background:var(--bg3);border-bottom:1px solid var(--border)}
+.diff-table td{padding:.7rem 1rem;font-size:.8rem;color:var(--muted2);border-bottom:1px solid var(--border);line-height:1.6;vertical-align:top}
+.diff-table tr:last-child td{border-bottom:none}
+.diff-table tr:hover td{background:rgba(255,255,255,.02)}
+.th-feat{color:var(--muted)}
+.th-npm{color:var(--amber)}
+.th-npx{color:var(--next)}
+.check{color:var(--mint)}
+.cross{color:var(--coral)}
+
+/* MVP DIAGRAM */
+.mvp-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0 1.5rem}
+.mvp-col{border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.mvp-col-header{padding:.75rem 1rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;border-bottom:1px solid var(--border)}
+.mvp-col.col-mvp .mvp-col-header{background:rgba(0,229,160,.1);color:var(--next)}
+.mvp-col.col-future .mvp-col-header{background:rgba(167,139,250,.1);color:var(--purple)}
+.mvp-col-body{padding:.875rem 1rem}
+.mvp-item{display:flex;align-items:center;gap:.625rem;margin-bottom:.5rem;font-size:.82rem;color:var(--muted2)}
+.mvp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot-green{background:var(--next)}
+.dot-purple{background:var(--purple)}
+
+/* STACK LIST */
+.stack-list{display:flex;flex-direction:column;gap:.5rem;margin:1rem 0 1.5rem}
+.stack-item{display:flex;align-items:center;gap:1rem;padding:.875rem 1rem;background:var(--bg2);border:1px solid var(--border);border-radius:8px;transition:border-color .2s}
+.stack-item:hover{border-color:var(--border2)}
+.stack-emoji{font-size:1.1rem;width:28px;text-align:center;flex-shrink:0}
+.stack-info{flex:1}
+.stack-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:var(--text)}
+.stack-desc{font-size:.75rem;color:var(--muted);margin-top:1px}
+.stack-badge{font-family:'DM Mono',monospace;font-size:.65rem;padding:2px 8px;border-radius:4px;border:1px solid var(--border2);color:var(--muted)}
+
+/* ARCH DIAGRAM */
+.arch-diagram{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin:1rem 0 1.5rem;font-family:'DM Mono',monospace;font-size:.75rem;line-height:1.9;overflow-x:auto;white-space:pre}
+.arch-next{color:var(--next)}
+.arch-react{color:var(--react)}
+.arch-purple{color:var(--purple)}
+.arch-amber{color:var(--amber)}
+.arch-muted{color:var(--muted)}
+
+/* EXERCISE */
+.exercise{background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2);border-radius:10px;padding:1.25rem;margin:1.5rem 0}
+.exercise-header{display:flex;align-items:center;gap:.75rem;margin-bottom:.875rem}
+.exercise-badge{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:4px;background:rgba(167,139,250,.15);color:var(--purple);border:1px solid rgba(167,139,250,.3)}
+.exercise-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--text)}
+.exercise-list{list-style:none;padding:0}
+.exercise-list li{display:flex;gap:.625rem;margin-bottom:.4rem;font-size:.82rem;color:var(--muted2);line-height:1.6}
+.exercise-list li::before{content:'→';color:var(--purple);flex-shrink:0;font-family:'DM Mono',monospace}
+
+/* BIB */
+.bib-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:.875rem;margin:1rem 0}
+.bib-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.1rem;display:flex;gap:.875rem;align-items:flex-start;transition:border-color .2s;text-decoration:none}
+.bib-card:hover{border-color:var(--next)}
+.bib-icon{font-size:1.3rem;flex-shrink:0;margin-top:2px}
+.bib-info{}
+.bib-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:var(--text);margin-bottom:2px}
+.bib-url{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--next)}
+.bib-desc{font-size:.75rem;color:var(--muted);margin-top:4px;line-height:1.5}
+
+/* FOOTER */
+.footer{margin-top:5rem;padding:2rem 3rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.footer-text{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted)}
+
+/* SEPARATOR */
+.sep{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:1rem 0}
+
+/* LIST */
+ul.body-list{padding-left:1rem;margin:.5rem 0 1rem}
+ul.body-list li{font-size:.87rem;color:var(--muted2);margin-bottom:.35rem;padding-left:.25rem}
+ul.body-list li::marker{color:var(--next)}
+
+/* HIGHLIGHT SPAN */
+.hi-react{color:var(--react)}
+.hi-next{color:var(--next)}
+.hi-amber{color:var(--amber)}
+.hi-purple{color:var(--purple)}
+.hi-coral{color:var(--coral)}
+.hi-mint{color:var(--mint)}
+
+/* MOBILE */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .main{margin-left:0}
+  .hero,.content{padding-left:1.5rem;padding-right:1.5rem}
+  .mvp-grid{grid-template-columns:1fr}
+  .cards{grid-template-columns:1fr 1fr}
+  .progress-bar{left:0}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-title">Full Stack · 2026</div>
+    <div class="sidebar-logo-sub">ISFDyT N°26 · Desarrollo de Software</div>
+  </div>
+  <div class="nav-section">Intro</div>
+  <a href="#s0" class="nav-item">Stack moderno</a>
+  <a href="#s1" class="nav-item">npm vs npx vs Git</a>
+  <div class="nav-section">Setup</div>
+  <a href="#s2" class="nav-item">Crear el proyecto</a>
+  <a href="#s3" class="nav-item">Estructura de carpetas</a>
+  <a href="#s4" class="nav-item">Scripts importantes</a>
+  <a href="#s5" class="nav-item">Instalar dependencias</a>
+  <div class="nav-section">Backend</div>
+  <a href="#s6" class="nav-item">Base de datos · Prisma</a>
+  <a href="#s7" class="nav-item">API REST en Next.js</a>
+  <div class="nav-section">Frontend</div>
+  <a href="#s8" class="nav-item">Tailwind · Componentes</a>
+  <a href="#s9" class="nav-item">Framer Motion</a>
+  <div class="nav-section">Proyecto</div>
+  <a href="#s10" class="nav-item">MVP · Sistema de reservas</a>
+  <a href="#s11" class="nav-item">Buenas prácticas</a>
+  <a href="#s12" class="nav-item">Bibliografía</a>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Programación y Desarrollo de Apps Móviles · 2° año · Clase 3</div>
+  <h1>Stack moderno:<br><em>Sistema de Reservas</em><br>con Next.js</h1>
+  <p class="hero-sub">Construimos un MVP real de reservas para restaurante usando las mismas tecnologías que usan los equipos profesionales hoy. Con IA como herramienta de trabajo.</p>
+  <div class="hero-tags">
+    <span class="htag hi">Next.js 15</span>
+    <span class="htag hi">Prisma ORM</span>
+    <span class="htag hi">Framer Motion</span>
+    <span class="htag hi">Tailwind CSS</span>
+    <span class="htag hi">shadcn/ui</span>
+    <span class="htag">TypeScript</span>
+    <span class="htag">React Hook Form</span>
+    <span class="htag">Zod</span>
+    <span class="htag">Claude / Copilot</span>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- S0: STACK MODERNO -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="s0">
+  <div class="section-num">01 — Introducción</div>
+  <h2>El stack <span class="hi-next">moderno</span> que usa el mercado</h2>
+  <p class="section-intro">Antes de escribir una línea de código, necesitamos entender qué es cada herramienta, para qué sirve y por qué el mercado las usa juntas. Esto es lo mismo que aprender los nombres de las herramientas de un carpintero antes de construir un mueble.</p>
+
+  <h3>¿Cómo evolucionó el frontend?</h3>
+  <p>Durante muchos años, el servidor generaba el HTML completo y lo mandaba al navegador. Eso se llama <strong>SSR clásico</strong> (Server Side Rendering). Después llegó <strong>jQuery</strong> y JavaScript empezó a modificar la página sin recargarla. Luego vinieron React, Vue y Angular, que llevaron todo el renderizado al navegador (<strong>CSR - Client Side Rendering</strong>). El problema: la página tardaba en cargar porque el navegador tenía que descargar mucho JavaScript antes de mostrar algo.</p>
+  <p>Next.js resuelve eso combinando los dos mundos: pre-renderiza en el servidor y luego "hidrata" en el cliente. Hoy con el <strong>App Router</strong> y los <strong>React Server Components</strong>, podés elegir componente por componente si corre en el servidor o en el cliente.</p>
+
+  <div class="cards">
+    <div class="card c-amber">
+      <div class="card-icon">🏠</div>
+      <div class="card-title">SSR</div>
+      <div class="card-desc">El servidor genera el HTML completo. Rápido para el usuario. El servidor hace todo el trabajo.</div>
+    </div>
+    <div class="card c-react">
+      <div class="card-icon">⚛️</div>
+      <div class="card-title">CSR</div>
+      <div class="card-desc">El navegador genera el HTML con JavaScript. Interactivo, pero carga lenta la primera vez.</div>
+    </div>
+    <div class="card c-next">
+      <div class="card-icon">▲</div>
+      <div class="card-title">Next.js</div>
+      <div class="card-desc">Lo mejor de los dos mundos. Pre-renderiza en el servidor, hidrata en el cliente. Full Stack en un proyecto.</div>
+    </div>
+    <div class="card c-purple">
+      <div class="card-icon">🧩</div>
+      <div class="card-title">Server Components</div>
+      <div class="card-desc">Componentes que corren solo en el servidor. Acceden a la base de datos directamente, sin API. Magia.</div>
+    </div>
+  </div>
+
+  <h3>El stack completo de la materia</h3>
+  <div class="stack-list">
+    <div class="stack-item">
+      <div class="stack-emoji">▲</div>
+      <div class="stack-info">
+        <div class="stack-name">Next.js 15</div>
+        <div class="stack-desc">Framework Full Stack. Front + Back + Rutas en un solo proyecto.</div>
+      </div>
+      <span class="stack-badge">framework</span>
+    </div>
+    <div class="stack-item">
+      <div class="stack-emoji">⚛️</div>
+      <div class="stack-info">
+        <div class="stack-name">React 19</div>
+        <div class="stack-desc">La librería de interfaces. Next.js está construido sobre React.</div>
+      </div>
+      <span class="stack-badge">UI library</span>
+    </div>
+    <div class="stack-item">
+      <div class="stack-emoji">🔷</div>
+      <div class="stack-info">
+        <div class="stack-name">TypeScript</div>
+        <div class="stack-desc">JavaScript con tipos. Detecta errores antes de ejecutar el código.</div>
+      </div>
+      <span class="stack-badge">lenguaje</span>
+    </div>
+    <div class="stack-item">
+      <div class="stack-emoji">🎨</div>
+      <div class="stack-info">
+        <div class="stack-name">Tailwind CSS</div>
+        <div class="stack-desc">CSS con clases utilitarias. Diseñás directo en el HTML sin escribir CSS.</div>
+      </div>
+      <span class="stack-badge">estilos</span>
+    </div>
+    <div class="stack-item">
+      <div class="stack-emoji">🗄️</div>
+      <div class="stack-info">
+        <div class="stack-name">Prisma ORM</div>
+        <div class="stack-desc">Habla con la base de datos usando TypeScript en vez de SQL crudo.</div>
+      </div>
+      <span class="stack-badge">base de datos</span>
+    </div>
+    <div class="stack-item">
+      <div class="stack-emoji">✨</div>
+      <div class="stack-info">
+        <div class="stack-name">Framer Motion</div>
+        <div class="stack-desc">Animaciones declarativas para React. Interfaces que se mueven como apps profesionales.</div>
+      </div>
+      <span class="stack-badge">animaciones</span>
+    </div>
+    <div class="stack-item">
+      <div class="stack-emoji">🧱</div>
+      <div class="stack-info">
+        <div class="stack-name">shadcn/ui</div>
+        <div class="stack-desc">Componentes de UI listos para producción. No es una librería: es código que copiás y controlás.</div>
+      </div>
+      <span class="stack-badge">componentes</span>
+    </div>
+    <div class="stack-item">
+      <div class="stack-emoji">🤖</div>
+      <div class="stack-info">
+        <div class="stack-name">Claude / GitHub Copilot</div>
+        <div class="stack-desc">IA como asistente de código. Genera, explica, corrige y documenta. Lo evaluás y decidís.</div>
+      </div>
+      <span class="stack-badge">IA</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- S1: NPM vs NPX vs GIT vs GIT BASH -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="s1">
+  <div class="section-num">02 — Herramientas</div>
+  <h2><span class="hi-amber">npm</span> vs <span class="hi-next">npx</span> vs <span class="hi-react">Git</span> vs Git Bash</h2>
+  <p class="section-intro">En la clase de hoy usamos varias herramientas desde la consola. Es fundamental entender qué hace cada una, porque son diferentes y se confunden fácilmente.</p>
+
+  <h3>npm — El gestor de paquetes</h3>
+  <p><strong>npm</strong> significa <em>Node Package Manager</em>. Es la herramienta que <strong>instala y gestiona las librerías</strong> (paquetes) que usa tu proyecto. Viene instalado automáticamente con Node.js.</p>
+  <p>Pensalo como el almacén de materiales de construcción. Cuando necesitás ladrillos (React) o cemento (Tailwind), le pedís al almacén que te los traiga.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">bash</span><span class="code-label">terminal</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+    <pre><span class="cmd-prompt">$</span> npm install framer-motion       <span class="cmd-comment"># instala una librería en tu proyecto</span>
+<span class="cmd-prompt">$</span> npm install prisma @prisma/client <span class="cmd-comment"># instala dos librerías juntas</span>
+<span class="cmd-prompt">$</span> npm run dev                       <span class="cmd-comment"># ejecuta un script definido en package.json</span>
+<span class="cmd-prompt">$</span> npm run build                     <span class="cmd-comment"># construye el proyecto para producción</span></pre>
+  </div>
+
+  <h3>npx — El ejecutor de paquetes</h3>
+  <p><strong>npx</strong> <em>ejecuta</em> un paquete sin necesidad de instalarlo permanentemente. Lo descarga, lo corre y lo descarta. Es perfecto para herramientas que usás una vez para crear o configurar algo.</p>
+  <p>Siguiendo la metáfora: si npm es el almacén, npx es el servicio de alquiler. Lo usás para la tarea, lo devolvés.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">bash</span><span class="code-label">terminal</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+    <pre><span class="cmd-prompt">$</span> npx create-next-app@latest reservas <span class="cmd-comment"># crea un proyecto nuevo (lo ejecuta sin instalar)</span>
+<span class="cmd-prompt">$</span> npx prisma init                      <span class="cmd-comment"># inicializa Prisma en el proyecto</span>
+<span class="cmd-prompt">$</span> npx prisma migrate dev               <span class="cmd-comment"># crea las tablas en la base de datos</span>
+<span class="cmd-prompt">$</span> npx shadcn@latest init               <span class="cmd-comment"># configura shadcn/ui</span></pre>
+  </div>
+
+  <table class="diff-table">
+    <thead><tr>
+      <th class="th-feat">Aspecto</th>
+      <th class="th-npm">npm</th>
+      <th class="th-npx">npx</th>
+    </tr></thead>
+    <tbody>
+      <tr><td><strong>¿Qué hace?</strong></td><td>Instala librerías en tu proyecto</td><td>Ejecuta herramientas una sola vez</td></tr>
+      <tr><td><strong>¿Guarda algo?</strong></td><td><span class="check">✓</span> Sí, en node_modules</td><td><span class="cross">✗</span> No, lo descarga y descarta</td></tr>
+      <tr><td><strong>¿Cuándo usarlo?</strong></td><td>Para instalar React, Tailwind, etc.</td><td>Para crear proyectos, configurar tools</td></tr>
+      <tr><td><strong>Ejemplo</strong></td><td><code>npm install axios</code></td><td><code>npx create-next-app@latest</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Git — El control de versiones</h3>
+  <p><strong>Git</strong> es el sistema que guarda el historial de cambios de tu código. Con Git podés volver atrás en el tiempo, trabajar en equipo sin pisarse, y subir tu código a plataformas como GitHub.</p>
+  <p>Es como el control de cambios de Word, pero profesional y para código. Cada vez que hacés un <code>commit</code>, guardás una "foto" del estado del proyecto en ese momento.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">bash</span><span class="code-label">comandos git básicos</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+    <pre><span class="cmd-prompt">$</span> git init                  <span class="cmd-comment"># inicia un repositorio en la carpeta actual</span>
+<span class="cmd-prompt">$</span> git add .                 <span class="cmd-comment"># marca todos los archivos para guardar</span>
+<span class="cmd-prompt">$</span> git commit -m "primer commit"  <span class="cmd-comment"># guarda la foto con un mensaje</span>
+<span class="cmd-prompt">$</span> git push origin main      <span class="cmd-comment"># sube los cambios a GitHub</span>
+<span class="cmd-prompt">$</span> git clone [url]           <span class="cmd-comment"># descarga un proyecto de GitHub</span></pre>
+  </div>
+
+  <h3>Git Bash — La pregunta de la clase</h3>
+  <p>Un alumno preguntó: <em>"¿Cuál es la diferencia entre Git y Git Bash?"</em> Muy buena pregunta. Son cosas distintas:</p>
+  <div class="cards">
+    <div class="card c-amber">
+      <div class="card-icon">🔧</div>
+      <div class="card-title">Git</div>
+      <div class="card-desc">El programa que gestiona el historial de versiones. La herramienta en sí. Corre detrás de escena.</div>
+    </div>
+    <div class="card c-mint">
+      <div class="card-icon">🖥️</div>
+      <div class="card-title">Git Bash</div>
+      <div class="card-desc">Una terminal (consola) para Windows que simula el entorno Linux/Mac. Te permite usar Git y comandos Unix desde Windows.</div>
+    </div>
+  </div>
+  <div class="callout callout-info">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <div class="callout-title">La analogía perfecta</div>
+      <div class="callout-text">Git es el motor. Git Bash es el panel de control desde donde manejás ese motor en Windows. En Mac y Linux no necesitás Git Bash porque ya tienen una terminal Unix nativa (la Terminal o iTerm).</div>
+    </div>
+  </div>
+  <div class="callout callout-tip">
+    <div class="callout-icon">✨</div>
+    <div class="callout-body">
+      <div class="callout-title">Tip profesional</div>
+      <div class="callout-text">La terminal integrada de VSCode (Ctrl+J) funciona perfectamente para todo. No necesitás abrir Git Bash por separado si usás VSCode.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- S2: CREAR EL PROYECTO -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="s2">
+  <div class="section-num">03 — Setup</div>
+  <h2>Crear el proyecto con <span class="hi-next">create-next-app</span></h2>
+  <p class="section-intro">Este es el comando más importante del comienzo. <code>create-next-app</code> es el generador oficial de Next.js. Crea toda la estructura del proyecto con las mejores configuraciones en un solo comando.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">bash</span><span class="code-label">crear el proyecto</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+    <pre><span class="cmd-prompt">$</span> npx create-next-app@latest reservas</pre>
+  </div>
+
+  <p>Va a hacer una serie de preguntas. Acá está cada una explicada con la respuesta que elegimos hoy en clase y por qué:</p>
+
+  <table class="diff-table">
+    <thead><tr>
+      <th class="th-feat">Pregunta</th>
+      <th class="th-npm">Respuesta</th>
+      <th class="th-npx">¿Por qué?</th>
+    </tr></thead>
+    <tbody>
+      <tr><td><strong>TypeScript?</strong></td><td><span class="check">✓ Yes</span></td><td>Detecta errores antes de ejecutar. Estándar en el mercado.</td></tr>
+      <tr><td><strong>ESLint?</strong></td><td><span class="check">✓ Yes</span></td><td>Analiza el código y avisa si hay errores de estilo o posibles bugs.</td></tr>
+      <tr><td><strong>Tailwind CSS?</strong></td><td><span class="check">✓ Yes</span></td><td>Diseñamos directo en el HTML con clases. Mucho más rápido.</td></tr>
+      <tr><td><strong>src/ directory?</strong></td><td><span class="check">✓ Yes</span></td><td>Organiza mejor el código. Todo el fuente queda en <code>/src</code>.</td></tr>
+      <tr><td><strong>App Router?</strong></td><td><span class="check">✓ Yes</span></td><td>El sistema de rutas nuevo y moderno de Next.js 13+. Más potente.</td></tr>
+      <tr><td><strong>Turbopack?</strong></td><td><span class="check">✓ Yes</span></td><td>Compilador ultra rápido (en Rust). El servidor de desarrollo arranca mucho más rápido.</td></tr>
+      <tr><td><strong>Import alias @/*?</strong></td><td><span class="check">✓ Yes</span></td><td>Permite escribir <code>import Button from '@/components/Button'</code> en vez de <code>../../components/Button</code>.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-info">
+    <div class="callout-icon">🔷</div>
+    <div class="callout-body">
+      <div class="callout-title">¿Qué es TypeScript?</div>
+      <div class="callout-text">JavaScript normal te deja hacer <code>let edad = "veinte"</code> cuando debería ser un número. TypeScript lo detecta y te avisa antes de ejecutar. Es como tener un corrector automático pero para lógica de código. Hoy es el estándar en cualquier empresa de software.</div>
+    </div>
+  </div>
+
+  <h3>¿Qué es el App Router?</h3>
+  <p>El <strong>App Router</strong> es el sistema de rutas nuevo de Next.js (desde la versión 13). Cada carpeta dentro de <code>app/</code> se convierte automáticamente en una URL. Además introduce los <strong>React Server Components</strong>: componentes que corren solo en el servidor y pueden acceder a la base de datos directamente.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">text</span><span class="code-label">cómo funcionan las rutas automáticas</span></div>
+    <pre><span class="hi-next">app/</span>page.tsx              →  <span class="hi-amber">localhost:3000/</span>
+<span class="hi-next">app/</span>reservas/page.tsx    →  <span class="hi-amber">localhost:3000/reservas</span>
+<span class="hi-next">app/</span>admin/page.tsx       →  <span class="hi-amber">localhost:3000/admin</span>
+<span class="hi-next">app/</span>api/reservas/route.ts →  <span class="hi-amber">localhost:3000/api/reservas</span>  ← API REST</pre>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- S3: ESTRUCTURA DE CARPETAS -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="s3">
+  <div class="section-num">04 — Estructura</div>
+  <h2>Estructura de <span class="hi-amber">carpetas</span> del proyecto</h2>
+  <p class="section-intro">Un proyecto bien organizado es la diferencia entre código que podés mantener y código que se convierte en un desastre. Esta estructura es la que usan los equipos profesionales.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">text</span><span class="code-label">arquitectura del proyecto reservas/</span></div>
+    <pre><span class="hi-next">reservas/</span>
+├── <span class="hi-next">src/</span>
+│   ├── <span class="hi-react">app/</span>                    <span class="cmd-comment">← rutas y páginas (App Router)</span>
+│   │   ├── page.tsx            <span class="cmd-comment">← página principal /</span>
+│   │   ├── layout.tsx          <span class="cmd-comment">← layout común para todas las páginas</span>
+│   │   ├── globals.css         <span class="cmd-comment">← estilos globales + variables Tailwind</span>
+│   │   ├── <span class="hi-amber">reservas/</span>
+│   │   │   └── page.tsx        <span class="cmd-comment">← /reservas</span>
+│   │   ├── <span class="hi-amber">admin/</span>
+│   │   │   └── page.tsx        <span class="cmd-comment">← /admin (dashboard)</span>
+│   │   └── <span class="hi-amber">api/</span>
+│   │       └── reservas/
+│   │           └── route.ts    <span class="cmd-comment">← API REST /api/reservas</span>
+│   ├── <span class="hi-purple">components/</span>             <span class="cmd-comment">← componentes reutilizables</span>
+│   │   ├── ui/                 <span class="cmd-comment">← componentes de shadcn/ui</span>
+│   │   ├── ReservaForm.tsx     <span class="cmd-comment">← formulario de reserva</span>
+│   │   └── CalendarioMesas.tsx <span class="cmd-comment">← vista del calendario</span>
+│   └── <span class="hi-coral">lib/</span>                    <span class="cmd-comment">← lógica compartida</span>
+│       ├── prisma.ts           <span class="cmd-comment">← cliente de base de datos</span>
+│       └── validations.ts      <span class="cmd-comment">← esquemas Zod</span>
+├── <span class="hi-amber">prisma/</span>
+│   ├── schema.prisma           <span class="cmd-comment">← modelo de base de datos</span>
+│   └── migrations/             <span class="cmd-comment">← historial de cambios en la BD</span>
+├── <span class="hi-muted">public/</span>                     <span class="cmd-comment">← imágenes, íconos, fuentes</span>
+├── .env                        <span class="cmd-comment">← variables de entorno (contraseñas, URLs)</span>
+├── package.json                <span class="cmd-comment">← lista de dependencias y scripts</span>
+└── tailwind.config.ts          <span class="cmd-comment">← configuración de Tailwind</span></pre>
+  </div>
+
+  <div class="callout callout-warn">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-body">
+      <div class="callout-title">Regla de oro: nunca subas el .env a GitHub</div>
+      <div class="callout-text">El archivo <code>.env</code> contiene contraseñas y claves secretas. Agrégalo al <code>.gitignore</code> desde el primer día. <code>create-next-app</code> lo hace automáticamente, pero hay que saberlo.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- S4: SCRIPTS -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="s4">
+  <div class="section-num">05 — Scripts</div>
+  <h2>Scripts de <span class="hi-react">npm</span> que vas a usar siempre</h2>
+  <p class="section-intro">El archivo <code>package.json</code> define los comandos que podés correr con <code>npm run</code>. Son los mismos en cualquier proyecto Next.js.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">bash</span><span class="code-label">los 4 comandos más usados</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+    <pre><span class="cmd-prompt">$</span> npm run dev    <span class="cmd-comment"># levanta el servidor de desarrollo en localhost:3000</span>
+<span class="cmd-prompt">$</span> npm run build  <span class="cmd-comment"># compila el proyecto para producción (antes de publicar)</span>
+<span class="cmd-prompt">$</span> npm start      <span class="cmd-comment"># corre el proyecto compilado (producción local)</span>
+<span class="cmd-prompt">$</span> npm run lint   <span class="cmd-comment"># analiza el código buscando errores y malas prácticas</span></pre>
+  </div>
+
+  <div class="callout callout-tip">
+    <div class="callout-icon">✨</div>
+    <div class="callout-body">
+      <div class="callout-title">Tip: hot reload automático</div>
+      <div class="callout-text">Con <code>npm run dev</code> el servidor detecta cada cambio que guardás y actualiza el navegador automáticamente. No necesitás recargar la página nunca mientras desarrollás.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- S5: INSTALAR DEPENDENCIAS -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="s5">
+  <div class="section-num">06 — Dependencias</div>
+  <h2>Instalar las <span class="hi-purple">dependencias</span> del proyecto</h2>
+  <p class="section-intro">Después de crear el proyecto base, instalamos las librerías adicionales que necesita el sistema de reservas. Cada una tiene un propósito específico.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">bash</span><span class="code-label">instalar todo el stack</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+    <pre><span class="cmd-comment"># ORM para la base de datos</span>
+<span class="cmd-prompt">$</span> npm install prisma @prisma/client
+<span class="cmd-prompt">$</span> npx prisma init
+
+<span class="cmd-comment"># Animaciones</span>
+<span class="cmd-prompt">$</span> npm install framer-motion
+
+<span class="cmd-comment"># Componentes de UI profesionales</span>
+<span class="cmd-prompt">$</span> npx shadcn@latest init
+
+<span class="cmd-comment"># Formularios con validación</span>
+<span class="cmd-prompt">$</span> npm install react-hook-form zod @hookform/resolvers</pre>
+  </div>
+
+  <h3>¿Qué hace cada uno?</h3>
+  <div class="cards">
+    <div class="card c-next">
+      <div class="card-icon">🗄️</div>
+      <div class="card-title">prisma + @prisma/client</div>
+      <div class="card-desc"><strong>prisma</strong> es la herramienta de configuración. <strong>@prisma/client</strong> es el que usás en el código para consultar la base de datos.</div>
+    </div>
+    <div class="card c-purple">
+      <div class="card-icon">✨</div>
+      <div class="card-title">framer-motion</div>
+      <div class="card-desc">Animaciones declarativas. Escribís qué querés animar, no cómo. El resultado parece una app nativa.</div>
+    </div>
+    <div class="card c-amber">
+      <div class="card-icon">🧱</div>
+      <div class="card-title">shadcn/ui</div>
+      <div class="card-desc">No instala una librería: copia componentes en tu proyecto. Controlás el código 100%. Botones, modales, formularios.</div>
+    </div>
+    <div class="card c-coral">
+      <div class="card-icon">📋</div>
+      <div class="card-title">react-hook-form + zod</div>
+      <div class="card-desc"><strong>react-hook-form</strong> maneja formularios eficientemente. <strong>zod</strong> define y valida la forma de los datos.</div>
+    </div>
+  </div>
+
+  <h3>¿Cómo lo hicimos con IA hoy?</h3>
+  <p>Usamos <strong>Claude Sonnet 4.6</strong> (vía Cursor o desde claude.ai) para crear la estructura inicial del proyecto. Le dimos el prompt con la descripción del sistema y la IA generó la arquitectura de carpetas, los modelos de Prisma y los primeros componentes. Después nosotros evaluamos, corregimos y tomamos las decisiones finales.</p>
+  <div class="callout callout-tip">
+    <div class="callout-icon">🤖</div>
+    <div class="callout-body">
+      <div class="callout-title">Flujo profesional con IA</div>
+      <div class="callout-text"><strong>1)</strong> Describís el problema claramente a la IA. <strong>2)</strong> La IA genera una propuesta. <strong>3)</strong> Vos la revisás, entendés cada parte y ajustás. <strong>4)</strong> Integrás al proyecto. La IA genera rápido; el criterio lo ponés vos.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- S6: BASE DE DATOS / PRISMA -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="s6">
+  <div class="section-num">07 — Backend</div>
+  <h2>Base de datos con <span class="hi-next">Prisma ORM</span></h2>
+  <p class="section-intro">Prisma es el puente entre tu código TypeScript y la base de datos. En vez de escribir SQL crudo, escribís objetos TypeScript y Prisma los traduce. Además detecta errores de tipos antes de ejecutar.</p>
+
+  <h3>¿Qué es un ORM?</h3>
+  <p>ORM significa <em>Object-Relational Mapper</em>. Traduce tablas de la base de datos en objetos de código. Sin ORM escribís: <code>SELECT * FROM reservas WHERE fecha = '2026-05-27'</code>. Con Prisma escribís: <code>prisma.reserva.findMany({"{"} where: {"{"} fecha {"}"} {"}"} )</code>. Más legible, más seguro, con autocompletado.</p>
+
+  <h3>El schema.prisma — el corazón de la base de datos</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">prisma</span><span class="code-label">prisma/schema.prisma</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+    <pre><span class="cm">// Motor de base de datos (SQLite para desarrollo, PostgreSQL para producción)</span>
+<span class="kw">datasource</span> db {
+  provider = <span class="str">"sqlite"</span>
+  url      = <span class="fn">env</span>(<span class="str">"DATABASE_URL"</span>)
+}
+
+<span class="kw">generator</span> client {
+  provider = <span class="str">"prisma-client-js"</span>
+}
+
+<span class="cm">// MODELO: Mesa del restaurante</span>
+<span class="kw">model</span> <span class="ty">Mesa</span> {
+  id        <span class="ty">Int</span>       <span class="op">@id @default(autoincrement())</span>
+  numero    <span class="ty">Int</span>       <span class="op">@unique</span>
+  capacidad <span class="ty">Int</span>
+  reservas  <span class="ty">Reserva[]</span>
+  createdAt <span class="ty">DateTime</span>  <span class="op">@default(now())</span>
+}
+
+<span class="cm">// MODELO: Cliente</span>
+<span class="kw">model</span> <span class="ty">Cliente</span> {
+  id       <span class="ty">Int</span>       <span class="op">@id @default(autoincrement())</span>
+  nombre   <span class="ty">String</span>
+  email    <span class="ty">String</span>    <span class="op">@unique</span>
+  telefono <span class="ty">String?</span>   <span class="cm">// ? = campo opcional</span>
+  reservas <span class="ty">Reserva[]</span>
+}
+
+<span class="cm">// MODELO: Reserva (el núcleo del MVP)</span>
+<span class="kw">model</span> <span class="ty">Reserva</span> {
+  id        <span class="ty">Int</span>          <span class="op">@id @default(autoincrement())</span>
+  fecha     <span class="ty">DateTime</span>
+  horario   <span class="ty">String</span>       <span class="cm">// "12:00", "13:30", "20:00"</span>
+  personas  <span class="ty">Int</span>
+  estado    <span class="ty">EstadoReserva</span> <span class="op">@default(PENDIENTE)</span>
+  notas     <span class="ty">String?</span>
+  
+  <span class="cm">// Relaciones</span>
+  mesaId    <span class="ty">Int</span>
+  mesa      <span class="ty">Mesa</span>     <span class="op">@relation(fields: [mesaId], references: [id])</span>
+  clienteId <span class="ty">Int</span>
+  cliente   <span class="ty">Cliente</span>  <span class="op">@relation(fields: [clienteId], references: [id])</span>
+  
+  createdAt <span class="ty">DateTime</span> <span class="op">@default(now())</span>
+  updatedAt <span class="ty">DateTime</span> <span class="op">@updatedAt</span>
+}
+
+<span class="cm">// ENUM: estados posibles de una reserva</span>
+<span class="kw">enum</span> <span class="ty">EstadoReserva</span> {
+  PENDIENTE
+  CONFIRMADA
+  CANCELADA
+  COMPLETADA
+}</pre>
+  </div>
+
+  <h3>Migraciones — crear las tablas en la BD</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">bash</span><span class="code-label">terminal</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+    <pre><span class="cmd-prompt">$</span> npx prisma migrate dev --name init   <span class="cmd-comment"># crea las tablas basándose en el schema</span>
+<span class="cmd-prompt">$</span> npx prisma studio                    <span class="cmd-comment"># abre una UI visual para ver/editar la BD</span>
+<span class="cmd-prompt">$</span> npx prisma generate                  <span class="cmd-comment"># regenera el cliente TypeScript</span></pre>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-icon">🔷</div>
+    <div class="callout-body">
+      <div class="callout-title">¿Qué es una migración?</div>
+      <div class="callout-text">Una migración es el registro de cada cambio que hacés en la estructura de la base de datos. Si agregás un campo nuevo al modelo, la migración guarda ese cambio como un archivo. Así podés replicar exactamente la misma base de datos en otro servidor o computadora.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- S7: API REST -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="s7">
+  <div class="section-num">08 — API</div>
+  <h2>API REST con <span class="hi-react">route.ts</span></h2>
+  <p class="section-intro">En Next.js con App Router, las APIs se crean con archivos <code>route.ts</code> dentro de la carpeta <code>app/api/</code>. Cada archivo exporta funciones con el nombre del método HTTP que maneja.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">typescript</span><span class="code-label">src/app/api/reservas/route.ts</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+    <pre><span class="kw">import</span> { <span class="ty">NextRequest</span>, <span class="ty">NextResponse</span> } <span class="kw">from</span> <span class="str">'next/server'</span>
+<span class="kw">import</span> { prisma } <span class="kw">from</span> <span class="str">'@/lib/prisma'</span>
+
+<span class="cm">// GET /api/reservas — trae todas las reservas</span>
+<span class="kw">export async function</span> <span class="fn">GET</span>() {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> reservas = <span class="kw">await</span> prisma.reserva.<span class="fn">findMany</span>({
+      include: {
+        cliente: <span class="kw">true</span>,    <span class="cm">// incluye los datos del cliente</span>
+        mesa: <span class="kw">true</span>,       <span class="cm">// incluye los datos de la mesa</span>
+      },
+      orderBy: { fecha: <span class="str">'asc'</span> }
+    })
+    <span class="kw">return</span> <span class="ty">NextResponse</span>.<span class="fn">json</span>(reservas)
+  } <span class="kw">catch</span> (error) {
+    <span class="kw">return</span> <span class="ty">NextResponse</span>.<span class="fn">json</span>(
+      { error: <span class="str">'Error al obtener reservas'</span> },
+      { status: <span class="num">500</span> }
+    )
+  }
+}
+
+<span class="cm">// POST /api/reservas — crea una nueva reserva</span>
+<span class="kw">export async function</span> <span class="fn">POST</span>(request: <span class="ty">NextRequest</span>) {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> body = <span class="kw">await</span> request.<span class="fn">json</span>()
+    
+    <span class="kw">const</span> reserva = <span class="kw">await</span> prisma.reserva.<span class="fn">create</span>({
+      data: {
+        fecha:    <span class="kw">new</span> <span class="ty">Date</span>(body.fecha),
+        horario:  body.horario,
+        personas: body.personas,
+        mesaId:   body.mesaId,
+        clienteId: body.clienteId,
+        notas:    body.notas,
+      }
+    })
+    
+    <span class="kw">return</span> <span class="ty">NextResponse</span>.<span class="fn">json</span>(reserva, { status: <span class="num">201</span> })
+  } <span class="kw">catch</span> (error) {
+    <span class="kw">return</span> <span class="ty">NextResponse</span>.<span class="fn">json</span>(
+      { error: <span class="str">'Error al crear la reserva'</span> },
+      { status: <span class="num">500</span> }
+    )
+  }
+}</pre>
+  </div>
+
+  <h3>Cliente de Prisma — archivo lib/prisma.ts</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">typescript</span><span class="code-label">src/lib/prisma.ts</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+    <pre><span class="kw">import</span> { <span class="ty">PrismaClient</span> } <span class="kw">from</span> <span class="str">'@prisma/client'</span>
+
+<span class="cm">// Patrón singleton: evita crear múltiples conexiones en desarrollo</span>
+<span class="kw">const</span> globalForPrisma = globalThis <span class="kw">as unknown as</span> {
+  prisma: <span class="ty">PrismaClient</span> | <span class="kw">undefined</span>
+}
+
+<span class="kw">export const</span> prisma = globalForPrisma.prisma ?? <span class="kw">new</span> <span class="ty">PrismaClient</span>()
+
+<span class="kw">if</span> (process.env.<span class="prop">NODE_ENV</span> !== <span class="str">'production'</span>) {
+  globalForPrisma.prisma = prisma
+}</pre>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- S8: TAILWIND + COMPONENTES -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="s8">
+  <div class="section-num">09 — Frontend</div>
+  <h2>Tailwind CSS y <span class="hi-amber">componentes</span></h2>
+  <p class="section-intro">Tailwind CSS te permite diseñar directamente en el HTML usando clases de utilidad. En vez de escribir CSS separado, describís el estilo con clases como <code>bg-blue-500</code>, <code>p-4</code>, <code>rounded-lg</code>.</p>
+
+  <h3>Ejemplo: formulario de reserva</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">tsx</span><span class="code-label">src/components/ReservaForm.tsx (simplificado)</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+    <pre><span class="str">"use client"</span>   <span class="cm">// este componente corre en el navegador (no en el servidor)</span>
+
+<span class="kw">import</span> { useForm } <span class="kw">from</span> <span class="str">'react-hook-form'</span>
+<span class="kw">import</span> { motion } <span class="kw">from</span> <span class="str">'framer-motion'</span>
+
+<span class="kw">export function</span> <span class="fn">ReservaForm</span>() {
+  <span class="kw">const</span> { register, handleSubmit } = <span class="fn">useForm</span>()
+
+  <span class="kw">const</span> <span class="fn">onSubmit</span> = <span class="kw">async</span> (data) => {
+    <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'/api/reservas'</span>, {
+      method: <span class="str">'POST'</span>,
+      body: <span class="ty">JSON</span>.<span class="fn">stringify</span>(data)
+    })
+  }
+
+  <span class="kw">return</span> (
+    <span class="tag">&lt;motion.div</span>
+      <span class="attr">initial</span>=<span class="val">{{ opacity: 0, y: 20 }}</span>
+      <span class="attr">animate</span>=<span class="val">{{ opacity: 1, y: 0 }}</span>
+      <span class="attr">transition</span>=<span class="val">{{ duration: 0.4 }}</span>
+      <span class="attr">className</span>=<span class="val">"bg-white rounded-2xl shadow-lg p-8 max-w-md"</span>
+    <span class="tag">&gt;</span>
+      <span class="tag">&lt;h2</span> <span class="attr">className</span>=<span class="val">"text-2xl font-bold mb-6"</span><span class="tag">&gt;</span>Nueva Reserva<span class="tag">&lt;/h2&gt;</span>
+      
+      <span class="tag">&lt;form</span> <span class="attr">onSubmit</span>=<span class="val">{handleSubmit(onSubmit)}</span> <span class="attr">className</span>=<span class="val">"space-y-4"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;input</span>
+          <span class="attr">type</span>=<span class="val">"date"</span>
+          <span class="attr">{...register('fecha')}</span>
+          <span class="attr">className</span>=<span class="val">"w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-500"</span>
+        <span class="tag">/&gt;</span>
+        <span class="tag">&lt;input</span>
+          <span class="attr">type</span>=<span class="val">"number"</span>
+          <span class="attr">placeholder</span>=<span class="val">"Cantidad de personas"</span>
+          <span class="attr">{...register('personas')}</span>
+          <span class="attr">className</span>=<span class="val">"w-full border rounded-lg p-3"</span>
+        <span class="tag">/&gt;</span>
+        <span class="tag">&lt;button</span>
+          <span class="attr">type</span>=<span class="val">"submit"</span>
+          <span class="attr">className</span>=<span class="val">"w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"</span>
+        <span class="tag">&gt;</span>
+          Confirmar Reserva
+        <span class="tag">&lt;/button&gt;</span>
+      <span class="tag">&lt;/form&gt;</span>
+    <span class="tag">&lt;/motion.div&gt;</span>
+  )
+}</pre>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- S9: FRAMER MOTION -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="s9">
+  <div class="section-num">10 — Animaciones</div>
+  <h2>Framer Motion — <span class="hi-purple">animaciones</span> profesionales</h2>
+  <p class="section-intro">Framer Motion hace que las interfaces se muevan de forma natural. En vez de escribir keyframes CSS complejos, describís el estado inicial y el estado final, y la librería calcula la animación.</p>
+
+  <h3>Los tres props fundamentales</h3>
+  <div class="cards">
+    <div class="card c-react">
+      <div class="card-icon">🎬</div>
+      <div class="card-title">initial</div>
+      <div class="card-desc">El estado <strong>antes</strong> de que el componente aparezca. Ejemplo: <code>opacity: 0</code>, <code>y: 20</code></div>
+    </div>
+    <div class="card c-next">
+      <div class="card-icon">✅</div>
+      <div class="card-title">animate</div>
+      <div class="card-desc">El estado <strong>final</strong> al que llega el componente. Ejemplo: <code>opacity: 1</code>, <code>y: 0</code></div>
+    </div>
+    <div class="card c-purple">
+      <div class="card-icon">⏱️</div>
+      <div class="card-title">transition</div>
+      <div class="card-desc">Cómo se hace la transición. <code>duration</code>, <code>delay</code>, <code>ease</code>, <code>type: "spring"</code></div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">tsx</span><span class="code-label">ejemplos de animaciones</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+    <pre><span class="kw">import</span> { motion } <span class="kw">from</span> <span class="str">'framer-motion'</span>
+
+<span class="cm">// 1. Aparecer desde abajo (fade up) — el más usado</span>
+<span class="tag">&lt;motion.div</span>
+  <span class="attr">initial</span>=<span class="val">{{ opacity: 0, y: 30 }}</span>
+  <span class="attr">animate</span>=<span class="val">{{ opacity: 1, y: 0 }}</span>
+  <span class="attr">transition</span>=<span class="val">{{ duration: 0.5 }}</span>
+<span class="tag">&gt;</span>
+  Contenido que aparece animado
+<span class="tag">&lt;/motion.div&gt;</span>
+
+<span class="cm">// 2. Efecto "spring" — rebote natural</span>
+<span class="tag">&lt;motion.button</span>
+  <span class="attr">whileHover</span>=<span class="val">{{ scale: 1.05 }}</span>
+  <span class="attr">whileTap</span>=<span class="val">{{ scale: 0.95 }}</span>
+  <span class="attr">transition</span>=<span class="val">{{ type: "spring", stiffness: 400 }}</span>
+<span class="tag">&gt;</span>
+  Botón con rebote
+<span class="tag">&lt;/motion.button&gt;</span>
+
+<span class="cm">// 3. Lista con animación escalonada (stagger)</span>
+<span class="tag">&lt;motion.ul</span>
+  <span class="attr">variants</span>=<span class="val">{{</span>
+    <span class="val">show: { transition: { staggerChildren: 0.1 } }</span>
+  <span class="val">}}</span>
+  <span class="attr">initial</span>=<span class="val">"hidden"</span>
+  <span class="attr">animate</span>=<span class="val">"show"</span>
+<span class="tag">&gt;</span>
+  {reservas.map(r =&gt; (
+    <span class="tag">&lt;motion.li</span>
+      <span class="attr">key</span>=<span class="val">{r.id}</span>
+      <span class="attr">variants</span>=<span class="val">{{ hidden: { opacity: 0 }, show: { opacity: 1 } }}</span>
+    <span class="tag">&gt;</span>
+      {r.cliente.nombre}
+    <span class="tag">&lt;/motion.li&gt;</span>
+  ))}
+<span class="tag">&lt;/motion.ul&gt;</span></pre>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- S10: MVP DEL SISTEMA DE RESERVAS -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="s10">
+  <div class="section-num">11 — Proyecto</div>
+  <h2>MVP del <span class="hi-next">Sistema de Reservas</span></h2>
+  <p class="section-intro">Un MVP (Minimum Viable Product) es la versión mínima que funciona y entrega valor real. No tiene todo, pero lo que tiene funciona bien. Primero construimos el MVP; después agregamos funcionalidades.</p>
+
+  <div class="mvp-grid">
+    <div class="mvp-col col-mvp">
+      <div class="mvp-col-header">✅ MVP — Lo construimos primero</div>
+      <div class="mvp-col-body">
+        <div class="mvp-item"><div class="mvp-dot dot-green"></div>Gestión de clientes (nombre, email, teléfono)</div>
+        <div class="mvp-item"><div class="mvp-dot dot-green"></div>Gestión de mesas (número, capacidad)</div>
+        <div class="mvp-item"><div class="mvp-dot dot-green"></div>Crear reserva (fecha, horario, personas, mesa)</div>
+        <div class="mvp-item"><div class="mvp-dot dot-green"></div>Ver reservas del día en un calendario simple</div>
+        <div class="mvp-item"><div class="mvp-dot dot-green"></div>Cambiar estado de reserva (confirmar / cancelar)</div>
+        <div class="mvp-item"><div class="mvp-dot dot-green"></div>API REST para todas estas operaciones</div>
+        <div class="mvp-item"><div class="mvp-dot dot-green"></div>Dashboard básico para el admin del restaurante</div>
+      </div>
+    </div>
+    <div class="mvp-col col-future">
+      <div class="mvp-col-header">🔮 Versiones futuras</div>
+      <div class="mvp-col-body">
+        <div class="mvp-item"><div class="mvp-dot dot-purple"></div>Autenticación (login para admin)</div>
+        <div class="mvp-item"><div class="mvp-dot dot-purple"></div>Pedidos online desde la reserva</div>
+        <div class="mvp-item"><div class="mvp-dot dot-purple"></div>Carta QR generada dinámicamente</div>
+        <div class="mvp-item"><div class="mvp-dot dot-purple"></div>Notificaciones por email/WhatsApp</div>
+        <div class="mvp-item"><div class="mvp-dot dot-purple"></div>Estadísticas de ocupación</div>
+        <div class="mvp-item"><div class="mvp-dot dot-purple"></div>App móvil para el personal</div>
+        <div class="mvp-item"><div class="mvp-dot dot-purple"></div>Integración con sistemas de pago</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Arquitectura del MVP</h3>
+  <div class="arch-diagram"><span class="arch-next">┌─────────────────────────────────────────────────────────┐
+│                    NEXT.JS (Full Stack)                  │
+│                                                         │
+│  FRONTEND (React + Tailwind + Framer Motion)            │
+│  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐ │
+│  │  /           │  │  /reservas   │  │  /admin       │ │
+│  │  Landing     │  │  Formulario  │  │  Dashboard    │ │
+│  │  (público)   │  │  de reserva  │  │  (protegido)  │ │
+│  └──────────────┘  └──────────────┘  └───────────────┘ │
+│                                                         │
+│  BACKEND (API Routes)                                   │
+│  ┌──────────────────────────────────────────────────┐  │
+│  │  /api/reservas   GET · POST · PATCH · DELETE     │  │
+│  │  /api/mesas      GET · POST                      │  │
+│  │  /api/clientes   GET · POST                      │  │
+│  └──────────────────────────────────────────────────┘  │
+│                                                         │
+│  PRISMA ORM                                             │
+│  ┌──────────────────────────────────────────────────┐  │
+│  │  Reserva  ←──→  Mesa                             │  │
+│  │     └──────────→ Cliente                         │  │
+│  └──────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+            ┌─────────────────────────┐
+            │   SQLite (dev)          │
+            │   PostgreSQL (prod)     │
+            └─────────────────────────┘</span></div>
+
+  <div class="exercise">
+    <div class="exercise-header">
+      <span class="exercise-badge">Desafío para la próxima clase</span>
+      <span class="exercise-title">Extender el MVP</span>
+    </div>
+    <ul class="exercise-list">
+      <li>Agregar el campo <code>telefono</code> al modelo <code>Cliente</code> en el schema y correr la migración</li>
+      <li>Crear el endpoint <code>GET /api/reservas/[id]</code> para traer una reserva por ID</li>
+      <li>Agregar una animación de entrada al formulario de reserva con Framer Motion</li>
+      <li>Usar Claude o Copilot para generar el componente de tarjeta de reserva, revisarlo y adaptarlo</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- S11: BUENAS PRÁCTICAS -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="s11">
+  <div class="section-num">12 — Buenas prácticas</div>
+  <h2>Código <span class="hi-mint">profesional</span>: lo que diferencia</h2>
+  <p class="section-intro">El código que funciona y el código profesional no son lo mismo. Estas prácticas son las que distinguen un proyecto mantenible de uno que nadie puede tocar después de seis meses.</p>
+
+  <h3>Variables de entorno</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">bash</span><span class="code-label">.env (nunca lo subas a GitHub)</span></div>
+    <pre><span class="cm"># URL de la base de datos</span>
+DATABASE_URL=<span class="str">"file:./dev.db"</span>
+
+<span class="cm"># En producción sería algo así:</span>
+<span class="cm"># DATABASE_URL="postgresql://user:password@host:5432/reservas"</span>
+
+<span class="cm"># Para autenticación (futuro)</span>
+NEXTAUTH_SECRET=<span class="str">"una-clave-secreta-muy-larga"</span></pre>
+  </div>
+
+  <h3>Errores comunes a evitar</h3>
+  <div class="callout callout-error">
+    <div class="callout-icon">❌</div>
+    <div class="callout-body">
+      <div class="callout-title">Errores frecuentes de principiantes</div>
+      <div class="callout-text">
+        <strong>1)</strong> Hardcodear contraseñas en el código: <code>password: "admin123"</code>. Siempre en <code>.env</code>.<br>
+        <strong>2)</strong> No validar los datos que llegan de la API. Siempre usá Zod para validar el <code>body</code>.<br>
+        <strong>3)</strong> Crear un nuevo <code>PrismaClient</code> en cada request. Usá el patrón singleton de <code>lib/prisma.ts</code>.<br>
+        <strong>4)</strong> Poner lógica de base de datos en el componente. Eso va en la API o en Server Components.<br>
+        <strong>5)</strong> No manejar los errores en los <code>try/catch</code> de la API.
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-tip">
+    <div class="callout-icon">✨</div>
+    <div class="callout-body">
+      <div class="callout-title">Principios de Clean Architecture</div>
+      <div class="callout-text">
+        <strong>Separación de responsabilidades:</strong> un componente hace una sola cosa. <code>ReservaForm</code> maneja el formulario; <code>ReservaCard</code> muestra la reserva.<br><br>
+        <strong>Modularidad:</strong> cada módulo es independiente y reemplazable sin romper el resto.<br><br>
+        <strong>Escalabilidad:</strong> el código nuevo no rompe el código viejo. Agregás, no modificás.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- S12: BIBLIOGRAFÍA -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="s12">
+  <div class="section-num">13 — Bibliografía</div>
+  <h2>Recursos y <span class="hi-amber">bibliografía</span></h2>
+  <p class="section-intro">Estas son las fuentes que usamos como referencia para la materia. Toda documentación oficial y gratuita.</p>
+
+  <h3>Documentación oficial</h3>
+  <div class="bib-list">
+    <a class="bib-card" href="https://nextjs.org/docs" target="_blank">
+      <div class="bib-icon">▲</div>
+      <div class="bib-info">
+        <div class="bib-title">Next.js Documentation</div>
+        <div class="bib-url">nextjs.org/docs</div>
+        <div class="bib-desc">Documentación oficial completa. App Router, rutas, API, Server Components.</div>
+      </div>
+    </a>
+    <a class="bib-card" href="https://www.prisma.io/docs" target="_blank">
+      <div class="bib-icon">🗄️</div>
+      <div class="bib-info">
+        <div class="bib-title">Prisma Documentation</div>
+        <div class="bib-url">prisma.io/docs</div>
+        <div class="bib-desc">ORM, schema, migraciones, cliente, relaciones entre modelos.</div>
+      </div>
+    </a>
+    <a class="bib-card" href="https://www.framer.com/motion" target="_blank">
+      <div class="bib-icon">✨</div>
+      <div class="bib-info">
+        <div class="bib-title">Framer Motion Docs</div>
+        <div class="bib-url">framer.com/motion</div>
+        <div class="bib-desc">Animaciones, variants, gestures, layout animations.</div>
+      </div>
+    </a>
+    <a class="bib-card" href="https://tailwindcss.com/docs" target="_blank">
+      <div class="bib-icon">🎨</div>
+      <div class="bib-info">
+        <div class="bib-title">Tailwind CSS Docs</div>
+        <div class="bib-url">tailwindcss.com/docs</div>
+        <div class="bib-desc">Todas las clases de utilidad, configuración, responsive design.</div>
+      </div>
+    </a>
+    <a class="bib-card" href="https://ui.shadcn.com" target="_blank">
+      <div class="bib-icon">🧱</div>
+      <div class="bib-info">
+        <div class="bib-title">shadcn/ui</div>
+        <div class="bib-url">ui.shadcn.com</div>
+        <div class="bib-desc">Componentes de UI. Botones, formularios, tablas, calendarios.</div>
+      </div>
+    </a>
+    <a class="bib-card" href="https://react-hook-form.com" target="_blank">
+      <div class="bib-icon">📋</div>
+      <div class="bib-info">
+        <div class="bib-title">React Hook Form</div>
+        <div class="bib-url">react-hook-form.com</div>
+        <div class="bib-desc">Manejo de formularios performante. Integración con Zod para validación.</div>
+      </div>
+    </a>
+    <a class="bib-card" href="https://zod.dev" target="_blank">
+      <div class="bib-icon">🛡️</div>
+      <div class="bib-info">
+        <div class="bib-title">Zod Documentation</div>
+        <div class="bib-url">zod.dev</div>
+        <div class="bib-desc">Validación de esquemas TypeScript. Define y valida la forma de los datos.</div>
+      </div>
+    </a>
+    <a class="bib-card" href="https://stackblitz.com" target="_blank">
+      <div class="bib-icon">⚡</div>
+      <div class="bib-info">
+        <div class="bib-title">StackBlitz</div>
+        <div class="bib-url">stackblitz.com</div>
+        <div class="bib-desc">IDE en el navegador. Crear proyectos Next.js sin instalar nada.</div>
+      </div>
+    </a>
+    <a class="bib-card" href="https://claude.ai" target="_blank">
+      <div class="bib-icon">🤖</div>
+      <div class="bib-info">
+        <div class="bib-title">Claude (Anthropic)</div>
+        <div class="bib-url">claude.ai</div>
+        <div class="bib-desc">IA para asistencia en código. Claude Sonnet 4.6 — el modelo usado en clase.</div>
+      </div>
+    </a>
+    <a class="bib-card" href="https://v0.dev" target="_blank">
+      <div class="bib-icon">🎨</div>
+      <div class="bib-info">
+        <div class="bib-title">v0 by Vercel</div>
+        <div class="bib-url">v0.dev</div>
+        <div class="bib-desc">Generación de interfaces con IA. Produce componentes React + Tailwind.</div>
+      </div>
+    </a>
+    <a class="bib-card" href="https://git-scm.com/doc" target="_blank">
+      <div class="bib-icon">🔧</div>
+      <div class="bib-info">
+        <div class="bib-title">Git Documentation</div>
+        <div class="bib-url">git-scm.com/doc</div>
+        <div class="bib-desc">Control de versiones. Comandos, flujos de trabajo, ramas.</div>
+      </div>
+    </a>
+    <a class="bib-card" href="https://www.typescriptlang.org/docs" target="_blank">
+      <div class="bib-icon">🔷</div>
+      <div class="bib-info">
+        <div class="bib-title">TypeScript Handbook</div>
+        <div class="bib-url">typescriptlang.org/docs</div>
+        <div class="bib-desc">Tipos, interfaces, generics, enums. La base para todo el stack.</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-text">ISFDyT N°26 · Tecnicatura Superior en Desarrollo de Software · 2026</div>
+  <div class="footer-text">Programación y Desarrollo de Apps Móviles · 2° año · Clase 3</div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// Progress bar
+window.addEventListener('scroll', () => {
+  const scrollTop = document.documentElement.scrollTop
+  const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight
+  const progress = scrollTop / scrollHeight
+  document.getElementById('progressBar').style.transform = `scaleX(${progress})`
+})
+
+// Active nav items
+const sections = document.querySelectorAll('.section')
+const navItems = document.querySelectorAll('.nav-item')
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navItems.forEach(item => item.classList.remove('active'))
+      const id = entry.target.id
+      const active = document.querySelector(`.nav-item[href="#${id}"]`)
+      if (active) active.classList.add('active')
+    }
+  })
+}, { threshold: 0.3 })
+sections.forEach(s => observer.observe(s))
+
+// Copy code
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre')
+  const text = pre.innerText
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ copiado'
+    setTimeout(() => btn.textContent = 'copiar', 2000)
+  })
+}
+</script>
+</body>
+</html>

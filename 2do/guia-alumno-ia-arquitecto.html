@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IA como Arquitecto de Software — Guía del Alumno</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue-50: #E6F1FB; --blue-100: #B5D4F4; --blue-400: #378ADD; --blue-600: #185FA5; --blue-800: #0C447C; --blue-900: #042C53;
+    --teal-50: #E1F5EE; --teal-100: #9FE1CB; --teal-400: #1D9E75; --teal-600: #0F6E56; --teal-800: #085041;
+    --amber-50: #FAEEDA; --amber-100: #FAC775; --amber-400: #EF9F27; --amber-600: #854F0B; --amber-800: #633806;
+    --coral-50: #FAECE7; --coral-100: #F5C4B3; --coral-400: #D85A30; --coral-600: #993C1D; --coral-800: #712B13;
+    --purple-50: #EEEDFE; --purple-100: #CECBF6; --purple-600: #534AB7; --purple-800: #3C3489;
+    --gray-50: #F1EFE8; --gray-100: #D3D1C7; --gray-400: #888780; --gray-600: #5F5E5A; --gray-800: #444441;
+    --bg: #FAFAF8;
+    --surface: #FFFFFF;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.15);
+    --text: #1A1A18;
+    --text-muted: #5F5E5A;
+    --text-subtle: #888780;
+    --font-sans: 'Plus Jakarta Sans', sans-serif;
+    --font-serif: 'DM Serif Display', serif;
+    --font-mono: 'DM Mono', monospace;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(250,250,248,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--border-strong);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    height: 56px;
+    gap: 0;
+  }
+  .nav-logo {
+    font-family: var(--font-serif);
+    font-size: 17px;
+    color: var(--text);
+    margin-right: 2rem;
+    white-space: nowrap;
+  }
+  .nav-links {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 0 14px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .nav-links a:hover { color: var(--text); border-bottom-color: var(--border-strong); }
+  .nav-links a.active { color: var(--blue-600); border-bottom-color: var(--blue-600); }
+  .nav-badge {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    background: var(--blue-50);
+    color: var(--blue-800);
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--blue-900) 0%, #0a3a6e 50%, #0F6E56 100%);
+    padding: 5rem 2rem 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--teal-100);
+    background: rgba(255,255,255,0.1);
+    padding: 5px 14px;
+    border-radius: 99px;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    color: #FFFFFF;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+  .hero h1 em { color: var(--teal-100); font-style: italic; }
+  .hero-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.65);
+    max-width: 560px;
+    margin: 0 auto 2.5rem;
+  }
+  .hero-pills {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .hero-pill {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 99px;
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.85);
+    border: 0.5px solid rgba(255,255,255,0.2);
+  }
+
+  /* MAIN LAYOUT */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 4rem 0;
+    border-bottom: 0.5px solid var(--border);
+  }
+  section:last-child { border-bottom: none; }
+
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--blue-600);
+    margin-bottom: 0.75rem;
+  }
+  .section-label::before {
+    content: '';
+    width: 18px;
+    height: 2px;
+    background: var(--blue-400);
+    border-radius: 2px;
+  }
+  .section-title {
+    font-family: var(--font-serif);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+  }
+  .section-desc {
+    font-size: 15px;
+    color: var(--text-muted);
+    max-width: 640px;
+    margin-bottom: 2.5rem;
+  }
+
+  /* ROADMAP VISUAL */
+  .roadmap {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    position: relative;
+    margin: 2rem 0;
+  }
+  .roadmap::before {
+    content: '';
+    position: absolute;
+    top: 36px;
+    left: calc(12.5% + 12px);
+    right: calc(12.5% + 12px);
+    height: 2px;
+    background: linear-gradient(to right, var(--blue-400), var(--teal-400), var(--amber-400), var(--coral-400));
+    z-index: 0;
+  }
+  .rm-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .rm-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 1rem;
+    border: 3px solid var(--surface);
+    box-shadow: 0 0 0 2px var(--border);
+  }
+  .rm-icon.blue { background: var(--blue-50); }
+  .rm-icon.teal { background: var(--teal-50); }
+  .rm-icon.amber { background: var(--amber-50); }
+  .rm-icon.coral { background: var(--coral-50); }
+  .rm-step-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .rm-step-sub { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+  .card-icon {
+    width: 40px; height: 40px;
+    border-radius: var(--radius);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .card-icon.blue { background: var(--blue-50); }
+  .card-icon.teal { background: var(--teal-50); }
+  .card-icon.amber { background: var(--amber-50); }
+  .card-icon.coral { background: var(--coral-50); }
+  .card-icon.purple { background: var(--purple-50); }
+  .card-title { font-size: 15px; font-weight: 600; color: var(--text); }
+  .card-subtitle { font-size: 12px; color: var(--text-muted); }
+
+  /* TWO ROLE COMPARISON */
+  .roles-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+  .role-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    border: 0.5px solid var(--border-strong);
+  }
+  .role-card.architect { border-top: 3px solid var(--blue-400); }
+  .role-card.executor { border-top: 3px solid var(--teal-400); }
+  .role-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+  .role-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 99px;
+  }
+  .role-badge.blue { background: var(--blue-50); color: var(--blue-800); }
+  .role-badge.teal { background: var(--teal-50); color: var(--teal-800); }
+  .role-name { font-size: 16px; font-weight: 600; color: var(--text); }
+  .role-tool { font-size: 12px; color: var(--text-muted); }
+  .role-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .role-list li {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    line-height: 1.45;
+  }
+  .role-list li::before {
+    content: '→';
+    color: var(--blue-400);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .role-card.executor .role-list li::before { color: var(--teal-400); }
+
+  /* FLOW DIAGRAM */
+  .flow-diagram {
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    margin: 2rem 0;
+  }
+  .flow-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-subtle); margin-bottom: 1.5rem; }
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .flow-row:last-child { margin-bottom: 0; }
+  .flow-node {
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .flow-node.blue { background: var(--blue-50); color: var(--blue-800); border: 1px solid var(--blue-100); }
+  .flow-node.teal { background: var(--teal-50); color: var(--teal-800); border: 1px solid var(--teal-100); }
+  .flow-node.amber { background: var(--amber-50); color: var(--amber-800); border: 1px solid var(--amber-100); }
+  .flow-node.coral { background: var(--coral-50); color: var(--coral-800); border: 1px solid var(--coral-100); }
+  .flow-node.gray { background: #FFFFFF; color: var(--gray-800); border: 1px solid var(--gray-100); }
+  .flow-arrow { color: var(--gray-400); font-size: 18px; font-weight: 300; }
+  .flow-label { font-size: 12px; color: var(--text-subtle); padding: 0 4px; }
+
+  /* CODE BLOCKS */
+  .code-wrap { margin: 1.5rem 0; }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--gray-800);
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 10px 16px;
+  }
+  .code-header-left { display: flex; align-items: center; gap: 8px; }
+  .code-dots { display: flex; gap: 5px; }
+  .code-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .code-dot.red { background: #FF5F57; }
+  .code-dot.yellow { background: #FEBC2E; }
+  .code-dot.green { background: #28C840; }
+  .code-lang { font-size: 11px; color: rgba(255,255,255,0.4); font-family: var(--font-mono); }
+  .copy-btn {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.08);
+    border: none;
+    padding: 4px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    transition: background 0.15s;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+  pre {
+    background: #1C1C1A;
+    padding: 1.25rem 1.5rem;
+    border-radius: 0 0 var(--radius) var(--radius);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.75;
+    color: #D4D4C8;
+  }
+  .kw { color: #C792EA; }
+  .str { color: #C3E88D; }
+  .cm { color: #546E7A; font-style: italic; }
+  .hl { color: #82AAFF; }
+  .val { color: #F78C6C; }
+
+  /* CALLOUTS */
+  .callout {
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .callout.info { background: var(--blue-50); border-left: 3px solid var(--blue-400); }
+  .callout.warning { background: var(--amber-50); border-left: 3px solid var(--amber-400); }
+  .callout.success { background: var(--teal-50); border-left: 3px solid var(--teal-400); }
+  .callout.danger { background: var(--coral-50); border-left: 3px solid var(--coral-400); }
+  .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .callout.info .callout-icon { color: var(--blue-600); }
+  .callout.warning .callout-icon { color: var(--amber-600); }
+  .callout.success .callout-icon { color: var(--teal-600); }
+  .callout.danger .callout-icon { color: var(--coral-600); }
+  .callout-body { flex: 1; }
+  .callout-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .callout p { font-size: 13.5px; color: var(--text-muted); margin: 0; line-height: 1.55; }
+
+  /* DATA MODEL SVG */
+  .diagram-wrap {
+    background: var(--surface);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin: 2rem 0;
+    overflow-x: auto;
+  }
+  .diagram-wrap svg { display: block; margin: 0 auto; max-width: 100%; }
+
+  /* STEP BLOCKS */
+  .steps { display: flex; flex-direction: column; gap: 0; position: relative; }
+  .steps::before {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 40px;
+    bottom: 40px;
+    width: 1px;
+    background: var(--border-strong);
+  }
+  .step {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    padding: 1.5rem 0;
+    position: relative;
+  }
+  .step-num {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--blue-600);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 0 0 4px var(--bg);
+  }
+  .step-content { flex: 1; padding-top: 6px; }
+  .step-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .step-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+  /* COMPARISON TABLE */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 0.5px solid var(--border-strong);
+    margin: 1.5rem 0;
+  }
+  .compare-table th {
+    background: var(--gray-50);
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-subtle);
+    border-bottom: 0.5px solid var(--border-strong);
+  }
+  .compare-table td {
+    padding: 12px 16px;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    border-bottom: 0.5px solid var(--border);
+    vertical-align: top;
+  }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:hover td { background: var(--gray-50); }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 99px;
+  }
+  .badge.yes { background: var(--teal-50); color: var(--teal-800); }
+  .badge.no { background: var(--coral-50); color: var(--coral-800); }
+  .badge.blue { background: var(--blue-50); color: var(--blue-800); }
+  .badge.amber { background: var(--amber-50); color: var(--amber-800); }
+
+  /* CHECKLIST */
+  .checklist { display: flex; flex-direction: column; gap: 10px; margin: 1.5rem 0; }
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.15s;
+    user-select: none;
+  }
+  .check-item:hover { background: var(--gray-50); }
+  .check-item input[type=checkbox] {
+    width: 16px; height: 16px;
+    margin-top: 2px;
+    accent-color: var(--blue-600);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .check-item label {
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+    line-height: 1.5;
+  }
+  .check-item.done label { color: var(--text-muted); text-decoration: line-through; }
+
+  /* ACCORDION */
+  .accordion { display: flex; flex-direction: column; gap: 8px; margin: 1.5rem 0; }
+  .acc-item {
+    background: var(--surface);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .acc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    gap: 10px;
+  }
+  .acc-header:hover { background: var(--gray-50); }
+  .acc-arrow { font-size: 16px; color: var(--text-muted); transition: transform 0.2s; flex-shrink: 0; }
+  .acc-item.open .acc-arrow { transform: rotate(90deg); }
+  .acc-body {
+    display: none;
+    padding: 0 16px 16px;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    line-height: 1.65;
+    border-top: 0.5px solid var(--border);
+  }
+  .acc-item.open .acc-body { display: block; }
+
+  /* TAGS */
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 99px;
+    border: 0.5px solid var(--border-strong);
+    color: var(--text-muted);
+    background: var(--surface);
+    margin: 2px;
+  }
+
+  /* GRID CARDS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.5rem 0; }
+  .mini-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem;
+  }
+  .mini-card-icon { font-size: 22px; margin-bottom: 8px; }
+  .mini-card-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .mini-card-desc { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
+
+  /* QUOTE */
+  .blockquote {
+    border-left: 3px solid var(--blue-400);
+    padding: 1rem 1.5rem;
+    background: var(--blue-50);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    margin: 1.5rem 0;
+  }
+  .blockquote p { font-size: 15px; color: var(--blue-800); font-style: italic; margin: 0; line-height: 1.6; }
+  .blockquote cite { font-size: 12px; color: var(--blue-600); font-style: normal; display: block; margin-top: 8px; }
+
+  /* FOOTER */
+  footer {
+    background: var(--gray-800);
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    padding: 2rem;
+    font-size: 13px;
+  }
+  footer strong { color: rgba(255,255,255,0.8); }
+
+  /* PROGRESS BAR */
+  .progress-section {
+    background: var(--surface);
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin: 2rem 0;
+  }
+  .progress-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 1rem; }
+  .progress-row { display: flex; flex-direction: column; gap: 10px; }
+  .progress-item { }
+  .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
+  .progress-bar { height: 6px; background: var(--gray-100); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 99px; }
+  .progress-fill.blue { background: var(--blue-400); }
+  .progress-fill.teal { background: var(--teal-400); }
+  .progress-fill.amber { background: var(--amber-400); }
+  .progress-fill.coral { background: var(--coral-400); }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .roadmap { grid-template-columns: 1fr 1fr; }
+    .roadmap::before { display: none; }
+    .roles-grid { grid-template-columns: 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+    nav { padding: 0 1rem; }
+    .hero { padding: 3rem 1rem 2.5rem; }
+  }
+
+  @media (max-width: 420px) {
+    .grid-3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-logo">🏗️ IA Arquitecto</span>
+  <div class="nav-links">
+    <a href="#roadmap" class="active">Roadmap</a>
+    <a href="#roles">Los roles</a>
+    <a href="#caso">Caso de estudio</a>
+    <a href="#prompts">Prompts</a>
+    <a href="#practica">Práctica</a>
+    <a href="#checklist">Checklist</a>
+  </div>
+  <span class="nav-badge">2do y 3er año · Soft</span>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-eyebrow">Clase de unificación · IA en el desarrollo</span>
+  <h1>IA como <em>arquitecto</em><br>de software</h1>
+  <p class="hero-sub">Aprendé a separar el rol de quien <strong>diseña</strong> del rol de quien <strong>ejecuta</strong> — y por qué esto cambia completamente cómo se construye software con IA.</p>
+  <div class="hero-pills">
+    <span class="hero-pill">💡 Idea → Visión → Core → MVP</span>
+    <span class="hero-pill">🧠 GPT como arquitecto</span>
+    <span class="hero-pill">⚡ Antigravity como ejecutor</span>
+    <span class="hero-pill">🚗 Caso real: agencia de autos</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+
+  <!-- SECCIÓN 1: EL PROBLEMA -->
+  <section>
+    <div class="section-label">El punto de partida</div>
+    <h2 class="section-title">¿Por qué no alcanza con pedirle código a la IA?</h2>
+    <p class="section-desc">Cuando le pedís a un IDE con IA que "haga una app de gestión de autos", el modelo no sabe qué querés realmente. Adivina. Y lo que genera es genérico, incompleto o no escala.</p>
+
+    <div class="grid-3">
+      <div class="mini-card">
+        <div class="mini-card-icon">🎲</div>
+        <div class="mini-card-title">El modelo adivina</div>
+        <div class="mini-card-desc">Sin contexto claro, el ejecutor toma decisiones de diseño que vos no pediste. Puede estar bien o puede estar todo mal.</div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-icon">🔄</div>
+        <div class="mini-card-title">Cambios constantes</div>
+        <div class="mini-card-desc">Sin un plan previo, cada consulta nueva rompe lo que ya estaba. El sistema nunca converge hacia algo sólido.</div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-icon">🏗️</div>
+        <div class="mini-card-title">Sobre-ingeniería desde el día 1</div>
+        <div class="mini-card-desc">Quieren construir todo de entrada. Resultado: ni el MVP queda bien y el proyecto se abandona.</div>
+      </div>
+    </div>
+
+    <div class="callout warning">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <div class="callout-title">El error más común</div>
+        <p>Muchos equipos junior empiezan a escribir código (o pedirle al IDE que lo haga) antes de entender qué problema están resolviendo y qué límites tiene el sistema. El resultado: reescribir todo desde cero a las dos semanas.</p>
+      </div>
+    </div>
+
+    <div class="blockquote">
+      <p>"El problema no es que la IA sea mala escribiendo código. El problema es que vos le estás pidiendo que haga el trabajo de tres personas a la vez: analista, arquitecto y desarrollador."</p>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 2: EL ROADMAP -->
+  <section id="roadmap">
+    <div class="section-label">El modelo mental</div>
+    <h2 class="section-title">El roadmap: de la idea al código</h2>
+    <p class="section-desc">Antes de escribir una sola línea de código, necesitás recorrer cuatro etapas. Cada una tiene un propósito claro y prepara el terreno para la siguiente.</p>
+
+    <div class="roadmap">
+      <div class="rm-step">
+        <div class="rm-icon blue">💡</div>
+        <div class="rm-step-title">Idea</div>
+        <div class="rm-step-sub">¿Qué problema concreto querés resolver?</div>
+      </div>
+      <div class="rm-step">
+        <div class="rm-icon teal">🌐</div>
+        <div class="rm-step-title">Visión</div>
+        <div class="rm-step-sub">¿Cómo se ve el sistema completo en el futuro?</div>
+      </div>
+      <div class="rm-step">
+        <div class="rm-icon amber">⚙️</div>
+        <div class="rm-step-title">Core</div>
+        <div class="rm-step-sub">¿Cuál es el modelo de datos y entidades centrales?</div>
+      </div>
+      <div class="rm-step">
+        <div class="rm-icon coral">🚀</div>
+        <div class="rm-step-title">MVP</div>
+        <div class="rm-step-sub">¿Qué es lo mínimo que aporta valor real?</div>
+      </div>
+    </div>
+
+    <div class="accordion">
+      <div class="acc-item open">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          <span>💡 Idea — el problema concreto</span>
+          <span class="acc-arrow">›</span>
+        </button>
+        <div class="acc-body">
+          <p>La idea es la semilla. No es un listado de funcionalidades, es una <strong>frase que describe el dolor</strong> que el sistema va a resolver. Tiene que ser tan clara que cualquier persona pueda entenderla.</p>
+          <br>
+          <p><strong>Ejemplo:</strong> "Necesito saber qué autos tiene la agencia, de dónde vienen y a cuánto se venden, porque ahora lo tenemos en papel y nos perdemos stock."</p>
+          <br>
+          <p>Nótese: menciona el problema actual (papel), el dato que falta (origen, precio) y el impacto (se pierde stock). Una buena idea tiene esos tres elementos.</p>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          <span>🌐 Visión — el sistema completo</span>
+          <span class="acc-arrow">›</span>
+        </button>
+        <div class="acc-body">
+          <p>La visión describe <strong>a dónde querés llegar</strong> en el largo plazo. No es lo que vas a construir hoy. Es la foto del sistema completo cuando esté maduro. Sirve para que todas las decisiones técnicas de hoy apunten en la misma dirección.</p>
+          <br>
+          <p><strong>Ejemplo (agencia de autos):</strong></p>
+          <ul style="padding-left: 18px; margin-top: 8px; color: var(--text-muted); font-size: 13.5px; line-height: 1.8;">
+            <li>Sistema web de gestión de inventario de autos</li>
+            <li>CRM para registrar clientes y oportunidades de venta</li>
+            <li>Panel de seguimiento de ventas y comisiones</li>
+            <li>Historial de cada unidad (service, propietarios anteriores)</li>
+            <li>Integración con portales de publicación (ML, etc.)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          <span>⚙️ Core — el modelo de datos</span>
+          <span class="acc-arrow">›</span>
+        </button>
+        <div class="acc-body">
+          <p>El core son las <strong>entidades centrales del sistema</strong>: los datos que no pueden faltar porque todo lo demás depende de ellos. Definir el core bien es la decisión de diseño más importante que vas a tomar.</p>
+          <br>
+          <p><strong>Ejemplo (agencia de autos):</strong></p>
+          <div style="margin-top: 10px; background: var(--gray-50); padding: 1rem; border-radius: var(--radius); font-family: var(--font-mono); font-size: 12.5px; color: var(--text); line-height: 1.8;">
+            <span style="color: var(--blue-600);">Auto</span> {<br>
+            &nbsp;&nbsp;id, marca, modelo, año,<br>
+            &nbsp;&nbsp;origen (nacional/importado),<br>
+            &nbsp;&nbsp;precio_lista, precio_venta,<br>
+            &nbsp;&nbsp;estado (disponible/vendido/reservado),<br>
+            &nbsp;&nbsp;fecha_ingreso<br>
+            }
+          </div>
+          <br>
+          <p>Todo lo demás (clientes, ventas, historial) viene después. El core es la base.</p>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-header" onclick="toggleAcc(this)">
+          <span>🚀 MVP — lo mínimo con valor real</span>
+          <span class="acc-arrow">›</span>
+        </button>
+        <div class="acc-body">
+          <p>MVP significa <strong>Minimum Viable Product</strong>. No es "lo más simple que puedo hacer". Es "lo mínimo que resuelve el problema original de forma completa". La diferencia es importante.</p>
+          <br>
+          <table class="compare-table">
+            <thead>
+              <tr><th>¿Entra en el MVP?</th><th>¿Por qué?</th><th></th></tr>
+            </thead>
+            <tbody>
+              <tr><td>CRUD completo de autos</td><td>Sin esto no hay sistema</td><td><span class="badge yes">Sí</span></td></tr>
+              <tr><td>Listado con filtros básicos</td><td>Necesario para encontrar un auto</td><td><span class="badge yes">Sí</span></td></tr>
+              <tr><td>Estado del auto (disp/vendido)</td><td>Información mínima esencial</td><td><span class="badge yes">Sí</span></td></tr>
+              <tr><td>CRM de clientes</td><td>Visión, no MVP</td><td><span class="badge no">No</span></td></tr>
+              <tr><td>Publicación en MercadoLibre</td><td>Integración compleja, no urgente</td><td><span class="badge no">No</span></td></tr>
+              <tr><td>Dashboard de ventas</td><td>No hay ventas aún que mostrar</td><td><span class="badge no">No</span></td></tr>
+            </tbody>
+          </table>
+          <div class="callout success" style="margin-top: 1rem;">
+            <span class="callout-icon">✅</span>
+            <div class="callout-body">
+              <div class="callout-title">Regla de oro del MVP</div>
+              <p>Si podés usar el sistema para resolver el problema original sin esa funcionalidad, no va en el MVP.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 3: LOS DOS ROLES -->
+  <section id="roles">
+    <div class="section-label">El modelo de trabajo</div>
+    <h2 class="section-title">Los dos roles: arquitecto y ejecutor</h2>
+    <p class="section-desc">La clave del flujo está en separar responsabilidades. En un equipo real, el arquitecto y el desarrollador tienen roles distintos. Con IA, hacemos lo mismo.</p>
+
+    <div class="roles-grid">
+      <div class="role-card architect">
+        <div class="role-header">
+          <div>
+            <div class="role-name">🧠 Arquitecto</div>
+            <div class="role-tool">GPT-4 / Claude (en chat)</div>
+          </div>
+          <span class="role-badge blue">Piensa</span>
+        </div>
+        <ul class="role-list">
+          <li>Define la visión completa del sistema</li>
+          <li>Establece el modelo de datos y entidades</li>
+          <li>Decide el alcance exacto del MVP</li>
+          <li>Define las tecnologías y estructura del proyecto</li>
+          <li>Genera el plan de acción para el ejecutor</li>
+          <li>Pone las reglas y restricciones</li>
+          <li><strong>No escribe código</strong></li>
+        </ul>
+      </div>
+      <div class="role-card executor">
+        <div class="role-header">
+          <div>
+            <div class="role-name">⚡ Ejecutor</div>
+            <div class="role-tool">Antigravity / Cursor (IDE con IA)</div>
+          </div>
+          <span class="role-badge teal">Ejecuta</span>
+        </div>
+        <ul class="role-list">
+          <li>Recibe el plan del arquitecto</li>
+          <li>Lo lee completo antes de hacer nada</li>
+          <li>Devuelve su entendimiento del plan</li>
+          <li>Lista archivos que va a crear</li>
+          <li>Propone orden de implementación</li>
+          <li>Espera confirmación antes de ejecutar</li>
+          <li><strong>No toma decisiones de diseño</strong></li>
+          <li>Si algo no está claro, consulta al arquitecto</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="flow-diagram">
+      <div class="flow-title">Flujo completo de trabajo &mdash; Arquitecto + Ejecutor</div>
+
+      <!-- FILA 1: Vos → Arquitecto -->
+      <div class="flow-row">
+        <div class="flow-node gray">👤 Vos / el equipo</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-label">Prompt con contexto</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node blue">🧠 Arquitecto (GPT)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node blue">Plan estructurado</div>
+      </div>
+
+      <!-- Flecha vertical -->
+      <div class="flow-row" style="padding-left: 30px;">
+        <div class="flow-arrow" style="transform: rotate(90deg);">→</div>
+        <div class="flow-label" style="margin-left: 4px;">revisás el plan</div>
+      </div>
+
+      <!-- FILA 2: Revisás → Ejecutor -->
+      <div class="flow-row">
+        <div class="flow-node gray">👤 Confirmás el plan</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-label">plan completo</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node teal">⚡ Ejecutor (Antigravity)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node amber">Devuelve entendimiento</div>
+      </div>
+
+      <!-- Flecha vertical -->
+      <div class="flow-row" style="padding-left: 30px;">
+        <div class="flow-arrow" style="transform: rotate(90deg);">→</div>
+        <div class="flow-label" style="margin-left: 4px;">confirmás o corregís</div>
+      </div>
+
+      <!-- FILA 3: Ejecuta -->
+      <div class="flow-row">
+        <div class="flow-node gray">👤 ³OK, ejecutá´</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node teal">Ejecutor escribe código</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node coral">Sistema funcionando ✅</div>
+      </div>
+
+      <!-- FILA 4: Iteración -->
+      <div class="flow-row" style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px dashed rgba(0,0,0,0.1);">
+        <div class="flow-node amber" style="font-size:12px;">⚠️ Algo no está claro</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-label">vuelvás al arquitecto</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node blue">Arquitecto ajusta el plan</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node gray">Revisás y reconfirmás</div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <div class="callout-title">¿Por qué este flujo?</div>
+        <p>El ejecutor (el IDE) es muy bueno escribiendo código, pero toma malas decisiones de arquitectura sin contexto. El arquitecto (GPT en modo razonamiento) es muy bueno pensando estructuras, pero está lejos del código. Al combinarlos correctamente, obtenés lo mejor de cada uno.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 4: CASO DE ESTUDIO -->
+  <section id="caso">
+    <div class="section-label">Caso de estudio</div>
+    <h2 class="section-title">Sistema para agencia de autos — paso a paso</h2>
+    <p class="section-desc">Vamos a aplicar todo el roadmap a un caso real. Seguí cada paso y entendé qué decisión se toma en cada etapa y por qué.</p>
+
+    <!-- MODELO DE DATOS -->
+    <h3 style="font-size: 17px; font-weight: 600; margin: 2rem 0 1rem; color: var(--text);">Modelo de datos — diagrama de entidades</h3>
+    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 1rem;">Así se ve el core del sistema. En el MVP solo necesitamos la tabla <strong>Auto</strong>. Las demás entidades se agregan en versiones futuras (visión).</p>
+
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 820 420" xmlns="http://www.w3.org/2000/svg" width="820" height="420" font-family="'DM Mono', monospace">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#888780"/>
+          </marker>
+        </defs>
+
+        <!-- AUTO - central, MVP -->
+        <rect x="290" y="30" width="240" height="220" rx="10" fill="#E6F1FB" stroke="#B5D4F4" stroke-width="1.5"/>
+        <rect x="290" y="30" width="240" height="36" rx="10" fill="#185FA5"/>
+        <rect x="290" y="54" width="240" height="12" rx="0" fill="#185FA5"/>
+        <text x="350" y="53" fill="white" font-size="13" font-weight="600">🚗  Auto</text>
+        <text x="310" y="53" fill="#B5D4F4" font-size="9">MVP ★</text>
+
+        <text x="305" y="90" fill="#0C447C" font-size="11">id</text><text x="380" y="90" fill="#185FA5" font-size="11">INT / PK</text>
+        <text x="305" y="108" fill="#0C447C" font-size="11">marca</text><text x="380" y="108" fill="#185FA5" font-size="11">VARCHAR</text>
+        <text x="305" y="126" fill="#0C447C" font-size="11">modelo</text><text x="380" y="126" fill="#185FA5" font-size="11">VARCHAR</text>
+        <text x="305" y="144" fill="#0C447C" font-size="11">año</text><text x="380" y="144" fill="#185FA5" font-size="11">INT</text>
+        <text x="305" y="162" fill="#0C447C" font-size="11">origen</text><text x="380" y="162" fill="#185FA5" font-size="11">ENUM</text>
+        <text x="305" y="180" fill="#0C447C" font-size="11">precio_lista</text><text x="380" y="180" fill="#185FA5" font-size="11">DECIMAL</text>
+        <text x="305" y="198" fill="#0C447C" font-size="11">precio_venta</text><text x="380" y="198" fill="#185FA5" font-size="11">DECIMAL</text>
+        <text x="305" y="216" fill="#0C447C" font-size="11">estado</text><text x="380" y="216" fill="#185FA5" font-size="11">ENUM</text>
+        <text x="305" y="234" fill="#0C447C" font-size="11">fecha_ingreso</text><text x="380" y="234" fill="#185FA5" font-size="11">DATE</text>
+
+        <!-- CLIENTE - visión -->
+        <rect x="20" y="160" width="200" height="145" rx="10" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="1"/>
+        <rect x="20" y="160" width="200" height="34" rx="10" fill="#888780"/>
+        <rect x="20" y="182" width="200" height="12" rx="0" fill="#888780"/>
+        <text x="65" y="182" fill="white" font-size="12" font-weight="600">👤  Cliente</text>
+        <text x="23" y="182" fill="#D3D1C7" font-size="9">Visión</text>
+        <text x="35" y="216" fill="#5F5E5A" font-size="11">id, nombre, apellido</text>
+        <text x="35" y="234" fill="#5F5E5A" font-size="11">telefono, email</text>
+        <text x="35" y="252" fill="#5F5E5A" font-size="11">dni, fecha_registro</text>
+        <text x="35" y="270" fill="#5F5E5A" font-size="11">vendedor_id (FK)</text>
+        <text x="35" y="290" fill="#5F5E5A" font-size="11">notas</text>
+
+        <!-- VENTA - visión -->
+        <rect x="20" y="330" width="200" height="80" rx="10" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="1"/>
+        <rect x="20" y="330" width="200" height="34" rx="10" fill="#888780"/>
+        <rect x="20" y="352" width="200" height="12" rx="0" fill="#888780"/>
+        <text x="65" y="352" fill="white" font-size="12" font-weight="600">💰  Venta</text>
+        <text x="23" y="352" fill="#D3D1C7" font-size="9">Visión</text>
+        <text x="35" y="386" fill="#5F5E5A" font-size="11">auto_id (FK), cliente_id (FK)</text>
+        <text x="35" y="402" fill="#5F5E5A" font-size="11">precio_final, fecha, vendedor_id</text>
+
+        <!-- HISTORIAL - visión -->
+        <rect x="600" y="160" width="200" height="130" rx="10" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="1"/>
+        <rect x="600" y="160" width="200" height="34" rx="10" fill="#888780"/>
+        <rect x="600" y="182" width="200" height="12" rx="0" fill="#888780"/>
+        <text x="645" y="182" fill="white" font-size="12" font-weight="600">📋  Historial</text>
+        <text x="603" y="182" fill="#D3D1C7" font-size="9">Visión</text>
+        <text x="615" y="216" fill="#5F5E5A" font-size="11">auto_id (FK)</text>
+        <text x="615" y="234" fill="#5F5E5A" font-size="11">tipo (service/siniestro)</text>
+        <text x="615" y="252" fill="#5F5E5A" font-size="11">descripcion, fecha</text>
+        <text x="615" y="270" fill="#5F5E5A" font-size="11">costo, km_al_momento</text>
+
+        <!-- FLECHAS -->
+        <line x1="220" y1="230" x2="290" y2="200" stroke="#888780" stroke-width="1" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+        <line x1="220" y1="360" x2="290" y2="220" stroke="#888780" stroke-width="1" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+        <line x1="600" y1="210" x2="530" y2="180" stroke="#888780" stroke-width="1" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+
+        <!-- LEYENDA -->
+        <rect x="290" y="275" width="240" height="38" rx="8" fill="white" stroke="#D3D1C7" stroke-width="1"/>
+        <rect x="300" y="285" width="12" height="12" rx="3" fill="#185FA5"/>
+        <text x="318" y="295" fill="#0C447C" font-size="11" font-weight="500">MVP — construir ahora</text>
+        <rect x="430" y="285" width="12" height="12" rx="3" fill="#888780"/>
+        <text x="448" y="295" fill="#5F5E5A" font-size="11">Visión — después</text>
+      </svg>
+    </div>
+
+    <!-- PROGRESO DE BUILD -->
+    <div class="progress-section">
+      <div class="progress-title">¿Qué construimos en cada etapa?</div>
+      <div class="progress-row">
+        <div class="progress-item">
+          <div class="progress-label"><span>MVP — CRUD de autos</span><span>100% del alcance v1</span></div>
+          <div class="progress-bar"><div class="progress-fill blue" style="width:100%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label"><span>v2 — Clientes + Oportunidades</span><span>Agrega el CRM básico</span></div>
+          <div class="progress-bar"><div class="progress-fill teal" style="width:65%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label"><span>v3 — Ventas + Historial</span><span>Cierra el ciclo de negocio</span></div>
+          <div class="progress-bar"><div class="progress-fill amber" style="width:40%"></div></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-label"><span>v4 — Integraciones externas</span><span>MercadoLibre, reportes, API</span></div>
+          <div class="progress-bar"><div class="progress-fill coral" style="width:20%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASOS DEL CASO -->
+    <h3 style="font-size: 17px; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--text);">Recorrido paso a paso del caso</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Identificar la idea</div>
+          <div class="step-desc">La agencia tiene su stock en papel. Pierde unidades, no sabe precios actualizados, no conoce el origen de cada auto. El problema está claro: falta de visibilidad del inventario.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Definir la visión con el arquitecto (GPT)</div>
+          <div class="step-desc">Le pasamos la idea al arquitecto con el prompt correcto. GPT devuelve la visión completa: sistema web, CRM, módulo de ventas, historial de unidades, integraciones futuras.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">El arquitecto define el core</div>
+          <div class="step-desc">Del análisis del sistema, el arquitecto extrae las entidades principales: Auto, Cliente, Venta, Historial. Define atributos, tipos de dato, relaciones y restricciones.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">El arquitecto delimita el MVP</div>
+          <div class="step-desc">Decide qué entra y qué no. MVP = CRUD de autos + listado con filtros + estados. Justifica cada decisión. Esto es lo que le pasamos al ejecutor.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">El arquitecto genera el plan de acción</div>
+          <div class="step-desc">El plan incluye: tecnologías, estructura de carpetas, archivos a crear, orden de implementación, reglas de código. Es el documento que recibe Antigravity.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <div class="step-title">El ejecutor lee el plan y confirma</div>
+          <div class="step-desc">Antigravity recibe el plan, lo lee completo y devuelve: entendimiento del alcance, lista de archivos a crear, orden de implementación y dudas. Vos lo revisás y confirmás.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-content">
+          <div class="step-title">El ejecutor construye el sistema</div>
+          <div class="step-desc">Una vez confirmado, Antigravity ejecuta el plan siguiendo las reglas estrictamente. Si encuentra algo que no estaba en el plan, consulta antes de decidir solo.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 5: PROMPTS -->
+  <section id="prompts">
+    <div class="section-label">Prompts completos</div>
+    <h2 class="section-title">Los prompts que vas a usar</h2>
+    <p class="section-desc">Estos son los prompts listos para copiar y usar. El primero va a GPT (el arquitecto). El segundo va a Antenagravity (el ejecutor), pegando el output del primero.</p>
+
+    <!-- PROMPT ARQUITECTO -->
+    <h3 style="font-size: 16px; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text);">Prompt 1 — El arquitecto (GPT)</h3>
+    <p style="color: var(--text-muted); font-size: 13.5px; margin-bottom: 1rem;">Pegá esto en ChatGPT o en cualquier LLM de razonamiento potente. Ajustá el bloque de contexto con tu propio caso.</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-header-left">
+          <div class="code-dots">
+            <div class="code-dot red"></div>
+            <div class="code-dot yellow"></div>
+            <div class="code-dot green"></div>
+          </div>
+          <span class="code-lang">prompt · arquitecto</span>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+      </div>
+      <pre>
+<span class="cm">## ROL</span>
+Actuá como <span class="hl">arquitecto de software senior</span> y <span class="hl">analista de sistemas</span>.
+Tu trabajo es pensar y planificar. No generas código.
+
+<span class="cm">## CONTEXTO DEL SISTEMA</span>
+<span class="str">Estoy desarrollando un sistema para una agencia de venta de autos.</span>
+<span class="str">Necesitan gestionar su inventario: qué autos tienen, de dónde</span>
+<span class="str">vienen (origen/procedencia) y el precio de venta.</span>
+<span class="str">Actualmente lo hacen en papel y pierden control del stock.</span>
+
+<span class="cm">## TU TAREA — realizá estos pasos en orden:</span>
+
+<span class="hl">1. VISIÓN DEL SISTEMA</span>
+   Define cómo se vería el sistema completo y maduro.
+   Incluí módulos, funcionalidades principales y usuarios del sistema.
+
+<span class="hl">2. CORE DEL SISTEMA</span>
+   Identificá las entidades principales (modelo de datos).
+   Para cada entidad: nombre, atributos clave y tipo de dato básico.
+   Indicá las relaciones entre entidades.
+
+<span class="hl">3. ALCANCE DEL MVP</span>
+   Define exactamente qué entra y qué NO entra en el MVP.
+   Justificá cada decisión con una razón concreta.
+   El MVP debe resolver el problema original de forma completa.
+
+<span class="hl">4. PLAN DE ACCIÓN PARA EL EJECUTOR</span>
+   Generá un plan estructurado que incluya:
+   - Stack tecnológico recomendado (con justificación)
+   - Estructura de carpetas del proyecto
+   - Lista de archivos a crear
+   - Orden de implementación (paso a paso)
+   - Reglas y restricciones de código que el ejecutor debe seguir
+
+<span class="cm">## RESTRICCIONES</span>
+- No generes código bajo ningún concepto
+- El plan debe ser ejecutable por otro modelo sin ambigüedad
+- Usá formato estructurado con secciones y numeración clara
+- Sé específico: nada de "etc." o respuestas genéricas</pre>
+    </div>
+
+    <!-- PROMPT EJECUTOR -->
+    <h3 style="font-size: 16px; font-weight: 600; margin: 2.5rem 0 0.75rem; color: var(--text);">Prompt 2 — El ejecutor (Antenagravity)</h3>
+    <p style="color: var(--text-muted); font-size: 13.5px; margin-bottom: 1rem;">Pegá esto en Antigravity, reemplazando el bloque final con el output completo de GPT.</p>
+
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-header-left">
+          <div class="code-dots">
+            <div class="code-dot red"></div>
+            <div class="code-dot yellow"></div>
+            <div class="code-dot green"></div>
+          </div>
+          <span class="code-lang">prompt · ejecutor</span>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">copiar</button>
+      </div>
+      <pre>
+<span class="cm">## INSTRUCCIONES ESTRICTAS — leé completo antes de hacer cualquier cosa</span>
+
+Recibís el siguiente plan de arquitectura generado por el arquitecto
+de software del equipo. Tu <span class="hl">único trabajo</span> es ejecutarlo exactamente.
+
+<span class="kw">REGLAS ABSOLUTAS:</span>
+- No modificar el plan
+- No ampliar funcionalidades no pedidas
+- No tomar decisiones de diseño ni de arquitectura
+- Si algo no está claro, preguntar antes de asumir
+- Si hay ambigüedad, listarla y esperar confirmación
+
+<span class="cm">## ANTES DE ESCRIBIR CÓDIGO, devolvé exactamente esto:</span>
+
+<span class="hl">ENTENDIMIENTO DEL PLAN</span>
+[explicá en tus palabras qué vas a construir y cuál es el límite]
+
+<span class="hl">ARCHIVOS QUE VAS A CREAR</span>
+[lista completa de archivos con su ruta relativa]
+
+<span class="hl">ORDEN DE IMPLEMENTACIÓN</span>
+[pasos numerados en el orden en que los vas a ejecutar]
+
+<span class="hl">DUDAS O AMBIGÜEDADES</span>
+[si las hay; si no hay ninguna, poné "Ninguna — listo para ejecutar"]
+
+<span class="cm">## Esperá mi confirmación antes de ejecutar.</span>
+
+<span class="kw">══════════════════════════════════════════</span>
+<span class="str">— PLAN DEL ARQUITECTO —</span>
+<span class="kw">══════════════════════════════════════════</span>
+<span class="val">[PEGAR ACÁ EL OUTPUT COMPLETO DE GPT]</span></pre>
+    </div>
+
+    <div class="callout success">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body">
+        <div class="callout-title">Por qué pedimos el entendimiento primero</div>
+        <p>Si el ejecutor entendió mal el plan y arranca a codear directamente, vas a tener que rehacer todo. Pidiéndole que devuelva su entendimiento primero, podés corregir antes de que sea tarde. Es el mismo principio que un desarrollador que repite el brief antes de arrancar.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 6: PRÁCTICA -->
+  <section id="practica">
+    <div class="section-label">Práctica en clase</div>
+    <h2 class="section-title">Tu turno — aplicá el flujo</h2>
+    <p class="section-desc">Ahora replicás el flujo con tu propio proyecto (o el de la agencia si no tenés uno). Seguí estos pasos en orden.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon amber">📝</div>
+          <div>
+            <div class="card-title">Paso 1 — Escribí la idea</div>
+            <div class="card-subtitle">5 minutos</div>
+          </div>
+        </div>
+        <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6;">En una sola frase o párrafo corto: ¿qué problema resuelve tu sistema? ¿Quién lo usa? ¿Qué duele hoy sin él? Sin mencionar tecnología todavía.</p>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon blue">🧠</div>
+          <div>
+            <div class="card-title">Paso 2 — El arquitecto</div>
+            <div class="card-subtitle">15-20 minutos</div>
+          </div>
+        </div>
+        <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6;">Pegá el Prompt 1 en GPT con tu contexto. Leé el output completo. Chequeá que el MVP esté bien delimitado y que el modelo de datos tenga sentido para tu caso.</p>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon teal">🔍</div>
+          <div>
+            <div class="card-title">Paso 3 — Revisá el plan</div>
+            <div class="card-subtitle">10 minutos</div>
+          </div>
+        </div>
+        <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6;">Antes de pasarle el plan al ejecutor, preguntate: ¿el MVP resuelve el problema original? ¿Las entidades tienen sentido? ¿Hay algo que sobre o falte? Pedile ajustes al arquitecto si hace falta.</p>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon coral">⚡</div>
+          <div>
+            <div class="card-title">Paso 4 — El ejecutor</div>
+            <div class="card-subtitle">20-30 minutos</div>
+          </div>
+        </div>
+        <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6;">Pegá el Prompt 2 en Antigravity con el plan de GPT. Leé el entendimiento que devuelve. ¿Entendió bien? ¿La lista de archivos tiene sentido? Confirmá solo si todo está claro.</p>
+      </div>
+    </div>
+
+    <div class="callout warning">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <div class="callout-title">Errores comunes en la práctica</div>
+        <p><strong>No saltees pasos.</strong> Si vas directo al ejecutor sin haber pasado por el arquitecto, vas a tener los mismos problemas de siempre. El valor está en el proceso completo, no en los prompts sueltos.</p>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <div class="callout-title">Tip para iterar con el arquitecto</div>
+        <p>Si el output de GPT no te convence, no lo descartés: preguntale. "¿Por qué pusiste X en el MVP y no Y?", "¿Qué pasaría si agrego Z desde el principio?". El arquitecto puede justificar y ajustar sus decisiones.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 7: CHECKLIST -->
+  <section id="checklist">
+    <div class="section-label">Validación final</div>
+    <h2 class="section-title">Checklist de cierre</h2>
+    <p class="section-desc">Marcá cada ítem cuando puedas responderlo sin dudar. Si alguno queda sin marcar, es el que tenés que repasar.</p>
+
+    <div class="checklist" id="checklist-items">
+      <label class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <span>Puedo explicar la diferencia entre Idea, Visión, Core y MVP con mis propias palabras.</span>
+      </label>
+      <label class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <span>Entiendo por qué no le pedimos código directamente al IDE sin un plan previo.</span>
+      </label>
+      <label class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <span>Sé qué diferencia al arquitecto del ejecutor y qué hace cada uno.</span>
+      </label>
+      <label class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <span>Sé qué tiene que incluir el prompt del arquitecto para que sea útil (los 4 bloques).</span>
+      </label>
+      <label class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <span>Sé qué debe devolver el ejecutor antes de escribir código y por qué es importante.</span>
+      </label>
+      <label class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <span>Para el caso de la agencia de autos: puedo decir qué entra en el MVP y qué no, con justificación.</span>
+      </label>
+      <label class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <span>Apliqué el flujo completo (o lo intenté) con mi propio proyecto en la práctica.</span>
+      </label>
+      <label class="check-item" onclick="toggleCheck(this)">
+        <input type="checkbox">
+        <span>Puedo identificar cuándo el ejecutor está saliendo del scope del plan.</span>
+      </label>
+    </div>
+
+    <div id="progress-display" style="margin-top: 1.5rem; padding: 1rem 1.25rem; background: var(--gray-50); border-radius: var(--radius); border: 0.5px solid var(--border-strong); display: flex; align-items: center; justify-content: space-between;">
+      <span style="font-size: 14px; color: var(--text-muted);">Progreso: <strong id="check-count">0</strong> de 8 completados</span>
+      <span id="check-emoji" style="font-size: 20px;">🚀</span>
+    </div>
+
+    <div class="blockquote" style="margin-top: 2rem;">
+      <p>"Un buen arquitecto no es el que sabe más tecnologías. Es el que sabe cuándo no usar una."</p>
+      <cite>— Principio de diseño de software</cite>
+    </div>
+  </section>
+
+  <!-- SECCIÓN: GLOSARIO RÁPIDO -->
+  <section>
+    <div class="section-label">Referencia rápida</div>
+    <h2 class="section-title">Glosario y conceptos clave</h2>
+    <p class="section-desc">Una referencia rápida para consultar cuando tengas dudas durante el desarrollo.</p>
+
+    <div class="accordion">
+      <div class="acc-item">
+        <button class="acc-header" onclick="toggleAcc(this)"><span>¿Qué es un MVP?</span><span class="acc-arrow">›</span></button>
+        <div class="acc-body"><p><strong>Minimum Viable Product</strong>. El subconjunto mínimo de funcionalidades que resuelve completamente el problema original y aporta valor real a los usuarios. No es un prototipo incompleto: es una versión funcional y completa de la solución más simple posible.</p></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-header" onclick="toggleAcc(this)"><span>¿Qué es el core de un sistema?</span><span class="acc-arrow">›</span></button>
+        <div class="acc-body"><p>Las entidades y relaciones centrales del modelo de datos. Son los datos sin los cuales el sistema no puede funcionar. En la agencia de autos, el core es el <strong>Auto</strong> con sus atributos básicos. Todo lo demás se construye sobre este core.</p></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-header" onclick="toggleAcc(this)"><span>¿Qué es un arquitecto de software?</span><span class="acc-arrow">›</span></button>
+        <div class="acc-body"><p>El rol responsable de definir la estructura de alto nivel de un sistema: qué componentes lo forman, cómo se comunican, qué tecnologías se usan y por qué. En este flujo, usamos un LLM (GPT) en ese rol para que piense el sistema antes de que nadie escriba código.</p></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-header" onclick="toggleAcc(this)"><span>¿Por qué el ejecutor devuelve un entendimiento antes de ejecutar?</span><span class="acc-arrow">›</span></button>
+        <div class="acc-body"><p>Porque los modelos de lenguaje pueden interpretar de forma diferente a lo que uno espera. Pidiéndole que reformule el plan con sus palabras y liste lo que va a hacer, podés detectar malentendidos antes de que se conviertan en código equivocado. Es el equivalente a un desarrollador que repite el brief antes de arrancar.</p></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-header" onclick="toggleAcc(this)"><span>¿Qué pasa si el arquitecto se equivoca?</span><span class="acc-arrow">›</span></button>
+        <div class="acc-body"><p>Es normal. El plan del arquitecto es un punto de partida, no una biblia. Si al revisar el output de GPT ves algo que no tiene sentido, le preguntás, le pedís que lo justifique o que lo ajuste. El arquitecto puede iterar. Lo importante es que los ajustes se hacen en el plan, no en el código.</p></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-header" onclick="toggleAcc(this)"><span>¿Cuándo el ejecutor puede tomar decisiones propias?</span><span class="acc-arrow">›</span></button>
+        <div class="acc-body"><p>En decisiones técnicas de implementación que no afecten la arquitectura (por ejemplo: cómo nombrar una variable interna, qué método de utilidad usar). Si hay algo que afecte la estructura, los archivos, las entidades o el scope: siempre consulta antes.</p></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <strong>IA como Arquitecto de Software</strong> — Guía del Alumno<br>
+  Clase de unificación &middot; 2do y 3er año Software &middot; 2025–2026
+</footer>
+
+<script>
+  // Accordion
+  function toggleAcc(btn) {
+    const item = btn.closest('.acc-item');
+    item.classList.toggle('open');
+  }
+
+  // Checklist
+  function toggleCheck(label) {
+    const cb = label.querySelector('input[type=checkbox]');
+    label.classList.toggle('done', cb.checked);
+    updateProgress();
+  }
+  function updateProgress() {
+    const checked = document.querySelectorAll('#checklist-items input:checked').length;
+    document.getElementById('check-count').textContent = checked;
+    const emojis = ['🚀','💪','🔥','⚡','✨','🎯','🏆','🎉','🥇'];
+    document.getElementById('check-emoji').textContent = emojis[Math.min(checked, 8)];
+  }
+
+  // Copy buttons
+  function copyCode(btn) {
+    const pre = btn.closest('.code-wrap').querySelector('pre');
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      btn.textContent = '✓ copiado';
+      setTimeout(() => btn.textContent = 'copiar', 2000);
+    });
+  }
+
+  // Active nav
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 80) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  });
+
+  // Open first accordion by default
+  document.querySelector('.acc-item').classList.add('open');
+</script>
+</body>
+</html>

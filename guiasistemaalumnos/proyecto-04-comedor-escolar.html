@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>De la idea al MVP — Control de Stock para Comedor Escolar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0e0d08;
+    --ink-soft: #16140c;
+    --pantry: #2e2a18;
+    --pantry-light: #3c361f;
+    --olive: #7c8a4a;
+    --olive-bright: #a3b566;
+    --mustard: #d9a440;
+    --mustard-bright: #edbb5a;
+    --cream: #efe9d8;
+    --cream-dim: #b3ab95;
+    --grey: #7a7461;
+    --alert: #c2562f;
+    --line: rgba(239, 233, 216, 0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 34px,
+      rgba(217,164,64,0.012) 34px,
+      rgba(217,164,64,0.012) 35px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  h1, h2, h3 { font-family: 'Fraunces', serif; font-weight: 600; letter-spacing: -0.01em; }
+
+  .mono { font-family: 'Space Mono', monospace; }
+
+  a { color: var(--mustard-bright); text-decoration: none; }
+
+  ::selection { background: var(--mustard); color: var(--ink); }
+
+  /* ===== HERO ===== */
+  .hero {
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 6vh 6vw;
+    position: relative;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 0%, rgba(124,138,74,0.14), transparent 60%),
+      linear-gradient(180deg, var(--ink) 0%, var(--ink-soft) 100%);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--mustard);
+    margin-bottom: 1.8rem;
+    opacity: 0;
+    animation: riseIn 0.8s 0.1s ease forwards;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.4rem, 7vw, 5rem);
+    line-height: 1.06;
+    max-width: 18ch;
+    color: var(--cream);
+    opacity: 0;
+    animation: riseIn 0.9s 0.3s ease forwards;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--olive-bright);
+    font-weight: 500;
+  }
+
+  .hero p.sub {
+    margin-top: 1.6rem;
+    max-width: 48ch;
+    font-size: 1.08rem;
+    color: var(--cream-dim);
+    opacity: 0;
+    animation: riseIn 0.9s 0.5s ease forwards;
+  }
+
+  .hero .shelf-line {
+    margin-top: 3rem;
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--mustard), transparent);
+    opacity: 0;
+    animation: riseIn 0.9s 0.7s ease forwards, growLine 1.4s 0.9s ease forwards;
+  }
+
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes growLine {
+    from { height: 0; }
+    to { height: 60px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-eyebrow, .hero h1, .hero p.sub, .hero .shelf-line {
+      animation: none !important;
+      opacity: 1 !important;
+    }
+  }
+
+  /* ===== STICKY STAGE TRACKER (signature element) ===== */
+  .ticket-wrap {
+    position: sticky;
+    top: 1.4rem;
+    z-index: 30;
+    display: flex;
+    justify-content: center;
+    padding: 0 1.4rem;
+    margin-top: -2.4rem;
+  }
+
+  .ticket {
+    background: var(--pantry);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.85rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.5);
+    backdrop-filter: blur(8px);
+    max-width: 780px;
+    width: 100%;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.74rem;
+    border-left: 3px solid var(--mustard);
+  }
+
+  .ticket-label {
+    color: var(--cream-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.65rem;
+    white-space: nowrap;
+  }
+
+  .ticket-stages {
+    display: flex;
+    gap: 0.4rem;
+    flex: 1;
+    overflow-x: auto;
+  }
+
+  .ticket-stage {
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    color: var(--grey);
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    cursor: default;
+  }
+
+  .ticket-stage.active {
+    background: var(--mustard);
+    color: var(--ink);
+    border-color: var(--mustard);
+    font-weight: 700;
+  }
+
+  @media (max-width: 720px) {
+    .ticket-label { display: none; }
+    .ticket-wrap { margin-top: -1.6rem; }
+  }
+
+  /* ===== SECTIONS ===== */
+  .section {
+    position: relative;
+    z-index: 2;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 6.5rem 1.6rem 2rem;
+  }
+
+  .stage-marker {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .stage-num {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    color: var(--mustard);
+    font-style: italic;
+  }
+
+  .stage-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+
+  .section h2 {
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    color: var(--cream);
+    margin-bottom: 0.6rem;
+  }
+
+  .section .lead {
+    color: var(--cream-dim);
+    font-size: 1.08rem;
+    max-width: 62ch;
+    margin-bottom: 2.6rem;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--line);
+    margin: 0 auto;
+    max-width: 880px;
+  }
+
+  /* ===== QUESTION CARDS ===== */
+  .qgrid {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2.4rem;
+  }
+
+  .qcard {
+    background: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--olive);
+    border-radius: 8px;
+    padding: 1.3rem 1.5rem;
+  }
+
+  .qcard .q {
+    font-weight: 600;
+    color: var(--cream);
+    font-size: 1.02rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .qcard .why {
+    color: var(--cream-dim);
+    font-size: 0.92rem;
+  }
+
+  .qcard .why b { color: var(--olive-bright); font-weight: 600; }
+
+  /* ===== PROMPT BLOCKS ===== */
+  .prompt-block {
+    background: var(--pantry);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin: 1.6rem 0 2.2rem;
+    overflow: hidden;
+  }
+
+  .prompt-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 1.1rem;
+    background: var(--pantry-light);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .prompt-head span {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--mustard-bright);
+  }
+
+  .prompt-tool {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--grey);
+    border: 1px solid var(--line);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .prompt-body {
+    padding: 1.1rem 1.3rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.86rem;
+    color: var(--cream);
+    white-space: pre-wrap;
+    line-height: 1.7;
+  }
+
+  .prompt-body .ph { color: var(--mustard-bright); }
+
+  /* ===== TIP / WARNING ===== */
+  .tip, .warn {
+    border-radius: 8px;
+    padding: 1.1rem 1.4rem;
+    margin: 1.4rem 0;
+    font-size: 0.95rem;
+    border: 1px solid var(--line);
+  }
+
+  .tip {
+    background: rgba(124,138,74,0.08);
+    border-left: 3px solid var(--olive);
+  }
+
+  .warn {
+    background: rgba(194,86,47,0.1);
+    border-left: 3px solid var(--alert);
+  }
+
+  .tip b, .warn b { color: var(--cream); }
+
+  .label-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--olive-bright);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .warn .label-tag { color: var(--alert); }
+
+  /* ===== ARCH DIAGRAM ===== */
+  .arch {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.9rem;
+    margin: 1.8rem 0 2.4rem;
+  }
+
+  .arch-box {
+    background: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.1rem;
+    text-align: center;
+  }
+
+  .arch-box .t {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--mustard);
+    margin-bottom: 0.5rem;
+  }
+
+  .arch-box .v {
+    font-weight: 600;
+    color: var(--cream);
+    font-size: 0.95rem;
+  }
+
+  .arch-box .d {
+    font-size: 0.8rem;
+    color: var(--cream-dim);
+    margin-top: 0.3rem;
+  }
+
+  @media (max-width: 680px) {
+    .arch { grid-template-columns: 1fr; }
+  }
+
+  /* ===== MVP SCOPE TABLE ===== */
+  .scope-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.6rem 0 2.4rem;
+    font-size: 0.92rem;
+  }
+
+  .scope-table th {
+    text-align: left;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--grey);
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .scope-table td {
+    padding: 0.75rem 0.8rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--cream-dim);
+    vertical-align: top;
+  }
+
+  .scope-table tr:last-child td { border-bottom: none; }
+
+  .pill {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .pill.in { background: rgba(217,164,64,0.18); color: var(--mustard-bright); }
+  .pill.out { background: rgba(122,116,97,0.18); color: var(--grey); }
+  .pill.later { background: rgba(194,86,47,0.12); color: #d98c6f; }
+
+  /* ===== PANTRY SHELF DIAGRAM (signature element) ===== */
+  .shelf-diagram {
+    background: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.8rem;
+    margin: 1.8rem 0 2.4rem;
+  }
+
+  .shelf-diagram .sd-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--grey);
+    margin-bottom: 1.2rem;
+    text-align: center;
+  }
+
+  .sd-flow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .sd-node {
+    flex: 1;
+    min-width: 130px;
+    background: var(--pantry);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .sd-node.highlight {
+    border-color: var(--mustard);
+    background: rgba(217,164,64,0.08);
+  }
+
+  .sd-node .sd-icon {
+    font-size: 1.6rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .sd-node .sd-title {
+    font-weight: 600;
+    color: var(--cream);
+    font-size: 0.88rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .sd-node .sd-desc {
+    font-size: 0.74rem;
+    color: var(--cream-dim);
+  }
+
+  .sd-arrow {
+    color: var(--mustard);
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 680px) {
+    .sd-flow { flex-direction: column; }
+    .sd-arrow { transform: rotate(90deg); }
+  }
+
+  /* ===== TIMELINE (weeks) ===== */
+  .weeks {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 1.8rem 0 2.4rem;
+  }
+
+  .week {
+    position: relative;
+    padding: 0 0 2rem 2rem;
+    border-left: 2px solid var(--line);
+    margin-left: -2px;
+  }
+
+  .week:last-child { padding-bottom: 0; }
+
+  .week::before {
+    content: "";
+    position: absolute;
+    left: -6px;
+    top: 0.3rem;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--mustard);
+    border: 2px solid var(--ink);
+  }
+
+  .week .wk-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--mustard);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.3rem;
+  }
+
+  .week .wk-title {
+    font-weight: 600;
+    color: var(--cream);
+    margin-bottom: 0.4rem;
+    font-size: 1.02rem;
+  }
+
+  .week .wk-desc {
+    color: var(--cream-dim);
+    font-size: 0.92rem;
+  }
+
+  /* ===== FOOTER / DOCENTE NOTE ===== */
+  .docente-note {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 4rem 1.6rem 6rem;
+  }
+
+  .docente-card {
+    background: var(--pantry);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 2.2rem 2.4rem;
+    border-left: 3px solid var(--mustard);
+  }
+
+  .docente-card .label-tag { margin-bottom: 0.8rem; }
+
+  .docente-card p { color: var(--cream-dim); font-size: 0.96rem; margin-bottom: 0.8rem; }
+
+  .docente-card p:last-child { margin-bottom: 0; }
+
+  footer {
+    text-align: center;
+    padding: 2.5rem 1.6rem 3.5rem;
+    color: var(--grey);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+  }
+
+  /* ===== checklist ===== */
+  .checklist { list-style: none; margin: 1.4rem 0 2.2rem; }
+  .checklist li {
+    display: flex;
+    gap: 0.7rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--cream-dim);
+    font-size: 0.94rem;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before {
+    content: "✓";
+    color: var(--mustard);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-eyebrow">Proyecto de cátedra — 2° año · Desarrollo de Software</div>
+  <h1>De la idea suelta<br>al <em>MVP que funciona</em></h1>
+  <p class="sub">Guía personal para el sistema de control de stock del comedor escolar: saber qué hay, comprar mejor, y que el menú del día descuente solo lo que usa.</p>
+  <div class="shelf-line"></div>
+</section>
+
+<div class="ticket-wrap">
+  <div class="ticket">
+    <span class="ticket-label">Tu lugar en la guía:</span>
+    <div class="ticket-stages">
+      <span class="ticket-stage active">01 Diagnóstico</span>
+      <span class="ticket-stage">02 Despensa</span>
+      <span class="ticket-stage">03 MVP</span>
+      <span class="ticket-stage">04 Balance</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STAGE 01 — DIAGNÓSTICO ============ -->
+<section class="section" id="diagnostico">
+  <div class="stage-marker">
+    <span class="stage-num">01</span>
+    <span class="stage-label">Diagnóstico</span>
+  </div>
+  <h2>Antes de programar nada, entendé cómo se vacía la despensa</h2>
+  <p class="lead">Un comedor escolar no es un negocio que vende productos — es una cocina que <b style="color:var(--cream)">consume</b> ingredientes para producir comidas. Esa diferencia cambia todo el diseño: no estás construyendo un sistema de ventas, estás construyendo un sistema que entiende la relación entre "qué hay" y "qué se cocina".</p>
+
+  <div class="qgrid">
+    <div class="qcard">
+      <div class="q">¿Existe ya una lista fija de platos que se cocinan, con sus ingredientes y cantidades por porción?</div>
+      <div class="why">Esto es la pieza que hace posible el descuento automático. Si el menú de hoy es "guiso de lentejas", el sistema necesita saber que ese plato usa, por ejemplo, 200g de lentejas y 50g de cebolla por cada 10 porciones. <b>Sin esta receta básica definida, no hay manera de descontar nada solo.</b></div>
+    </div>
+    <div class="qcard">
+      <div class="q">¿Cómo se mide cada producto: por unidad, por kilo, por litro, por paquete?</div>
+      <div class="why">No es lo mismo "3 unidades de aceite" que "3 litros de aceite" — y mezclar unidades es la fuente número uno de errores en sistemas de inventario. Definí una unidad de medida clara por cada producto desde el principio.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">¿Cuántas porciones se cocinan por día, y eso varía o es siempre el mismo número de chicos?</div>
+      <div class="why">Si el número de porciones varía día a día (por ejemplo, según asistencia), el cálculo de descuento de stock tiene que multiplicar por esa cantidad variable, no por un número fijo. Esto define si necesitás un campo "porciones de hoy" en el sistema.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">¿Qué pasa cuando falta un ingrediente para el menú planeado del día? ¿Eso lo maneja el sistema o lo resuelve el cocinero en la cocina?</div>
+      <div class="why">No hace falta resolverlo con lógica compleja en el MVP, pero el sistema sí tiene que <b>avisar</b> si falta stock antes de intentar descontar — no puede dejar el inventario en negativo silenciosamente.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">¿Qué pasa cuando llega una compra nueva: quién la registra y con qué información mínima (producto, cantidad, fecha)?</div>
+      <div class="why">El stock no solo baja (al cocinar), también sube (al comprar). Sin un flujo claro de "ingreso de compra", el inventario va a quedar siempre desactualizado del lado de lo que entra.</div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <span class="label-tag">Cómo usar esto con la IA</span>
+    Llevá a la IA, además de tus respuestas, un ejemplo concreto: un plato real del comedor con sus ingredientes y cantidades aproximadas. Ese ejemplo va a ser el caso de prueba que usen juntos durante todo el desarrollo, en vez de trabajar con datos inventados.
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 1 — Cierre del diagnóstico</span>
+      <span class="prompt-tool">Usalo en Claude / ChatGPT / Copilot Chat</span>
+    </div>
+    <div class="prompt-body">Estoy diseñando un sistema de control de stock para el comedor de una escuela, como proyecto de la materia Desarrollo de Software (2° año, tecnicatura). El objetivo es saber qué productos hay para comprar mejor, y que el stock se descuente automáticamente según el menú cocinado cada día. Lo usa solo el cocinero/encargado del comedor.
+
+Estas son mis respuestas:
+- Recetas/platos con ingredientes: <span class="ph">[tu respuesta, con un ejemplo real de plato]</span>
+- Unidades de medida que voy a usar: <span class="ph">[kg / litro / unidad / paquete, etc.]</span>
+- Porciones por día: <span class="ph">[fijo / variable]</span>
+- Qué pasa si falta un ingrediente: <span class="ph">[tu respuesta]</span>
+- Cómo se registra una compra nueva: <span class="ph">[tu respuesta]</span>
+
+Actuá como arquitecto de software senior. Todavía no generes código. Ayudame a:
+1. Identificar las entidades principales del sistema
+2. Proponerme cómo modelarías la relación entre un Plato y sus ingredientes con cantidades, de forma que el descuento de stock se pueda calcular automáticamente
+3. Sugerirme 3 funcionalidades para el MVP y 3 que deberían quedar fuera de alcance por ahora (recetas sugeridas y planificación de menús quedan para el futuro)
+
+Hacé preguntas si te falta información, no asumas nada.</div>
+  </div>
+
+  <div class="warn">
+    <span class="label-tag">Riesgo común en esta etapa</span>
+    Pensar el sistema como "una lista de productos con cantidad" sin modelar la relación entre <b>plato e ingrediente</b>. Si no existe esa relación en tu base de datos, el descuento automático es imposible de implementar — vas a terminar restando stock a mano, que es exactamente lo que el sistema tenía que evitar.
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ STAGE 02 — DESPENSA (ARQUITECTURA) ============ -->
+<section class="section" id="despensa">
+  <div class="stage-marker">
+    <span class="stage-num">02</span>
+    <span class="stage-label">Despensa — Arquitectura</span>
+  </div>
+  <h2>El orden de la alacena define el orden del código</h2>
+  <p class="lead">Antes de escribir UI, ordená qué vas a guardar y cómo se conecta. La pieza central de este proyecto es la relación entre <b style="color:var(--cream)">Plato</b> e <b style="color:var(--cream)">Ingrediente</b>: esa tabla intermedia es la que hace posible automatizar el descuento.</p>
+
+  <div class="arch">
+    <div class="arch-box">
+      <div class="t">Frontend</div>
+      <div class="v">React + Vite</div>
+      <div class="d">Inventario, registro de compra, registro del menú cocinado hoy</div>
+    </div>
+    <div class="arch-box">
+      <div class="t">Backend / Datos</div>
+      <div class="v">Firebase Firestore</div>
+      <div class="d">Sin servidor propio que mantener — ideal para el MVP de cátedra</div>
+    </div>
+    <div class="arch-box">
+      <div class="t">Estado en frontend</div>
+      <div class="v">Zustand o Context</div>
+      <div class="d">Plato seleccionado para hoy, cantidad de porciones, alertas de stock bajo</div>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom: 1rem; font-size: 1.3rem; color: var(--cream);">Las entidades mínimas (lo que vas a guardar)</h3>
+
+  <table class="scope-table">
+    <tr><th>Entidad</th><th>Campos clave</th><th>Por qué existe</th></tr>
+    <tr>
+      <td><b style="color:var(--cream)">Producto</b></td>
+      <td class="mono">nombre, unidadMedida, stockActual, stockMínimo</td>
+      <td>El ítem base del inventario — stockMínimo habilita avisos de "hay que comprar"</td>
+    </tr>
+    <tr>
+      <td><b style="color:var(--cream)">Plato</b></td>
+      <td class="mono">nombre, porcionesBase</td>
+      <td>Lo que se cocina — porcionesBase es la cantidad de referencia de la receta</td>
+    </tr>
+    <tr>
+      <td><b style="color:var(--cream)">Ingrediente de Plato</b></td>
+      <td class="mono">platoId, productoId, cantidadPorPorciónBase</td>
+      <td>La pieza clave: conecta un plato con los productos que consume y en qué cantidad</td>
+    </tr>
+    <tr>
+      <td><b style="color:var(--cream)">Registro de Menú del Día</b></td>
+      <td class="mono">fecha, platoId, porcionesCocinadas</td>
+      <td>Dispara el descuento automático: multiplica cantidadPorPorciónBase × porciones reales</td>
+    </tr>
+    <tr>
+      <td><b style="color:var(--cream)">Compra</b></td>
+      <td class="mono">productoId, cantidad, fecha</td>
+      <td>El movimiento que hace subir el stock — sin esto el inventario solo bajaría</td>
+    </tr>
+  </table>
+
+  <div class="shelf-diagram">
+    <div class="sd-label">Cómo viaja un número del menú del día hasta el stock</div>
+    <div class="sd-flow">
+      <div class="sd-node">
+        <div class="sd-icon">🍲</div>
+        <div class="sd-title">Plato de hoy</div>
+        <div class="sd-desc">"Guiso de lentejas" × 80 porciones</div>
+      </div>
+      <div class="sd-arrow">→</div>
+      <div class="sd-node highlight">
+        <div class="sd-icon">📐</div>
+        <div class="sd-title">Cálculo</div>
+        <div class="sd-desc">cantidad receta × (porciones hoy ÷ porciones base)</div>
+      </div>
+      <div class="sd-arrow">→</div>
+      <div class="sd-node">
+        <div class="sd-icon">📦</div>
+        <div class="sd-title">Stock actualizado</div>
+        <div class="sd-desc">Se resta de cada producto involucrado</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <span class="label-tag">Por qué "cantidad por porción base" y no "cantidad fija"</span>
+    Si guardás la receta para una cantidad de referencia (por ejemplo 10 porciones) y no para "todo el comedor", podés escalarla a cualquier número de porciones reales con una simple multiplicación. Esto es lo que te permite manejar los días en que cambia la cantidad de chicos sin reescribir la receta.
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 2 — Diseño del modelo de datos y cálculo de descuento</span>
+      <span class="prompt-tool">Pegale el resultado del Prompt 1 como contexto</span>
+    </div>
+    <div class="prompt-body">Con base en las entidades que definimos (Producto, Plato, Ingrediente de Plato, Registro de Menú del Día, Compra), ayudame a:
+
+1. Diseñar la estructura de colecciones en Firestore, con ejemplos de documentos en JSON
+2. Escribir la lógica (en pseudocódigo primero, después en JS) que calcula cuánto stock descontar de cada producto cuando se registra el menú cocinado de un día, escalando la receta según las porciones reales
+3. Proponer cómo evitar que el stock quede en negativo si no hay suficiente cantidad de un producto, y qué debería ver el cocinero en ese caso
+
+No me generes el código del front todavía. Quiero entender el cálculo y poder explicarlo en una defensa sin mirar el código.</div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 3 — Esqueleto del proyecto React</span>
+      <span class="prompt-tool">Recién ahora pedís código</span>
+    </div>
+    <div class="prompt-body">Ahora sí, ayudame a armar el esqueleto inicial del proyecto en React + Vite, conectado a Firebase Firestore, con esta estructura de carpetas:
+
+- /components → piezas de UI reutilizables (tarjeta de producto con su stock, selector de plato del día)
+- /pages → Inventario, MenuDelDia, RegistrarCompra, Platos
+- /services → funciones que hablan con Firestore (registrarCompra, registrarMenuDelDia, descontarStockSegunPlato, etc.)
+- /store → estado global con Zustand
+
+No me llenes de funcionalidad todavía. Quiero el esqueleto navegable, con datos de prueba (mock), antes de conectar la lógica real.</div>
+  </div>
+
+  <div class="warn">
+    <span class="label-tag">Riesgo común en esta etapa</span>
+    Empezar a programar la pantalla de inventario antes de tener clara la relación Plato-Ingrediente. Si esa relación no está bien pensada desde el modelo de datos, vas a terminar reescribiendo media base de datos cuando llegues a implementar el descuento automático en la semana 3.
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ STAGE 03 — MVP ============ -->
+<section class="section" id="mvp">
+  <div class="stage-marker">
+    <span class="stage-num">03</span>
+    <span class="stage-label">MVP — Construir lo esencial</span>
+  </div>
+  <h2>Lo que tiene que andar para que sirva el lunes a la mañana</h2>
+  <p class="lead">El MVP de este proyecto no incluye sugerencia de recetas ni planificación de menús — eso lo dejaste, con buen criterio, para una versión futura. El MVP es: saber qué hay, registrar lo que se cocina, y que el stock se actualice solo.</p>
+
+  <table class="scope-table">
+    <tr><th>Funcionalidad</th><th>Estado</th><th>Nota</th></tr>
+    <tr>
+      <td>Ver inventario actual de productos con su stock</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>Sin esto no hay sistema, es la base de todo</td>
+    </tr>
+    <tr>
+      <td>Registrar una compra nueva (sube el stock)</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>El stock tiene que poder reponerse, no solo consumirse</td>
+    </tr>
+    <tr>
+      <td>Definir platos con sus ingredientes y cantidades por porción</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>Es el requisito previo para que el descuento automático sea posible</td>
+    </tr>
+    <tr>
+      <td>Registrar el menú cocinado del día y descontar stock automáticamente</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>El corazón del valor del proyecto — la parte que "automatiza"</td>
+    </tr>
+    <tr>
+      <td>Alerta de stock bajo (por debajo del mínimo definido)</td>
+      <td><span class="pill later">Después</span></td>
+      <td>Muy valioso para "comprar mejor", pero el sistema funciona sin esto el primer día</td>
+    </tr>
+    <tr>
+      <td>Reporte de qué comprar según consumo histórico</td>
+      <td><span class="pill later">Después</span></td>
+      <td>Buena evolución una vez que haya datos reales acumulados en el sistema</td>
+    </tr>
+    <tr>
+      <td>Sugerencia de recetas según lo que hay en stock</td>
+      <td><span class="pill out">Fuera de alcance</span></td>
+      <td>Es la visión a futuro que mencionaste — requiere lógica de "qué se puede cocinar con esto", mucho más compleja</td>
+    </tr>
+    <tr>
+      <td>Planificación semanal de menús</td>
+      <td><span class="pill out">Fuera de alcance</span></td>
+      <td>Queda completamente para el futuro, según definiste — el MVP solo registra el plato del día, no planifica la semana</td>
+    </tr>
+  </table>
+
+  <div class="tip">
+    <span class="label-tag">Cómo decidir qué entra y qué no</span>
+    Preguntate: <b>"¿esto hace falta para que el stock esté siempre actualizado y confiable?"</b> Si la respuesta es no, es una mejora sobre un sistema que ya funciona, no un requisito para que funcione.
+  </div>
+
+  <h3 style="margin-bottom: 1rem; margin-top: 2.4rem; font-size: 1.3rem; color: var(--cream);">Plan de 4 semanas (orientativo)</h3>
+
+  <div class="weeks">
+    <div class="week">
+      <div class="wk-label">Semana 1</div>
+      <div class="wk-title">Modelo de datos + esqueleto navegable</div>
+      <div class="wk-desc">Firestore con productos y un par de platos de prueba cargados a mano. React con las pantallas creadas pero sin lógica real — solo navegación.</div>
+    </div>
+    <div class="week">
+      <div class="wk-label">Semana 2</div>
+      <div class="wk-title">Inventario y registro de compras</div>
+      <div class="wk-desc">El cocinero puede ver el stock actual de cada producto y registrar una compra que lo actualiza correctamente.</div>
+    </div>
+    <div class="week">
+      <div class="wk-label">Semana 3</div>
+      <div class="wk-title">Platos con ingredientes y descuento automático</div>
+      <div class="wk-desc">Se pueden definir platos con sus ingredientes y cantidades. Al registrar el menú del día con sus porciones, el stock se descuenta solo, escalando la receta.</div>
+    </div>
+    <div class="week">
+      <div class="wk-label">Semana 4</div>
+      <div class="wk-title">Pulido, casos borde, defensa</div>
+      <div class="wk-desc">Probar qué pasa si falta stock para el menú de hoy, si se registra una compra con cantidad negativa, si dos registros de menú se hacen el mismo día por error. Preparar la explicación de arquitectura.</div>
+    </div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 4 — Construir el descuento automático del menú del día</span>
+      <span class="prompt-tool">El prompt más importante del proyecto</span>
+    </div>
+    <div class="prompt-body">Quiero implementar el registro del menú del día. El flujo es:
+
+1. El cocinero elige un plato de la lista de platos definidos
+2. Indica cuántas porciones se van a cocinar hoy
+3. El sistema calcula, para cada ingrediente del plato, cuánto hay que descontar del stock (escalando la receta según las porciones reales)
+4. Si algún producto no tiene stock suficiente, el sistema avisa ANTES de confirmar, mostrando qué falta y cuánto
+5. Si hay stock suficiente de todos los ingredientes, se confirma y se descuenta todo junto
+
+Ayudame a implementarlo paso a paso:
+- Primero la función que calcula las cantidades necesarias y verifica si hay stock suficiente (sin UI todavía, que la pueda probar en consola)
+- Después el componente de UI que la usa, mostrando claramente qué falta si no hay stock
+- Por último la función que confirma y descuenta el stock de todos los productos involucrados
+
+Explicame cada función a medida que la escribís, no solo me tires el código.</div>
+  </div>
+
+  <div class="warn">
+    <span class="label-tag">Riesgo común en esta etapa</span>
+    Descontar el stock producto por producto, sin verificar primero si hay suficiente de TODOS los ingredientes. Si descontás de a uno y te quedás sin stock en el tercer ingrediente, el inventario queda en un estado a medio camino, que es peor que no haber descontado nada.
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ STAGE 04 — BALANCE ============ -->
+<section class="section" id="balance">
+  <div class="stage-marker">
+    <span class="stage-num">04</span>
+    <span class="stage-label">Balance — Revisar y evolucionar</span>
+  </div>
+  <h2>El cierre de caja de la despensa</h2>
+  <p class="lead">Así como en una cocina se hace un balance al final del día o la semana, esta etapa es la revisión honesta de tu MVP: ¿el stock que muestra el sistema es el que realmente hay? Y un mapa de hacia dónde puede crecer.</p>
+
+  <ul class="checklist">
+    <li>¿Puedo registrar una compra y ver el stock subir correctamente, sin que se rompa nada?</li>
+    <li>¿Puedo registrar el menú del día y ver que el stock baja exactamente lo que la receta indica, escalado a las porciones reales?</li>
+    <li>¿Puedo explicar, sin mirar el código, por qué modelé "Ingrediente de Plato" como su propia entidad en vez de guardar los ingredientes como texto suelto dentro del plato?</li>
+    <li>¿Sé qué pasa si falta stock para cocinar el menú del día, aunque no lo haya resuelto de forma elaborada?</li>
+    <li>¿Dejé afuera del MVP las recetas sugeridas y la planificación de menús a propósito, o simplemente no tuve tiempo de hacerlas?</li>
+  </ul>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 5 — Auditoría de lo construido</span>
+      <span class="prompt-tool">Usalo cuando creas que ya terminaste</span>
+    </div>
+    <div class="prompt-body">Te voy a pasar el código de mi sistema de control de stock para comedor escolar [pegá los archivos relevantes].
+
+Actuá como revisor de código senior, no como generador. Quiero que me digas:
+1. Qué casos borde no estoy manejando (stock insuficiente para algún ingrediente, compras con cantidades inválidas, platos sin ingredientes definidos)
+2. Si hay algo en mi modelo de datos que me va a complicar cuando en el futuro quiera agregar sugerencia de recetas según el stock disponible o planificación semanal de menús
+3. Tres preguntas que probablemente me haga un profesor en la defensa, sobre por qué dejé la sugerencia de recetas y la planificación de menús fuera del MVP
+
+No me reescribas todo el proyecto. Señalame los puntos y explicame el porqué de cada uno.</div>
+  </div>
+
+  <h3 style="margin-bottom: 1rem; margin-top: 2.4rem; font-size: 1.3rem; color: var(--cream);">Hacia dónde puede crecer (después del MVP)</h3>
+
+  <div class="qgrid">
+    <div class="qcard">
+      <div class="q">Sugerencia de recetas según el stock disponible</div>
+      <div class="why">La visión original del proyecto: dado el inventario actual, qué platos definidos se pueden cocinar hoy sin necesitar comprar nada. Es lógica de "matching" entre stock disponible y recetas — bien encaminado una vez que el modelo de Plato-Ingrediente ya esté sólido.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">Cálculo de porciones y raciones según cantidad de chicos</div>
+      <div class="why">Una capa sobre el cálculo que ya existe en el MVP — la diferencia es hacerlo más inteligente: por ejemplo, ajustando según edad o tipo de ración, no solo cantidad total de porciones.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">Planificación semanal de menús con anticipación de compras</div>
+      <div class="why">El salto de "registrar el día de hoy" a "planificar la semana y saber qué comprar con anticipación" — un módulo entero, ideal si el proyecto sigue después de la materia.</div>
+    </div>
+  </div>
+</section>
+
+<div class="docente-note">
+  <div class="docente-card">
+    <span class="label-tag">Nota para la documentación de cátedra</span>
+    <p>Esta guía corresponde al proyecto <b style="color:var(--cream)">"Control de stock para comedor escolar"</b> dentro del trabajo práctico integrador de Desarrollo de Software (2° año). El alumno definió correctamente que la sugerencia de recetas y la planificación de menús quedan para una etapa futura — el trabajo pedagógico central en este caso fue ayudar a modelar bien la relación entre <b style="color:var(--cream)">Plato e Ingrediente</b>, que es lo que habilita el descuento automático de stock sin que eso implique resolver "qué cocinar".</p>
+    <p>Este es el cuarto documento de la serie. Mismo esqueleto pedagógico (Diagnóstico → Arquitectura → MVP → Balance) que los proyectos anteriores, con paleta de color propia (oliva + mostaza sobre fondo cálido oscuro) para diferenciarlo visualmente del resto.</p>
+  </div>
+</div>
+
+<footer>
+  Proyecto 04 / Control de Stock — Comedor Escolar · Tecnicatura Superior en Desarrollo de Software
+</footer>
+
+</body>
+</html>

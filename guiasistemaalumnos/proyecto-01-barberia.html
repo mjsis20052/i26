@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>De la idea al MVP — Sistema de Reservas para Barbería</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0c0a08;
+    --ink-soft: #15110d;
+    --leather: #2b1d14;
+    --leather-light: #3a2a1c;
+    --copper: #c17a3f;
+    --copper-bright: #e0985c;
+    --cream: #ede4d3;
+    --cream-dim: #b8af9f;
+    --steel: #8a8d91;
+    --blood: #a13d2f;
+    --line: rgba(237, 228, 211, 0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  /* Texture: subtle vertical grain like leather grooves */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 2px,
+      rgba(255,255,255,0.008) 3px,
+      transparent 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  h1, h2, h3 { font-family: 'Fraunces', serif; font-weight: 600; letter-spacing: -0.01em; }
+
+  .mono { font-family: 'Space Mono', monospace; }
+
+  a { color: var(--copper-bright); text-decoration: none; }
+
+  ::selection { background: var(--copper); color: var(--ink); }
+
+  /* ===== HERO ===== */
+  .hero {
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 6vh 6vw;
+    position: relative;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 0%, rgba(193,122,63,0.12), transparent 60%),
+      linear-gradient(180deg, var(--ink) 0%, var(--ink-soft) 100%);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin-bottom: 1.8rem;
+    opacity: 0;
+    animation: riseIn 0.8s 0.1s ease forwards;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.4rem, 7vw, 5.2rem);
+    line-height: 1.04;
+    max-width: 16ch;
+    color: var(--cream);
+    opacity: 0;
+    animation: riseIn 0.9s 0.3s ease forwards;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--copper-bright);
+    font-weight: 500;
+  }
+
+  .hero p.sub {
+    margin-top: 1.6rem;
+    max-width: 46ch;
+    font-size: 1.08rem;
+    color: var(--cream-dim);
+    opacity: 0;
+    animation: riseIn 0.9s 0.5s ease forwards;
+  }
+
+  .hero .razor-line {
+    margin-top: 3rem;
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--copper), transparent);
+    opacity: 0;
+    animation: riseIn 0.9s 0.7s ease forwards, growLine 1.4s 0.9s ease forwards;
+  }
+
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes growLine {
+    from { height: 0; }
+    to { height: 60px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-eyebrow, .hero h1, .hero p.sub, .hero .razor-line {
+      animation: none !important;
+      opacity: 1 !important;
+    }
+  }
+
+  /* ===== TICKET (signature element) ===== */
+  .ticket-wrap {
+    position: sticky;
+    top: 1.4rem;
+    z-index: 30;
+    display: flex;
+    justify-content: center;
+    padding: 0 1.4rem;
+    margin-top: -2.4rem;
+  }
+
+  .ticket {
+    background: var(--leather);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0.85rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.5);
+    backdrop-filter: blur(8px);
+    max-width: 760px;
+    width: 100%;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.74rem;
+  }
+
+  .ticket-label {
+    color: var(--cream-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.65rem;
+    white-space: nowrap;
+  }
+
+  .ticket-stages {
+    display: flex;
+    gap: 0.4rem;
+    flex: 1;
+    overflow-x: auto;
+  }
+
+  .ticket-stage {
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    color: var(--steel);
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    cursor: default;
+  }
+
+  .ticket-stage.active {
+    background: var(--copper);
+    color: var(--ink);
+    border-color: var(--copper);
+    font-weight: 700;
+  }
+
+  @media (max-width: 720px) {
+    .ticket-label { display: none; }
+    .ticket-wrap { margin-top: -1.6rem; }
+  }
+
+  /* ===== SECTIONS ===== */
+  .section {
+    position: relative;
+    z-index: 2;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 6.5rem 1.6rem 2rem;
+  }
+
+  .stage-marker {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .stage-num {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    color: var(--copper);
+    font-style: italic;
+  }
+
+  .stage-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--steel);
+  }
+
+  .section h2 {
+    font-size: clamp(1.9rem, 4vw, 2.7rem);
+    color: var(--cream);
+    margin-bottom: 0.6rem;
+  }
+
+  .section .lead {
+    color: var(--cream-dim);
+    font-size: 1.08rem;
+    max-width: 62ch;
+    margin-bottom: 2.6rem;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--line);
+    margin: 0 auto;
+    max-width: 880px;
+  }
+
+  /* ===== QUESTION CARDS ===== */
+  .qgrid {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2.4rem;
+  }
+
+  .qcard {
+    background: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--copper);
+    border-radius: 8px;
+    padding: 1.3rem 1.5rem;
+  }
+
+  .qcard .q {
+    font-weight: 600;
+    color: var(--cream);
+    font-size: 1.02rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .qcard .why {
+    color: var(--cream-dim);
+    font-size: 0.92rem;
+  }
+
+  .qcard .why b { color: var(--copper-bright); font-weight: 600; }
+
+  /* ===== PROMPT BLOCKS ===== */
+  .prompt-block {
+    background: var(--leather);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin: 1.6rem 0 2.2rem;
+    overflow: hidden;
+  }
+
+  .prompt-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 1.1rem;
+    background: var(--leather-light);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .prompt-head span {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--copper-bright);
+  }
+
+  .prompt-tool {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--steel);
+    border: 1px solid var(--line);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .prompt-body {
+    padding: 1.1rem 1.3rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.86rem;
+    color: var(--cream);
+    white-space: pre-wrap;
+    line-height: 1.7;
+  }
+
+  .prompt-body .ph { color: var(--copper-bright); }
+
+  /* ===== TIP / WARNING ===== */
+  .tip, .warn {
+    border-radius: 8px;
+    padding: 1.1rem 1.4rem;
+    margin: 1.4rem 0;
+    font-size: 0.95rem;
+    border: 1px solid var(--line);
+  }
+
+  .tip {
+    background: rgba(193,122,63,0.07);
+    border-left: 3px solid var(--copper);
+  }
+
+  .warn {
+    background: rgba(161,61,47,0.08);
+    border-left: 3px solid var(--blood);
+  }
+
+  .tip b, .warn b { color: var(--cream); }
+
+  .label-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--copper);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .warn .label-tag { color: var(--blood); }
+
+  /* ===== ARCH DIAGRAM ===== */
+  .arch {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.9rem;
+    margin: 1.8rem 0 2.4rem;
+  }
+
+  .arch-box {
+    background: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.1rem;
+    text-align: center;
+  }
+
+  .arch-box .t {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--copper);
+    margin-bottom: 0.5rem;
+  }
+
+  .arch-box .v {
+    font-weight: 600;
+    color: var(--cream);
+    font-size: 0.95rem;
+  }
+
+  .arch-box .d {
+    font-size: 0.8rem;
+    color: var(--cream-dim);
+    margin-top: 0.3rem;
+  }
+
+  @media (max-width: 680px) {
+    .arch { grid-template-columns: 1fr; }
+  }
+
+  /* ===== MVP SCOPE TABLE ===== */
+  .scope-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.6rem 0 2.4rem;
+    font-size: 0.92rem;
+  }
+
+  .scope-table th {
+    text-align: left;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--steel);
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .scope-table td {
+    padding: 0.75rem 0.8rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--cream-dim);
+    vertical-align: top;
+  }
+
+  .scope-table tr:last-child td { border-bottom: none; }
+
+  .pill {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .pill.in { background: rgba(193,122,63,0.18); color: var(--copper-bright); }
+  .pill.out { background: rgba(138,141,145,0.12); color: var(--steel); }
+  .pill.later { background: rgba(161,61,47,0.12); color: #c97c6f; }
+
+  /* ===== TIMELINE (weeks) ===== */
+  .weeks {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 1.8rem 0 2.4rem;
+    border-left: 2px solid var(--line);
+    padding-left: 0;
+  }
+
+  .week {
+    position: relative;
+    padding: 0 0 2rem 2rem;
+    border-left: 2px solid var(--line);
+    margin-left: -2px;
+  }
+
+  .week:last-child { padding-bottom: 0; }
+
+  .week::before {
+    content: "";
+    position: absolute;
+    left: -6px;
+    top: 0.3rem;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--copper);
+    border: 2px solid var(--ink);
+  }
+
+  .week .wk-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--copper);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.3rem;
+  }
+
+  .week .wk-title {
+    font-weight: 600;
+    color: var(--cream);
+    margin-bottom: 0.4rem;
+    font-size: 1.02rem;
+  }
+
+  .week .wk-desc {
+    color: var(--cream-dim);
+    font-size: 0.92rem;
+  }
+
+  /* ===== FOOTER / DOCENTE NOTE ===== */
+  .docente-note {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 4rem 1.6rem 6rem;
+  }
+
+  .docente-card {
+    background: var(--leather);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 2.2rem 2.4rem;
+  }
+
+  .docente-card .label-tag { margin-bottom: 0.8rem; }
+
+  .docente-card p { color: var(--cream-dim); font-size: 0.96rem; margin-bottom: 0.8rem; }
+
+  .docente-card p:last-child { margin-bottom: 0; }
+
+  footer {
+    text-align: center;
+    padding: 2.5rem 1.6rem 3.5rem;
+    color: var(--steel);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+  }
+
+  /* ===== checklist ===== */
+  .checklist { list-style: none; margin: 1.4rem 0 2.2rem; }
+  .checklist li {
+    display: flex;
+    gap: 0.7rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--cream-dim);
+    font-size: 0.94rem;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before {
+    content: "✓";
+    color: var(--copper);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-eyebrow">Proyecto de cátedra — 2° año · Desarrollo de Software</div>
+  <h1>De la idea suelta<br>al <em>MVP que funciona</em></h1>
+  <p class="sub">Guía personal para el proyecto de sistema de reservas para barbería. Pensada para recorrerla con tu asistente de IA al lado, no en lugar de tu cabeza.</p>
+  <div class="razor-line"></div>
+</section>
+
+<div class="ticket-wrap">
+  <div class="ticket">
+    <span class="ticket-label">Tu turno en el documento:</span>
+    <div class="ticket-stages">
+      <span class="ticket-stage active">01 Diagnóstico</span>
+      <span class="ticket-stage">02 Corte</span>
+      <span class="ticket-stage">03 Afeitado</span>
+      <span class="ticket-stage">04 Espejo</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STAGE 01 — DIAGNÓSTICO ============ -->
+<section class="section" id="diagnostico">
+  <div class="stage-marker">
+    <span class="stage-num">01</span>
+    <span class="stage-label">Diagnóstico</span>
+  </div>
+  <h2>Antes de tocar el teclado, sentate al cliente en la silla</h2>
+  <p class="lead">Un barbero no empieza a cortar sin mirar la cabeza que tiene enfrente. Vos tampoco deberías empezar a codear sin haber respondido esto. La IA te va a ayudar muchísimo más rápido si llegás con estas respuestas claras — si llegás solo con "quiero hacer una app de reservas para barbería", el asistente va a inventar el 80% del producto por vos, y va a inventar mal.</p>
+
+  <div class="qgrid">
+    <div class="qcard">
+      <div class="q">¿Quién reserva el turno: el cliente final, o el barbero anota a mano y vos solo lo digitalizás?</div>
+      <div class="why">Define todo lo que viene después. <b>Si reserva el cliente</b>, necesitás una vista pública sin login. <b>Si reserva el barbero</b>, es básicamente un panel de administración con calendario — proyecto mucho más chico y mucho más realista para un cuatrimestre.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">¿Hay un solo barbero o varios, cada uno con su propia agenda?</div>
+      <div class="why">Un solo barbero = un calendario. Varios barberos = necesitás modelar "recursos" (cada barbero es un recurso con su propia disponibilidad), lo cual complica la base de datos y la UI de selección. Para el MVP, <b>elegí uno solo</b> y dejá "varios barberos" como evolución futura.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">¿Qué servicios ofrece y cuánto dura cada uno?</div>
+      <div class="why">"Corte" no es lo mismo que "Corte + Barba" en duración. Esto determina cómo se calculan los horarios disponibles en el calendario — no es un detalle de diseño, es lógica de negocio central.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">¿Qué pasa si dos personas intentan reservar el mismo horario al mismo tiempo?</div>
+      <div class="why">Esta pregunta separa un proyecto de facultad de un proyecto real. No necesitás resolverlo perfecto en el MVP, pero tenés que <b>saber que el problema existe</b> antes de que la IA te entregue un código que lo ignora silenciosamente.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">¿El barbero necesita confirmar el turno, o se confirma automático al reservar?</div>
+      <div class="why">Define si hay un estado "pendiente" en tu modelo de turno, o si todo turno reservado ya es firme. Más estados = más pantallas = más tiempo de desarrollo.</div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <span class="label-tag">Cómo usar esto con la IA</span>
+    No le pidas "hacé un sistema de reservas para barbería" todavía. Primero respondé estas 5 preguntas vos mismo, en una hoja o en un doc. Después usá ese texto como insumo del primer prompt. La diferencia en la calidad de lo que te devuelve la IA es enorme.
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 1 — Cierre del diagnóstico</span>
+      <span class="prompt-tool">Usalo en Claude / ChatGPT / Copilot Chat</span>
+    </div>
+    <div class="prompt-body">Estoy diseñando un sistema de reservas para una barbería como proyecto de la materia Desarrollo de Software (2° año, tecnicatura). Estas son mis respuestas:
+
+- Quién reserva: <span class="ph">[tu respuesta]</span>
+- Cantidad de barberos: <span class="ph">[tu respuesta]</span>
+- Servicios y duración: <span class="ph">[tu respuesta]</span>
+- Confirmación: <span class="ph">[tu respuesta]</span>
+
+Quiero que actúes como arquitecto de software senior. No me generes código todavía. Primero ayudame a:
+1. Identificar las entidades principales del sistema (qué "cosas" necesito guardar en la base de datos)
+2. Detectar si me falta alguna pregunta clave antes de empezar a diseñar
+3. Proponerme 3 funcionalidades para el MVP y 3 funcionalidades que NO deberían estar en el MVP
+
+Hacé preguntas si algo no está claro, no asumas.</div>
+  </div>
+
+  <div class="warn">
+    <span class="label-tag">Riesgo común en esta etapa</span>
+    El error típico de segundo año es pasar directo de "tengo la idea" a "ya tengo el código generado", sin escribir nunca las entidades en papel. Después el alumno no puede explicar por qué su base de datos tiene esa forma. <b>Si no podés dibujar tus tablas en un pizarrón sin mirar el código, todavía no entendés tu propio sistema.</b>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ STAGE 02 — CORTE (ARQUITECTURA) ============ -->
+<section class="section" id="corte">
+  <div class="stage-marker">
+    <span class="stage-num">02</span>
+    <span class="stage-label">Corte — Arquitectura</span>
+  </div>
+  <h2>Definí la forma antes de afeitar el detalle</h2>
+  <p class="lead">El corte es la estructura: las piezas grandes, cómo se conectan, qué hace cada una. Acá es donde la IA actúa como tu "arquitecto senior" — vos le das el contexto del diagnóstico, y juntos definen el esqueleto.</p>
+
+  <div class="arch">
+    <div class="arch-box">
+      <div class="t">Frontend</div>
+      <div class="v">React + Vite</div>
+      <div class="d">Calendario de turnos, formulario de reserva, panel del barbero</div>
+    </div>
+    <div class="arch-box">
+      <div class="t">Backend / Datos</div>
+      <div class="v">Firebase Firestore</div>
+      <div class="d">Sin servidor propio que mantener — ideal para MVP de cátedra</div>
+    </div>
+    <div class="arch-box">
+      <div class="t">Estado en frontend</div>
+      <div class="v">Zustand o Context</div>
+      <div class="d">Quién está logueado, qué turno se está armando</div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <span class="label-tag">Por qué esta combinación, no otra</span>
+    Elegiste React, así que vamos a apalancarnos en lo que tu propio profe ya usa en otros proyectos de la cátedra (Firebase Firestore). No es la única opción válida — un backend propio con Node + Postgres también funcionaría — pero para un cuatrimestre, evitarte montar y mantener un servidor es tiempo que rendís en funcionalidad real.
+  </div>
+
+  <h3 style="margin-bottom: 1rem; font-size: 1.3rem; color: var(--cream);">Las entidades mínimas (lo que vas a guardar)</h3>
+
+  <table class="scope-table">
+    <tr><th>Entidad</th><th>Campos clave</th><th>Por qué existe</th></tr>
+    <tr>
+      <td><b style="color:var(--cream)">Servicio</b></td>
+      <td class="mono">nombre, duración (min), precio</td>
+      <td>Sin esto no podés calcular cuánto dura un turno</td>
+    </tr>
+    <tr>
+      <td><b style="color:var(--cream)">Turno</b></td>
+      <td class="mono">fecha, hora, servicioId, clienteNombre, clienteTelefono, estado</td>
+      <td>El corazón del sistema</td>
+    </tr>
+    <tr>
+      <td><b style="color:var(--cream)">Disponibilidad</b></td>
+      <td class="mono">díaSemana, horaInicio, horaFin</td>
+      <td>Define cuándo el barbero trabaja, para no ofrecer horarios imposibles</td>
+    </tr>
+  </table>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 2 — Diseño del modelo de datos</span>
+      <span class="prompt-tool">Pegale el resultado del Prompt 1 como contexto</span>
+    </div>
+    <div class="prompt-body">Con base en las entidades que definimos (Servicio, Turno, Disponibilidad), ayudame a diseñar la estructura de colecciones en Firestore.
+
+Necesito que me expliques:
+1. Cómo modelarías cada colección y sus documentos (con ejemplos de JSON)
+2. Cómo evitarías que se pisen dos reservas en el mismo horario, aunque sea con una validación simple
+3. Qué índices o consultas (queries) voy a necesitar para mostrar "horarios disponibles" en el calendario
+
+No me generes el código del front todavía. Quiero entender el modelo de datos primero y poder explicarlo sin mirar el código.</div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 3 — Esqueleto del proyecto React</span>
+      <span class="prompt-tool">Recién ahora pedís código</span>
+    </div>
+    <div class="prompt-body">Ahora sí, ayudame a armar el esqueleto inicial del proyecto en React + Vite, conectado a Firebase Firestore, con esta estructura de carpetas:
+
+- /components → piezas de UI reutilizables
+- /pages → Home, Reservar, PanelBarbero
+- /services → funciones que hablan con Firestore (crearTurno, obtenerDisponibilidad, etc.)
+- /store → estado global con Zustand
+
+No me llenes de funcionalidad todavía. Quiero el esqueleto navegable, con datos de prueba (mock), antes de conectar la lógica real.</div>
+  </div>
+
+  <div class="warn">
+    <span class="label-tag">Riesgo común en esta etapa</span>
+    Pedirle a la IA "hacé toda la app" en un solo prompt gigante. Te va a tirar 400 líneas que no revisaste, con decisiones de arquitectura que no elegiste vos. Si en la entrega no podés explicar por qué el código está organizado así, ese código no es tuyo — es un riesgo, no un mérito.
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ STAGE 03 — AFEITADO (MVP) ============ -->
+<section class="section" id="afeitado">
+  <div class="stage-marker">
+    <span class="stage-num">03</span>
+    <span class="stage-label">Afeitado — Construir el MVP</span>
+  </div>
+  <h2>El afeitado es lo que se nota de cerca</h2>
+  <p class="lead">Acá es donde se define qué entra al MVP y qué se queda afuera. La regla de un MVP real: <b style="color:var(--cream)">tiene que poder usarse de punta a punta</b>, aunque sea feo y le falten funciones — no tiene que poder hacer de todo.</p>
+
+  <table class="scope-table">
+    <tr><th>Funcionalidad</th><th>Estado</th><th>Nota</th></tr>
+    <tr>
+      <td>Ver horarios disponibles por día</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>Sin esto no hay producto</td>
+    </tr>
+    <tr>
+      <td>Reservar un turno (nombre + teléfono, sin login)</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>Pedir cuenta de usuario en un MVP es friction innecesaria</td>
+    </tr>
+    <tr>
+      <td>Elegir servicio (corte, barba, combo)</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>Afecta directamente la duración del turno</td>
+    </tr>
+    <tr>
+      <td>Panel simple del barbero para ver turnos del día</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>Sin esto el sistema no sirve en la vida real, aunque sea solo lectura</td>
+    </tr>
+    <tr>
+      <td>Cancelar / reprogramar turno</td>
+      <td><span class="pill later">Después</span></td>
+      <td>Importante, pero el sistema funciona sin esto el primer día</td>
+    </tr>
+    <tr>
+      <td>Notificaciones por WhatsApp/email</td>
+      <td><span class="pill later">Después</span></td>
+      <td>Es una integración externa — alto esfuerzo, no bloquea el MVP</td>
+    </tr>
+    <tr>
+      <td>Login de clientes con historial de turnos</td>
+      <td><span class="pill out">Fuera de alcance</span></td>
+      <td>Resuelve un problema que esta barbería todavía no tiene</td>
+    </tr>
+    <tr>
+      <td>Pagos online</td>
+      <td><span class="pill out">Fuera de alcance</span></td>
+      <td>En una barbería de barrio, se paga en el local. No lo inventes si nadie lo pidió.</td>
+    </tr>
+  </table>
+
+  <div class="tip">
+    <span class="label-tag">Cómo decidir qué entra y qué no</span>
+    Preguntate: <b>"¿el sistema sirve sin esto?"</b> Si la respuesta es sí, no es MVP, es versión 2. Esta tabla es un punto de partida — ajustala con tu propio criterio según lo que charlaste en el diagnóstico, pero no la dejes crecer sin que cada ítem nuevo pase esa pregunta.
+  </div>
+
+  <h3 style="margin-bottom: 1rem; margin-top: 2.4rem; font-size: 1.3rem; color: var(--cream);">Plan de 4 semanas (orientativo)</h3>
+
+  <div class="weeks">
+    <div class="week">
+      <div class="wk-label">Semana 1</div>
+      <div class="wk-title">Modelo de datos + esqueleto navegable</div>
+      <div class="wk-desc">Firestore con datos de prueba cargados a mano. React con las 3 pantallas creadas pero vacías. Nada de lógica real todavía — solo navegación.</div>
+    </div>
+    <div class="week">
+      <div class="wk-label">Semana 2</div>
+      <div class="wk-title">Flujo de reserva funcionando</div>
+      <div class="wk-desc">El cliente puede ver horarios disponibles reales y crear un turno que se guarda en Firestore. Esta semana es el corazón del proyecto.</div>
+    </div>
+    <div class="week">
+      <div class="wk-label">Semana 3</div>
+      <div class="wk-title">Panel del barbero + validaciones</div>
+      <div class="wk-desc">Vista de turnos del día. Validación para que no se pisen dos reservas en el mismo horario. Manejo de errores visibles para el usuario.</div>
+    </div>
+    <div class="week">
+      <div class="wk-label">Semana 4</div>
+      <div class="wk-title">Pulido, casos borde, defensa</div>
+      <div class="wk-desc">Probar qué pasa si reservás sin completar un campo, si elegís un horario pasado, si dos pestañas reservan a la vez. Preparar la explicación de arquitectura para la entrega.</div>
+    </div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 4 — Construir el flujo de reserva</span>
+      <span class="prompt-tool">El prompt más importante del proyecto</span>
+    </div>
+    <div class="prompt-body">Quiero implementar la pantalla de reserva de turno. El flujo es:
+
+1. El cliente elige un servicio de una lista
+2. Ve los horarios disponibles para hoy/los próximos días, calculados según la duración del servicio y la disponibilidad del barbero
+3. Completa nombre y teléfono
+4. Confirma, y el turno se guarda en Firestore con estado "pendiente"
+
+Ayudame a implementar esto paso a paso:
+- Primero la función que calcula los horarios disponibles (sin UI todavía, que la pueda probar en consola)
+- Después el componente de UI que la usa
+- Por último la función que guarda el turno, validando que el horario no se haya ocupado entre que lo calculé y que confirmé
+
+Explicame cada función a medida que la escribís, no solo me tires el código.</div>
+  </div>
+
+  <div class="warn">
+    <span class="label-tag">Riesgo común en esta etapa</span>
+    Confiar en que "como anda en mi prueba, está terminado". Probá el caso feo: ¿qué pasa si dejás el teléfono vacío? ¿Si elegís un horario de ayer? Un MVP que se rompe con el primer dato raro no es un MVP, es una demo.
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ STAGE 04 — ESPEJO (ITERACIÓN) ============ -->
+<section class="section" id="espejo">
+  <div class="stage-marker">
+    <span class="stage-num">04</span>
+    <span class="stage-label">Espejo — Revisar y evolucionar</span>
+  </div>
+  <h2>Antes de levantarte de la silla, mirate en el espejo</h2>
+  <p class="lead">El barbero te gira el sillón al espejo al final, no para venderte algo más, sino para que confirmes que esto es lo que querías. Esta etapa es revisión honesta del MVP, y un mapa de hacia dónde puede crecer después.</p>
+
+  <ul class="checklist">
+    <li>¿Puedo reservar un turno de punta a punta sin que se rompa nada?</li>
+    <li>¿Puedo explicar, sin mirar el código, por qué elegí Firestore y no otra base de datos?</li>
+    <li>¿Sé qué pasa si dos personas reservan el mismo horario a la vez, aunque no lo haya resuelto perfecto?</li>
+    <li>¿El panel del barbero le sirve a un barbero real, o solo le sirve a mí para la demo?</li>
+    <li>¿Dejé afuera del MVP cosas que no eran necesarias, en vez de simplemente no haber tenido tiempo de hacerlas?</li>
+  </ul>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 5 — Auditoría de lo construido</span>
+      <span class="prompt-tool">Usalo cuando creas que ya terminaste</span>
+    </div>
+    <div class="prompt-body">Te voy a pasar el código de mi sistema de reservas para barbería [pegá los archivos relevantes].
+
+Actuá como revisor de código senior, no como generador. Quiero que me digas:
+1. Qué casos borde no estoy manejando (horarios pasados, campos vacíos, reservas duplicadas)
+2. Si hay algo en mi modelo de datos que me va a complicar cuando quiera agregar "varios barberos" más adelante
+3. Tres preguntas que probablemente me haga un profesor en la defensa, sobre decisiones de mi arquitectura
+
+No me reescribas todo el proyecto. Señalame los puntos y explicame el porqué de cada uno.</div>
+  </div>
+
+  <h3 style="margin-bottom: 1rem; margin-top: 2.4rem; font-size: 1.3rem; color: var(--cream);">Hacia dónde puede crecer (después del MVP)</h3>
+
+  <div class="qgrid">
+    <div class="qcard">
+      <div class="q">Varios barberos con agendas independientes</div>
+      <div class="why">El salto natural si la barbería crece. Implica modelar "barbero" como entidad propia y que el cliente elija con quién atenderse.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">Notificaciones automáticas (WhatsApp/email) al confirmar o recordar el turno</div>
+      <div class="why">Alto valor percibido para un negocio real, pero requiere integrar un servicio externo — buen tema para profundizar como ampliación, no como parte del MVP.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">Panel de estadísticas para el barbero (turnos por semana, servicios más pedidos)</div>
+      <div class="why">Es la diferencia entre "sistema de reservas" y "sistema de gestión". Buen tema de ampliación si el proyecto sigue después de la materia.</div>
+    </div>
+  </div>
+</section>
+
+<div class="docente-note">
+  <div class="docente-card">
+    <span class="label-tag">Nota para la documentación de cátedra</span>
+    <p>Esta guía corresponde al proyecto <b style="color:var(--cream)">"Sistema de reservas para barbería"</b> dentro del trabajo práctico integrador de Desarrollo de Software (2° año). El enfoque pedagógico es el mismo que en el resto de la cátedra: la IA actúa como arquitecto/mentor en cada etapa, no como generador de la solución final — el alumno debe poder explicar y defender cada decisión sin depender del asistente en el momento de la entrega.</p>
+    <p>Esta es la primera guía de una serie — cada proyecto del curso tendrá su propio documento con identidad de color distinta, mismo esqueleto pedagógico (Diagnóstico → Arquitectura → MVP → Iteración), adaptado al dominio específico de cada idea.</p>
+  </div>
+</div>
+
+<footer>
+  Proyecto 01 / Sistema de Reservas — Barbería · Tecnicatura Superior en Desarrollo de Software
+</footer>
+
+</body>
+</html>

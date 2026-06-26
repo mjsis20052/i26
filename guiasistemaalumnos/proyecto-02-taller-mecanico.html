@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>De la idea al MVP — Sistema de Gestión para Taller Mecánico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0d10;
+    --ink-soft: #11161b;
+    --steelpanel: #1c2630;
+    --steelpanel-light: #243140;
+    --steel: #4a90b8;
+    --steel-bright: #6fb3d9;
+    --safety: #e8b13d;
+    --safety-bright: #f5c75e;
+    --cream: #e8ecef;
+    --cream-dim: #9aa7b0;
+    --grey: #5e6b75;
+    --hazard: #c2462f;
+    --line: rgba(232, 236, 239, 0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  /* Texture: faint diagonal hazard hatching, very subtle */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent 0px,
+      transparent 26px,
+      rgba(232,177,61,0.012) 26px,
+      rgba(232,177,61,0.012) 28px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  h1, h2, h3 { font-family: 'Oswald', sans-serif; font-weight: 600; letter-spacing: -0.005em; text-transform: none; }
+
+  .mono { font-family: 'Space Mono', monospace; }
+
+  a { color: var(--steel-bright); text-decoration: none; }
+
+  ::selection { background: var(--safety); color: var(--ink); }
+
+  /* ===== HERO ===== */
+  .hero {
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 6vh 6vw;
+    position: relative;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 0%, rgba(74,144,184,0.14), transparent 60%),
+      linear-gradient(180deg, var(--ink) 0%, var(--ink-soft) 100%);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--safety);
+    margin-bottom: 1.8rem;
+    opacity: 0;
+    animation: riseIn 0.8s 0.1s ease forwards;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.4rem, 7vw, 5rem);
+    line-height: 1.06;
+    max-width: 18ch;
+    color: var(--cream);
+    opacity: 0;
+    animation: riseIn 0.9s 0.3s ease forwards;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--steel-bright);
+    font-weight: 600;
+    border-bottom: 4px solid var(--safety);
+  }
+
+  .hero p.sub {
+    margin-top: 1.6rem;
+    max-width: 46ch;
+    font-size: 1.08rem;
+    color: var(--cream-dim);
+    opacity: 0;
+    animation: riseIn 0.9s 0.5s ease forwards;
+  }
+
+  .hero .gauge-line {
+    margin-top: 3rem;
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--steel), transparent);
+    opacity: 0;
+    animation: riseIn 0.9s 0.7s ease forwards, growLine 1.4s 0.9s ease forwards;
+  }
+
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes growLine {
+    from { height: 0; }
+    to { height: 60px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-eyebrow, .hero h1, .hero p.sub, .hero .gauge-line {
+      animation: none !important;
+      opacity: 1 !important;
+    }
+  }
+
+  /* ===== ORDEN DE TRABAJO (signature element, sticky) ===== */
+  .ticket-wrap {
+    position: sticky;
+    top: 1.4rem;
+    z-index: 30;
+    display: flex;
+    justify-content: center;
+    padding: 0 1.4rem;
+    margin-top: -2.4rem;
+  }
+
+  .ticket {
+    background: var(--steelpanel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.85rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.55);
+    backdrop-filter: blur(8px);
+    max-width: 780px;
+    width: 100%;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.74rem;
+    border-left: 3px solid var(--safety);
+  }
+
+  .ticket-label {
+    color: var(--cream-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.65rem;
+    white-space: nowrap;
+  }
+
+  .ticket-stages {
+    display: flex;
+    gap: 0.4rem;
+    flex: 1;
+    overflow-x: auto;
+  }
+
+  .ticket-stage {
+    padding: 0.3rem 0.7rem;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    color: var(--grey);
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    cursor: default;
+  }
+
+  .ticket-stage.active {
+    background: var(--safety);
+    color: var(--ink);
+    border-color: var(--safety);
+    font-weight: 700;
+  }
+
+  @media (max-width: 720px) {
+    .ticket-label { display: none; }
+    .ticket-wrap { margin-top: -1.6rem; }
+  }
+
+  /* ===== SECTIONS ===== */
+  .section {
+    position: relative;
+    z-index: 2;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 6.5rem 1.6rem 2rem;
+  }
+
+  .stage-marker {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .stage-num {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1rem;
+    color: var(--safety);
+    font-weight: 600;
+  }
+
+  .stage-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+
+  .section h2 {
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    color: var(--cream);
+    margin-bottom: 0.6rem;
+  }
+
+  .section .lead {
+    color: var(--cream-dim);
+    font-size: 1.08rem;
+    max-width: 62ch;
+    margin-bottom: 2.6rem;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--line);
+    margin: 0 auto;
+    max-width: 880px;
+  }
+
+  /* ===== QUESTION CARDS ===== */
+  .qgrid {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2.4rem;
+  }
+
+  .qcard {
+    background: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--steel);
+    border-radius: 6px;
+    padding: 1.3rem 1.5rem;
+  }
+
+  .qcard .q {
+    font-weight: 600;
+    color: var(--cream);
+    font-size: 1.02rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .qcard .why {
+    color: var(--cream-dim);
+    font-size: 0.92rem;
+  }
+
+  .qcard .why b { color: var(--steel-bright); font-weight: 600; }
+
+  /* ===== PROMPT BLOCKS ===== */
+  .prompt-block {
+    background: var(--steelpanel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    margin: 1.6rem 0 2.2rem;
+    overflow: hidden;
+  }
+
+  .prompt-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 1.1rem;
+    background: var(--steelpanel-light);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .prompt-head span {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--safety-bright);
+  }
+
+  .prompt-tool {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--grey);
+    border: 1px solid var(--line);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .prompt-body {
+    padding: 1.1rem 1.3rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.86rem;
+    color: var(--cream);
+    white-space: pre-wrap;
+    line-height: 1.7;
+  }
+
+  .prompt-body .ph { color: var(--safety-bright); }
+
+  /* ===== TIP / WARNING ===== */
+  .tip, .warn {
+    border-radius: 6px;
+    padding: 1.1rem 1.4rem;
+    margin: 1.4rem 0;
+    font-size: 0.95rem;
+    border: 1px solid var(--line);
+  }
+
+  .tip {
+    background: rgba(74,144,184,0.08);
+    border-left: 3px solid var(--steel);
+  }
+
+  .warn {
+    background: rgba(194,70,47,0.1);
+    border-left: 3px solid var(--hazard);
+  }
+
+  .tip b, .warn b { color: var(--cream); }
+
+  .label-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--steel-bright);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .warn .label-tag { color: var(--hazard); }
+
+  /* ===== ARCH DIAGRAM ===== */
+  .arch {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.9rem;
+    margin: 1.8rem 0 2.4rem;
+  }
+
+  .arch-box {
+    background: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 1.1rem;
+    text-align: center;
+  }
+
+  .arch-box .t {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--safety);
+    margin-bottom: 0.5rem;
+  }
+
+  .arch-box .v {
+    font-weight: 600;
+    color: var(--cream);
+    font-size: 0.95rem;
+  }
+
+  .arch-box .d {
+    font-size: 0.8rem;
+    color: var(--cream-dim);
+    margin-top: 0.3rem;
+  }
+
+  @media (max-width: 680px) {
+    .arch { grid-template-columns: 1fr; }
+  }
+
+  /* ===== MVP SCOPE TABLE ===== */
+  .scope-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.6rem 0 2.4rem;
+    font-size: 0.92rem;
+  }
+
+  .scope-table th {
+    text-align: left;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--grey);
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .scope-table td {
+    padding: 0.75rem 0.8rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--cream-dim);
+    vertical-align: top;
+  }
+
+  .scope-table tr:last-child td { border-bottom: none; }
+
+  .pill {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .pill.in { background: rgba(232,177,61,0.18); color: var(--safety-bright); }
+  .pill.out { background: rgba(94,107,117,0.18); color: var(--grey); }
+  .pill.later { background: rgba(194,70,47,0.14); color: #d98c7a; }
+
+  /* ===== TIMELINE (weeks) ===== */
+  .weeks {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 1.8rem 0 2.4rem;
+    padding-left: 0;
+  }
+
+  .week {
+    position: relative;
+    padding: 0 0 2rem 2rem;
+    border-left: 2px solid var(--line);
+    margin-left: -2px;
+  }
+
+  .week:last-child { padding-bottom: 0; }
+
+  .week::before {
+    content: "";
+    position: absolute;
+    left: -6px;
+    top: 0.3rem;
+    width: 11px;
+    height: 11px;
+    border-radius: 2px;
+    background: var(--safety);
+    border: 2px solid var(--ink);
+    transform: rotate(45deg);
+  }
+
+  .week .wk-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--safety);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.3rem;
+  }
+
+  .week .wk-title {
+    font-weight: 600;
+    color: var(--cream);
+    margin-bottom: 0.4rem;
+    font-size: 1.02rem;
+  }
+
+  .week .wk-desc {
+    color: var(--cream-dim);
+    font-size: 0.92rem;
+  }
+
+  /* ===== VEHICLE DAMAGE DIAGRAM (signature element) ===== */
+  .damage-diagram {
+    background: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.8rem;
+    margin: 1.8rem 0 2.4rem;
+  }
+
+  .damage-diagram .dd-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--grey);
+    margin-bottom: 1.2rem;
+    text-align: center;
+  }
+
+  .dd-views {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.8rem;
+  }
+
+  .dd-view {
+    text-align: center;
+  }
+
+  .dd-view svg { width: 100%; height: auto; }
+
+  .dd-view .dd-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--cream-dim);
+    margin-top: 0.5rem;
+  }
+
+  @media (max-width: 680px) {
+    .dd-views { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ===== FOOTER / DOCENTE NOTE ===== */
+  .docente-note {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 4rem 1.6rem 6rem;
+  }
+
+  .docente-card {
+    background: var(--steelpanel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 2.2rem 2.4rem;
+    border-left: 3px solid var(--safety);
+  }
+
+  .docente-card .label-tag { margin-bottom: 0.8rem; }
+
+  .docente-card p { color: var(--cream-dim); font-size: 0.96rem; margin-bottom: 0.8rem; }
+
+  .docente-card p:last-child { margin-bottom: 0; }
+
+  footer {
+    text-align: center;
+    padding: 2.5rem 1.6rem 3.5rem;
+    color: var(--grey);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+  }
+
+  /* ===== checklist ===== */
+  .checklist { list-style: none; margin: 1.4rem 0 2.2rem; }
+  .checklist li {
+    display: flex;
+    gap: 0.7rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--cream-dim);
+    font-size: 0.94rem;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before {
+    content: "✓";
+    color: var(--safety);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-eyebrow">Proyecto de cátedra — 2° año · Desarrollo de Software</div>
+  <h1>De la idea suelta<br>al <em>MVP que funciona</em></h1>
+  <p class="sub">Guía personal para el proyecto de gestión de taller mecánico: ingreso de vehículos, estado, repuestos y el camino hacia la automatización del taller.</p>
+  <div class="gauge-line"></div>
+</section>
+
+<div class="ticket-wrap">
+  <div class="ticket">
+    <span class="ticket-label">Orden de trabajo:</span>
+    <div class="ticket-stages">
+      <span class="ticket-stage active">01 Diagnóstico</span>
+      <span class="ticket-stage">02 Estructura</span>
+      <span class="ticket-stage">03 MVP</span>
+      <span class="ticket-stage">04 Revisión</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STAGE 01 — DIAGNÓSTICO ============ -->
+<section class="section" id="diagnostico">
+  <div class="stage-marker">
+    <span class="stage-num">01</span>
+    <span class="stage-label">Diagnóstico</span>
+  </div>
+  <h2>Antes de levantar el capot, mirá bien el auto que entra</h2>
+  <p class="lead">En un taller, antes de tocar el motor, hay una recepción: se anota cómo llegó el auto, qué tiene, qué pide el cliente. Tu sistema arranca en ese mismo punto. Si le pedís a la IA "hacé un sistema para taller mecánico" sin haber respondido esto, vas a recibir un CRUD genérico que no entiende nada de cómo funciona un taller de verdad.</p>
+
+  <div class="qgrid">
+    <div class="qcard">
+      <div class="q">¿El "estado de ingreso" es solo una descripción escrita, o necesitás marcar visualmente dónde está el daño en el auto?</div>
+      <div class="why">Define la complejidad de toda una pantalla. <b>Marcar sobre un diagrama</b> es mucho más demostrable y profesional que un campo de texto libre, y no es tan difícil de hacer como parece: alcanza con un dibujo simple del auto y puntos que el usuario ubica con clicks.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">¿Quién registra el ingreso: el mecánico, alguien de recepción, o ambos en distintos momentos?</div>
+      <div class="why">Si hay más de un rol, necesitás distinguir permisos (quién puede registrar ingreso, quién puede cerrar la orden de trabajo). Para un MVP de cátedra, <b>un solo tipo de usuario interno</b> alcanza — sin clientes externos todavía.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">¿Qué pasa con un vehículo desde que entra hasta que sale? ¿Qué estados intermedios tiene?</div>
+      <div class="why">Esto es el corazón del sistema: <span class="mono" style="font-size:0.85em;">Ingresado → En diagnóstico → En reparación → Esperando repuesto → Listo para retirar</span> es un flujo típico. Sin definir estos pasos, no hay "orden de trabajo" real, solo una lista de autos.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">Cuando "automatizás el taller", ¿qué tarea manual concreta estás reemplazando?</div>
+      <div class="why">"Automatizar" sin un verbo específico detrás es una palabra vacía. ¿Reemplaza la planilla de Excel del dueño? ¿El cuaderno de anotaciones en el mostrador? Nombrá la tarea real — eso es lo que vas a poder defender en la entrega.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">¿El descuento de repuestos del stock tiene que ser automático al usarlos en una reparación, o alguien lo anota a mano todavía?</div>
+      <div class="why">Automático es más ambicioso y es justo el tipo de funcionalidad que demuestra que entendiste el negocio: cuando el mecánico marca "usé 1 filtro de aceite" en la orden de trabajo, el stock se actualiza solo, sin un segundo paso manual.</div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <span class="label-tag">Cómo usar esto con la IA</span>
+    Respondé estas 5 preguntas en tus propias palabras antes de escribir el primer prompt. La clave de este proyecto en particular es el <b>flujo de estados del vehículo</b> — si no lo tenés claro vos, la IA te va a proponer uno genérico que no representa cómo trabaja un taller real.
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 1 — Cierre del diagnóstico</span>
+      <span class="prompt-tool">Usalo en Claude / ChatGPT / Copilot Chat</span>
+    </div>
+    <div class="prompt-body">Estoy diseñando un sistema de gestión para un taller mecánico, como proyecto de la materia Desarrollo de Software (2° año, tecnicatura). El objetivo final es automatizar la gestión del taller: registro de ingreso de vehículos con su estado, y manejo de repuestos.
+
+Estas son mis respuestas:
+- Registro de estado: <span class="ph">[texto / diagrama visual / fotos]</span>
+- Quién usa el sistema: <span class="ph">[tu respuesta]</span>
+- Estados del vehículo desde que entra hasta que sale: <span class="ph">[tu respuesta]</span>
+- Tarea manual concreta que se reemplaza: <span class="ph">[tu respuesta]</span>
+- Descuento de repuestos: <span class="ph">[automático / manual]</span>
+
+Actuá como arquitecto de software senior. Todavía no generes código. Ayudame a:
+1. Identificar las entidades principales del sistema
+2. Proponer el flujo completo de estados de una orden de trabajo, de punta a punta
+3. Sugerirme 3 funcionalidades para el MVP y 3 que deberían quedar fuera de alcance por ahora
+
+Hacé preguntas si te falta información, no asumas nada del negocio.</div>
+  </div>
+
+  <div class="warn">
+    <span class="label-tag">Riesgo común en esta etapa</span>
+    Pensar el sistema como "una tabla de autos" en lugar de como "un flujo de trabajo". Un taller no gestiona autos sueltos: gestiona <b>órdenes de trabajo</b> que avanzan por etapas. Si tu modelo de datos no tiene un concepto de "estado actual" y "historial de cambios de estado", te vas a quedar corto rápido.
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ STAGE 02 — ESTRUCTURA ============ -->
+<section class="section" id="estructura">
+  <div class="stage-marker">
+    <span class="stage-num">02</span>
+    <span class="stage-label">Estructura — Arquitectura</span>
+  </div>
+  <h2>El chasis antes que la pintura</h2>
+  <p class="lead">Definí las piezas grandes del sistema y cómo se conectan antes de escribir una sola línea de UI. Acá la IA actúa como tu arquitecto senior: vos aportás el contexto del diagnóstico, juntos definen el esqueleto de datos y de pantallas.</p>
+
+  <div class="arch">
+    <div class="arch-box">
+      <div class="t">Frontend</div>
+      <div class="v">React + Vite</div>
+      <div class="d">Ingreso de vehículo, orden de trabajo, stock de repuestos</div>
+    </div>
+    <div class="arch-box">
+      <div class="t">Backend / Datos</div>
+      <div class="v">Firebase Firestore</div>
+      <div class="d">Sin servidor propio que mantener — ideal para el MVP de cátedra</div>
+    </div>
+    <div class="arch-box">
+      <div class="t">Estado en frontend</div>
+      <div class="v">Zustand o Context</div>
+      <div class="d">Orden de trabajo activa, usuario logueado, carrito de repuestos a usar</div>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom: 1rem; font-size: 1.3rem; color: var(--cream);">Las entidades mínimas (lo que vas a guardar)</h3>
+
+  <table class="scope-table">
+    <tr><th>Entidad</th><th>Campos clave</th><th>Por qué existe</th></tr>
+    <tr>
+      <td><b style="color:var(--cream)">Vehículo</b></td>
+      <td class="mono">patente, marca, modelo, año, clienteNombre, clienteTelefono</td>
+      <td>Identifica de quién es el auto que está en el taller</td>
+    </tr>
+    <tr>
+      <td><b style="color:var(--cream)">Orden de Trabajo</b></td>
+      <td class="mono">vehiculoId, fechaIngreso, estadoActual, diagnostico, danios[]</td>
+      <td>El corazón del sistema — representa "este auto pasando por el taller"</td>
+    </tr>
+    <tr>
+      <td><b style="color:var(--cream)">Daño registrado</b></td>
+      <td class="mono">vista (frente/atrás/lateral), coordenadaX, coordenadaY, descripción</td>
+      <td>Permite marcar visualmente sobre el diagrama del auto, no solo en texto</td>
+    </tr>
+    <tr>
+      <td><b style="color:var(--cream)">Repuesto</b></td>
+      <td class="mono">nombre, código, stockActual, precio</td>
+      <td>Inventario base — sin esto no hay nada que descontar</td>
+    </tr>
+    <tr>
+      <td><b style="color:var(--cream)">Repuesto usado en OT</b></td>
+      <td class="mono">ordenTrabajoId, repuestoId, cantidad</td>
+      <td>Conecta una reparación con el stock que consumió — esta tabla es la que "automatiza"</td>
+    </tr>
+  </table>
+
+  <div class="tip">
+    <span class="label-tag">Por qué este diagrama de daños y no fotos sueltas</span>
+    Marcar puntos sobre un dibujo esquemático del auto (4 vistas: frente, atrás, lateral izquierdo, lateral derecho) es mucho más fácil de implementar que análisis de imágenes reales, y se ve igual de profesional en una demo. Guardás coordenadas relativas (0 a 1) en vez de píxeles, así funciona en cualquier tamaño de pantalla.
+  </div>
+
+  <div class="damage-diagram">
+    <div class="dd-label">Referencia visual — 4 vistas del vehículo para marcar daños</div>
+    <div class="dd-views">
+      <div class="dd-view">
+        <svg viewBox="0 0 100 60"><rect x="10" y="15" width="80" height="30" rx="6" fill="none" stroke="#4a90b8" stroke-width="2"/><circle cx="50" cy="14" r="2" fill="#e8b13d"/><rect x="20" y="42" width="12" height="8" rx="2" fill="none" stroke="#4a90b8" stroke-width="1.5"/><rect x="68" y="42" width="12" height="8" rx="2" fill="none" stroke="#4a90b8" stroke-width="1.5"/></svg>
+        <div class="dd-name">Frente</div>
+      </div>
+      <div class="dd-view">
+        <svg viewBox="0 0 100 60"><rect x="10" y="15" width="80" height="30" rx="6" fill="none" stroke="#4a90b8" stroke-width="2"/><rect x="20" y="42" width="12" height="8" rx="2" fill="none" stroke="#4a90b8" stroke-width="1.5"/><rect x="68" y="42" width="12" height="8" rx="2" fill="none" stroke="#4a90b8" stroke-width="1.5"/></svg>
+        <div class="dd-name">Atrás</div>
+      </div>
+      <div class="dd-view">
+        <svg viewBox="0 0 100 60"><path d="M8 40 Q8 28 22 26 L35 14 L70 14 L85 26 Q92 28 92 40 L92 44 L8 44 Z" fill="none" stroke="#4a90b8" stroke-width="2"/><circle cx="28" cy="44" r="6" fill="none" stroke="#4a90b8" stroke-width="1.5"/><circle cx="72" cy="44" r="6" fill="none" stroke="#4a90b8" stroke-width="1.5"/></svg>
+        <div class="dd-name">Lateral Izq.</div>
+      </div>
+      <div class="dd-view">
+        <svg viewBox="0 0 100 60" transform="scale(-1,1)" style="transform:scaleX(-1)"><path d="M8 40 Q8 28 22 26 L35 14 L70 14 L85 26 Q92 28 92 40 L92 44 L8 44 Z" fill="none" stroke="#4a90b8" stroke-width="2"/><circle cx="28" cy="44" r="6" fill="none" stroke="#4a90b8" stroke-width="1.5"/><circle cx="72" cy="44" r="6" fill="none" stroke="#4a90b8" stroke-width="1.5"/></svg>
+        <div class="dd-name">Lateral Der.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 2 — Diseño del modelo de datos y flujo de estados</span>
+      <span class="prompt-tool">Pegale el resultado del Prompt 1 como contexto</span>
+    </div>
+    <div class="prompt-body">Con base en las entidades que definimos (Vehículo, Orden de Trabajo, Daño registrado, Repuesto, Repuesto usado en OT), ayudame a:
+
+1. Diseñar la estructura de colecciones en Firestore, con ejemplos de documentos en JSON
+2. Definir el flujo de estados de una Orden de Trabajo (de "ingresado" a "entregado"), incluyendo qué transiciones son válidas y cuáles no
+3. Diseñar cómo se descuenta el stock de un repuesto automáticamente cuando se lo asocia a una orden de trabajo, sin que quede en negativo
+
+No me generes el código del front todavía. Quiero entender el modelo de datos y poder explicarlo en una defensa sin mirar el código.</div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 3 — Esqueleto del proyecto React</span>
+      <span class="prompt-tool">Recién ahora pedís código</span>
+    </div>
+    <div class="prompt-body">Ahora sí, ayudame a armar el esqueleto inicial del proyecto en React + Vite, conectado a Firebase Firestore, con esta estructura de carpetas:
+
+- /components → piezas de UI reutilizables (incluyendo un componente de diagrama de vehículo con 4 vistas, donde se puedan marcar puntos de daño con click)
+- /pages → IngresoVehiculo, OrdenTrabajo, Stock
+- /services → funciones que hablan con Firestore (crearOrdenTrabajo, registrarDanio, descontarStock, etc.)
+- /store → estado global con Zustand
+
+No me llenes de funcionalidad todavía. Quiero el esqueleto navegable, con datos de prueba (mock), antes de conectar la lógica real.</div>
+  </div>
+
+  <div class="warn">
+    <span class="label-tag">Riesgo común en esta etapa</span>
+    Pedirle a la IA todo de una sola vez, incluyendo el componente de diagrama interactivo. Ese componente en particular conviene pedirlo aparte y probarlo solo, antes de integrarlo al resto — es la pieza más visual y la que más vas a necesitar ajustar a mano.
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ STAGE 03 — MVP ============ -->
+<section class="section" id="mvp">
+  <div class="stage-marker">
+    <span class="stage-num">03</span>
+    <span class="stage-label">MVP — Construir lo esencial</span>
+  </div>
+  <h2>Lo que tiene que andar para que sirva el lunes a la mañana</h2>
+  <p class="lead">Un MVP de taller real no necesita reportes ni dashboards. Necesita que cuando entra un auto roto, alguien lo pueda registrar, y que cuando se usa un repuesto, el stock no quede mintiendo.</p>
+
+  <table class="scope-table">
+    <tr><th>Funcionalidad</th><th>Estado</th><th>Nota</th></tr>
+    <tr>
+      <td>Registrar ingreso de vehículo con datos básicos</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>Punto de partida de todo el sistema</td>
+    </tr>
+    <tr>
+      <td>Marcar daños visualmente sobre el diagrama del vehículo</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>Es el diferencial del proyecto — vale la pena el esfuerzo</td>
+    </tr>
+    <tr>
+      <td>Avanzar la orden de trabajo por sus estados (ingresado → reparando → listo)</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>Sin esto, el sistema es una lista estática, no una herramienta de gestión</td>
+    </tr>
+    <tr>
+      <td>Ver stock de repuestos y descontar automático al usarlos en una OT</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>Es la parte de "automatizar" que pediste — el corazón del valor del sistema</td>
+    </tr>
+    <tr>
+      <td>Alerta de stock bajo / repuesto agotado</td>
+      <td><span class="pill later">Después</span></td>
+      <td>Útil, pero el sistema funciona sin esto el primer día</td>
+    </tr>
+    <tr>
+      <td>Notificación al cliente cuando el auto está listo</td>
+      <td><span class="pill later">Después</span></td>
+      <td>Requiere integración externa (WhatsApp/email) — buena ampliación, no bloquea el MVP</td>
+    </tr>
+    <tr>
+      <td>Portal para que el cliente consulte el estado de su auto online</td>
+      <td><span class="pill out">Fuera de alcance</span></td>
+      <td>Implica autenticación pública y otra capa entera de seguridad</td>
+    </tr>
+    <tr>
+      <td>Facturación / contabilidad integrada</td>
+      <td><span class="pill out">Fuera de alcance</span></td>
+      <td>Es un dominio en sí mismo — no lo resuelvas de prepo dentro de este proyecto</td>
+    </tr>
+  </table>
+
+  <div class="tip">
+    <span class="label-tag">Cómo decidir qué entra y qué no</span>
+    Preguntate: <b>"¿el taller puede operar sin esto desde el primer día?"</b> Si la respuesta es sí, no es MVP. Ajustá esta tabla según lo que vos definiste en el diagnóstico, pero pasá cada funcionalidad nueva por esa pregunta antes de sumarla.
+  </div>
+
+  <h3 style="margin-bottom: 1rem; margin-top: 2.4rem; font-size: 1.3rem; color: var(--cream);">Plan de 4 semanas (orientativo)</h3>
+
+  <div class="weeks">
+    <div class="week">
+      <div class="wk-label">Semana 1</div>
+      <div class="wk-title">Modelo de datos + esqueleto navegable</div>
+      <div class="wk-desc">Firestore con vehículos y repuestos de prueba cargados a mano. React con las 3 pantallas creadas pero sin lógica real — solo navegación entre ellas.</div>
+    </div>
+    <div class="week">
+      <div class="wk-label">Semana 2</div>
+      <div class="wk-title">Ingreso de vehículo + diagrama de daños</div>
+      <div class="wk-desc">El formulario de ingreso funciona de punta a punta, y se pueden marcar puntos de daño sobre las 4 vistas del vehículo, guardados en Firestore.</div>
+    </div>
+    <div class="week">
+      <div class="wk-label">Semana 3</div>
+      <div class="wk-title">Flujo de estados + stock automático</div>
+      <div class="wk-desc">La orden de trabajo avanza por sus estados. Al asociar un repuesto a una reparación, el stock se descuenta solo, sin pasos manuales.</div>
+    </div>
+    <div class="week">
+      <div class="wk-label">Semana 4</div>
+      <div class="wk-title">Pulido, casos borde, defensa</div>
+      <div class="wk-desc">Probar qué pasa si intentás usar más stock del que hay, si dos personas editan la misma orden a la vez, si falta un dato obligatorio. Preparar la explicación de arquitectura.</div>
+    </div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 4 — Construir el descuento automático de stock</span>
+      <span class="prompt-tool">El prompt más importante del proyecto</span>
+    </div>
+    <div class="prompt-body">Quiero implementar la funcionalidad de uso de repuestos en una orden de trabajo. El flujo es:
+
+1. Desde la orden de trabajo, el mecánico busca un repuesto por nombre o código
+2. Indica la cantidad que va a usar
+3. Al confirmar, se descuenta esa cantidad del stock del repuesto y se registra el vínculo entre la orden de trabajo y el repuesto usado
+4. Si no hay stock suficiente, el sistema avisa y no permite continuar
+
+Ayudame a implementarlo paso a paso:
+- Primero la función que valida si hay stock suficiente y descuenta (sin UI todavía, que la pueda probar en consola)
+- Después el componente de UI que la usa, integrado a la pantalla de orden de trabajo
+- Explicame cómo evitar que el stock quede mal si dos mecánicos usan el mismo repuesto casi al mismo tiempo
+
+Explicame cada función a medida que la escribís, no solo me tires el código.</div>
+  </div>
+
+  <div class="warn">
+    <span class="label-tag">Riesgo común en esta etapa</span>
+    Hacer que el descuento de stock funcione "en el caso feliz" y no probar el caso real: ¿qué pasa si pedís usar 5 filtros y quedan 2? Un sistema de taller que deja el stock en negativo no automatiza nada, lo único que hace es mentir con más prolijidad que un cuaderno.
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ STAGE 04 — REVISIÓN ============ -->
+<section class="section" id="revision">
+  <div class="stage-marker">
+    <span class="stage-num">04</span>
+    <span class="stage-label">Revisión — Control de calidad</span>
+  </div>
+  <h2>El último control antes de entregar las llaves</h2>
+  <p class="lead">En un taller serio, antes de devolver el auto hay un control de calidad: se revisa que lo que se prometió arreglar, esté arreglado. Esta etapa es esa misma revisión, aplicada a tu propio sistema.</p>
+
+  <ul class="checklist">
+    <li>¿Puedo registrar el ingreso de un vehículo y marcar daños sobre el diagrama sin que se rompa nada?</li>
+    <li>¿Puedo explicar, sin mirar el código, por qué modelé el stock como una colección separada de los repuestos usados en cada orden?</li>
+    <li>¿Sé qué pasa si se intenta usar más stock del disponible, aunque no lo haya resuelto perfecto?</li>
+    <li>¿El flujo de estados de la orden de trabajo representa cómo trabaja un taller real, o es genérico ("pendiente/en proceso/terminado") sin sentido del dominio?</li>
+    <li>¿Dejé afuera del MVP cosas que no eran necesarias, en vez de simplemente no haber tenido tiempo de hacerlas?</li>
+  </ul>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 5 — Auditoría de lo construido</span>
+      <span class="prompt-tool">Usalo cuando creas que ya terminaste</span>
+    </div>
+    <div class="prompt-body">Te voy a pasar el código de mi sistema de gestión de taller mecánico [pegá los archivos relevantes].
+
+Actuá como revisor de código senior, no como generador. Quiero que me digas:
+1. Qué casos borde no estoy manejando (stock insuficiente, transiciones de estado inválidas, datos faltantes)
+2. Si hay algo en mi modelo de datos que me va a complicar cuando quiera agregar "notificaciones al cliente" o "portal de seguimiento" más adelante
+3. Tres preguntas que probablemente me haga un profesor en la defensa, sobre decisiones de mi arquitectura
+
+No me reescribas todo el proyecto. Señalame los puntos y explicame el porqué de cada uno.</div>
+  </div>
+
+  <h3 style="margin-bottom: 1rem; margin-top: 2.4rem; font-size: 1.3rem; color: var(--cream);">Hacia dónde puede crecer (después del MVP)</h3>
+
+  <div class="qgrid">
+    <div class="qcard">
+      <div class="q">Alertas automáticas de stock bajo o repuesto agotado</div>
+      <div class="why">Buen siguiente paso: avisar antes de que el repuesto se agote, no solo descontarlo cuando se usa.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">Notificaciones al cliente por WhatsApp cuando el auto está listo</div>
+      <div class="why">Alto valor percibido para un negocio real, requiere integrar un servicio externo — buen tema de ampliación, no parte del MVP.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">Historial completo por vehículo (todas sus visitas al taller, no solo la actual)</div>
+      <div class="why">Convierte el sistema de "gestión de una reparación" a "gestión de la relación con el cliente" — un salto de alcance importante, ideal si el proyecto sigue después de la materia.</div>
+    </div>
+  </div>
+</section>
+
+<div class="docente-note">
+  <div class="docente-card">
+    <span class="label-tag">Nota para la documentación de cátedra</span>
+    <p>Esta guía corresponde al proyecto <b style="color:var(--cream)">"Sistema de gestión para taller mecánico"</b> dentro del trabajo práctico integrador de Desarrollo de Software (2° año). El enfoque pedagógico es el mismo que en el resto de la cátedra: la IA actúa como arquitecto/mentor en cada etapa, no como generador de la solución final — el alumno debe poder explicar y defender cada decisión sin depender del asistente en el momento de la entrega.</p>
+    <p>Este es el segundo documento de la serie. Mismo esqueleto pedagógico (Diagnóstico → Arquitectura → MVP → Revisión) que el proyecto de barbería, con paleta de color propia (acero + amarillo de seguridad industrial) para diferenciarlo visualmente del resto.</p>
+  </div>
+</div>
+
+<footer>
+  Proyecto 02 / Sistema de Gestión — Taller Mecánico · Tecnicatura Superior en Desarrollo de Software
+</footer>
+
+</body>
+</html>

@@ -1281,6 +1281,163 @@
                 gap: 1rem;
             }
         }
+        /* ─── PROYECTOS DE ALUMNOS ─── */
+        .proyectos-section {
+            margin-bottom: 5rem;
+            padding-top: 1rem;
+        }
+
+        .proyectos-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--accent-a);
+            text-transform: uppercase;
+            letter-spacing: 0.4em;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .proyectos-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .proyectos-intro {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            max-width: 640px;
+        }
+
+        .proyectos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .proj-mini-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all .35s cubic-bezier(.23,1,.32,1);
+            position: relative;
+        }
+
+        .proj-mini-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 40px rgba(0,0,0,.4);
+        }
+
+        .proj-mini-strip {
+            height: 3px;
+            width: 100%;
+        }
+
+        .proj-mini-inner {
+            padding: 1.2rem 1.3rem 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .proj-mini-icon {
+            font-size: 1.5rem;
+            margin-bottom: .6rem;
+        }
+
+        .proj-mini-num {
+            font-family: 'Space Mono', monospace;
+            font-size: .52rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: .3rem;
+        }
+
+        .proj-mini-card h3 {
+            font-size: .95rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: .5rem;
+            transition: color .25s;
+        }
+
+        .proj-mini-cta {
+            font-family: 'Space Mono', monospace;
+            font-size: .55rem;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            margin-top: auto;
+            padding-top: .8rem;
+            border-top: 1px solid rgba(255,255,255,.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all .25s;
+        }
+
+        .proj-mini-arrow {
+            opacity: .3;
+            transition: all .3s;
+        }
+
+        .proj-mini-card:hover .proj-mini-arrow { opacity: 1; transform: translateX(4px); }
+
+        /* per-card colors */
+        .proj-mini-barberia .proj-mini-strip { background: linear-gradient(90deg,#c17a3f,#e0985c); }
+        .proj-mini-barberia:hover { border-color: #c17a3f; }
+        .proj-mini-barberia:hover h3 { color: #e0985c; }
+        .proj-mini-barberia .proj-mini-cta { color: #c17a3f; }
+
+        .proj-mini-taller .proj-mini-strip { background: linear-gradient(90deg,#243140,#4a90b8,#e8b13d); }
+        .proj-mini-taller:hover { border-color: #4a90b8; }
+        .proj-mini-taller:hover h3 { color: #6fb3d9; }
+        .proj-mini-taller .proj-mini-cta { color: #4a90b8; }
+
+        .proj-mini-gaming .proj-mini-strip { background: linear-gradient(90deg,#d63ef0,#7c3aed,#b6f53a); }
+        .proj-mini-gaming:hover { border-color: #d63ef0; }
+        .proj-mini-gaming:hover h3 { color: #ed6bfa; }
+        .proj-mini-gaming .proj-mini-cta { color: #d63ef0; }
+
+        .proj-mini-comedor .proj-mini-strip { background: linear-gradient(90deg,#7c8a4a,#a3b566,#d9a440); }
+        .proj-mini-comedor:hover { border-color: #a3b566; }
+        .proj-mini-comedor:hover h3 { color: #c5d478; }
+        .proj-mini-comedor .proj-mini-cta { color: #a3b566; }
+
+        .proyectos-ver-todos {
+            display: inline-flex;
+            align-items: center;
+            gap: .6rem;
+            font-family: 'Space Mono', monospace;
+            font-size: .62rem;
+            text-transform: uppercase;
+            letter-spacing: .15em;
+            text-decoration: none;
+            color: var(--accent-a);
+            border: 1px solid rgba(245,158,11,.3);
+            border-radius: 5px;
+            padding: .5rem 1.1rem;
+            margin-top: 1.5rem;
+            transition: all .25s;
+            background: rgba(245,158,11,.05);
+        }
+
+        .proyectos-ver-todos:hover {
+            background: rgba(245,158,11,.12);
+            border-color: rgba(245,158,11,.6);
+        }
+
         /* ─── BACK TO TOP ─── */
         .back-to-top {
             position: fixed;
@@ -1493,6 +1650,10 @@
                 </a></li>
             <li><a href="3ro/clase-disenio-ui-I26.html" id="snav-ui">
                     <span class="nav-badge yr3">3°</span> <span>Diseño UI</span>
+                </a></li>
+            <div class="site-nav-sep"></div>
+            <li><a href="guiasistemaalumnos/index.html" id="snav-proyectos" style="color:#f59e0b;border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.08);">
+                    🚀 <span>Proyectos</span>
                 </a></li>
         </ul>
     </nav>
@@ -1859,10 +2020,56 @@
             </div>
         </section>
 
+        <!-- PROYECTOS DE ALUMNOS -->
+        <section class="proyectos-section" style="border-top: 1px solid var(--border); padding-top: 4rem; margin-top: 4rem;">
+            <h2 class="proyectos-title">Proyectos de Alumnos · 2° Año</h2>
+            <p class="proyectos-intro">De la idea al MVP. Sistemas reales diseñados y construidos por los alumnos de 2° año — con arquitectura, base de datos y flujo completo de usuario.</p>
+            <div class="proyectos-grid">
+                <a href="guiasistemaalumnos/proyecto-01-barberia.html" class="proj-mini-card proj-mini-barberia">
+                    <div class="proj-mini-strip"></div>
+                    <div class="proj-mini-inner">
+                        <div class="proj-mini-icon">✂️</div>
+                        <div class="proj-mini-num">Proyecto 01</div>
+                        <h3>Sistema de Reservas para Barbería</h3>
+                        <div class="proj-mini-cta">Ver guía <span class="proj-mini-arrow">→</span></div>
+                    </div>
+                </a>
+                <a href="guiasistemaalumnos/proyecto-02-taller-mecanico.html" class="proj-mini-card proj-mini-taller">
+                    <div class="proj-mini-strip"></div>
+                    <div class="proj-mini-inner">
+                        <div class="proj-mini-icon">🔧</div>
+                        <div class="proj-mini-num">Proyecto 02</div>
+                        <h3>Sistema de Gestión para Taller Mecánico</h3>
+                        <div class="proj-mini-cta">Ver guía <span class="proj-mini-arrow">→</span></div>
+                    </div>
+                </a>
+                <a href="guiasistemaalumnos/proyecto-03-gaming-hub.html" class="proj-mini-card proj-mini-gaming">
+                    <div class="proj-mini-strip"></div>
+                    <div class="proj-mini-inner">
+                        <div class="proj-mini-icon">🎮</div>
+                        <div class="proj-mini-num">Proyecto 03</div>
+                        <h3>Plataforma de Eventos y Noticias Gaming</h3>
+                        <div class="proj-mini-cta">Ver guía <span class="proj-mini-arrow">→</span></div>
+                    </div>
+                </a>
+                <a href="guiasistemaalumnos/proyecto-04-comedor-escolar.html" class="proj-mini-card proj-mini-comedor">
+                    <div class="proj-mini-strip"></div>
+                    <div class="proj-mini-inner">
+                        <div class="proj-mini-icon">🥗</div>
+                        <div class="proj-mini-num">Proyecto 04</div>
+                        <h3>Control de Stock para Comedor Escolar</h3>
+                        <div class="proj-mini-cta">Ver guía <span class="proj-mini-arrow">→</span></div>
+                    </div>
+                </a>
+            </div>
+            <a href="guiasistemaalumnos/index.html" class="proyectos-ver-todos">Ver todos los proyectos →</a>
+        </section>
+
         <!-- ÚLTIMAS ACTUALIZACIONES (LÍNEA DE TIEMPO) -->
         <section class="year-section" style="margin-top: 4rem; border-top: 1px solid var(--border); padding-top: 4rem;">
             <h2 class="year-title" style="color: var(--accent-a);">Línea de tiempo de actualizaciones</h2>
             <div style="color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 0.9rem; line-height: 1.8;">
+                <p><strong>26 de Junio, 2026:</strong> Nueva sección <strong>Proyectos de Alumnos</strong> — 4 sistemas reales construidos por alumnos de 2° año: barbería, taller mecánico, gaming hub y comedor escolar (<a href="guiasistemaalumnos/index.html" style="color:var(--accent-a);text-decoration:none;">ver proyectos</a>).</p>
                 <p><strong>9 de Junio, 2026:</strong> Nueva guía <strong>IA como Arquitecto de Software</strong> agregada al programa de 2° año — flujo completo: GPT como arquitecto → Antigravity como ejecutor, caso agencia de autos y prompts listos para usar (<a href="2do/guia-alumno-ia-arquitecto.html" style="color:#378ADD;text-decoration:none;">ver guía</a>).</p>
                 <p><strong>27 de Mayo, 2026:</strong> Nueva clase de <strong>Full Stack: Sistema de Reservas con Next.js</strong> agregada al programa de 2° año — Programación y Desarrollo de Apps Móviles (<a href="2do/clase_fullstack_reservas.html" style="color:var(--accent-a);text-decoration:none;">ver clase Full Stack</a>).</p>
                 <p><strong>22 de Mayo, 2026:</strong> Nueva clase de <strong>Diseño de Interfaces (UI) con IA</strong> agregada al programa de 3° año (<a href="3ro/clase-disenio-ui-I26.html" style="color:var(--accent-p);text-decoration:none;">ver clase de UI</a>).</p>

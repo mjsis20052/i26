@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>De la idea al MVP — Plataforma de Eventos y Noticias Gaming</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0612;
+    --ink-soft: #110b1c;
+    --panel: #1a1228;
+    --panel-light: #241a36;
+    --magenta: #d63ef0;
+    --magenta-bright: #ed6bfa;
+    --lime: #b6f53a;
+    --lime-dim: #8fc92e;
+    --cream: #ede9f5;
+    --cream-dim: #a89fc0;
+    --grey: #6e6483;
+    --danger: #ff4d6d;
+    --line: rgba(237, 233, 245, 0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle at 20% 0%, rgba(214,62,240,0.06), transparent 40%),
+                       radial-gradient(circle at 85% 30%, rgba(182,245,58,0.04), transparent 40%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; font-weight: 600; letter-spacing: -0.01em; }
+
+  .mono { font-family: 'Space Mono', monospace; }
+
+  a { color: var(--magenta-bright); text-decoration: none; }
+
+  ::selection { background: var(--magenta); color: var(--ink); }
+
+  /* ===== NAVBAR (functional menu) ===== */
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 2rem;
+    background: rgba(10, 6, 18, 0.72);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .navbar .brand {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--cream);
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .navbar .brand .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--lime);
+    box-shadow: 0 0 8px var(--lime);
+  }
+
+  .navbar nav {
+    display: flex;
+    gap: 0.3rem;
+  }
+
+  .navbar nav button {
+    background: transparent;
+    border: none;
+    color: var(--cream-dim);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.5rem 0.85rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .navbar nav button:hover {
+    color: var(--cream);
+    background: var(--panel);
+  }
+
+  .navbar nav button.active {
+    color: var(--magenta-bright);
+    background: rgba(214,62,240,0.1);
+  }
+
+  .navbar .menu-toggle {
+    display: none;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--cream);
+    border-radius: 6px;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+
+  @media (max-width: 760px) {
+    .navbar nav {
+      position: fixed;
+      top: 58px;
+      left: 0;
+      right: 0;
+      background: var(--ink-soft);
+      border-bottom: 1px solid var(--line);
+      flex-direction: column;
+      padding: 0.6rem;
+      gap: 0.2rem;
+      display: none;
+    }
+    .navbar nav.open { display: flex; }
+    .navbar nav button { text-align: left; width: 100%; }
+    .navbar .menu-toggle { display: block; }
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 6vh 6vw;
+    position: relative;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 0%, rgba(214,62,240,0.16), transparent 60%),
+      linear-gradient(180deg, var(--ink) 0%, var(--ink-soft) 100%);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--lime);
+    margin-bottom: 1.8rem;
+    opacity: 0;
+    animation: riseIn 0.8s 0.1s ease forwards;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.4rem, 7vw, 5rem);
+    line-height: 1.06;
+    max-width: 18ch;
+    color: var(--cream);
+    opacity: 0;
+    animation: riseIn 0.9s 0.3s ease forwards;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--magenta-bright);
+    font-weight: 700;
+  }
+
+  .hero p.sub {
+    margin-top: 1.6rem;
+    max-width: 48ch;
+    font-size: 1.08rem;
+    color: var(--cream-dim);
+    opacity: 0;
+    animation: riseIn 0.9s 0.5s ease forwards;
+  }
+
+  .hero .pulse-line {
+    margin-top: 3rem;
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--magenta), transparent);
+    opacity: 0;
+    animation: riseIn 0.9s 0.7s ease forwards, growLine 1.4s 0.9s ease forwards;
+  }
+
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes growLine {
+    from { height: 0; }
+    to { height: 60px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-eyebrow, .hero h1, .hero p.sub, .hero .pulse-line {
+      animation: none !important;
+      opacity: 1 !important;
+    }
+  }
+
+  /* ===== SCOPE WARNING BANNER (signature element) ===== */
+  .scope-wrap {
+    position: sticky;
+    top: 4.2rem;
+    z-index: 30;
+    display: flex;
+    justify-content: center;
+    padding: 0 1.4rem;
+    margin-top: -2.2rem;
+  }
+
+  .scope-banner {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.85rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.55);
+    backdrop-filter: blur(8px);
+    max-width: 780px;
+    width: 100%;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.74rem;
+    border-left: 3px solid var(--magenta);
+  }
+
+  .scope-label {
+    color: var(--cream-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.65rem;
+    white-space: nowrap;
+  }
+
+  .scope-stages {
+    display: flex;
+    gap: 0.4rem;
+    flex: 1;
+    overflow-x: auto;
+  }
+
+  .scope-stage {
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    color: var(--grey);
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    cursor: default;
+  }
+
+  .scope-stage.active {
+    background: var(--magenta);
+    color: var(--ink);
+    border-color: var(--magenta);
+    font-weight: 700;
+  }
+
+  @media (max-width: 720px) {
+    .scope-label { display: none; }
+  }
+
+  /* ===== SECTIONS ===== */
+  .section {
+    position: relative;
+    z-index: 2;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 6.5rem 1.6rem 2rem;
+  }
+
+  .stage-marker {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .stage-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1rem;
+    color: var(--magenta-bright);
+    font-weight: 700;
+  }
+
+  .stage-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+
+  .section h2 {
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    color: var(--cream);
+    margin-bottom: 0.6rem;
+  }
+
+  .section .lead {
+    color: var(--cream-dim);
+    font-size: 1.08rem;
+    max-width: 62ch;
+    margin-bottom: 2.6rem;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--line);
+    margin: 0 auto;
+    max-width: 880px;
+  }
+
+  /* ===== QUESTION CARDS ===== */
+  .qgrid {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2.4rem;
+  }
+
+  .qcard {
+    background: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--magenta);
+    border-radius: 8px;
+    padding: 1.3rem 1.5rem;
+  }
+
+  .qcard .q {
+    font-weight: 600;
+    color: var(--cream);
+    font-size: 1.02rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .qcard .why {
+    color: var(--cream-dim);
+    font-size: 0.92rem;
+  }
+
+  .qcard .why b { color: var(--magenta-bright); font-weight: 600; }
+
+  /* ===== PROMPT BLOCKS ===== */
+  .prompt-block {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin: 1.6rem 0 2.2rem;
+    overflow: hidden;
+  }
+
+  .prompt-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 1.1rem;
+    background: var(--panel-light);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .prompt-head span {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--lime);
+  }
+
+  .prompt-tool {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--grey);
+    border: 1px solid var(--line);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .prompt-body {
+    padding: 1.1rem 1.3rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.86rem;
+    color: var(--cream);
+    white-space: pre-wrap;
+    line-height: 1.7;
+  }
+
+  .prompt-body .ph { color: var(--lime); }
+
+  /* ===== TIP / WARNING ===== */
+  .tip, .warn {
+    border-radius: 8px;
+    padding: 1.1rem 1.4rem;
+    margin: 1.4rem 0;
+    font-size: 0.95rem;
+    border: 1px solid var(--line);
+  }
+
+  .tip {
+    background: rgba(182,245,58,0.05);
+    border-left: 3px solid var(--lime-dim);
+  }
+
+  .warn {
+    background: rgba(255,77,109,0.08);
+    border-left: 3px solid var(--danger);
+  }
+
+  .tip b, .warn b { color: var(--cream); }
+
+  .label-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--lime);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .warn .label-tag { color: var(--danger); }
+
+  /* ===== ARCH DIAGRAM ===== */
+  .arch {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.9rem;
+    margin: 1.8rem 0 2.4rem;
+  }
+
+  .arch-box {
+    background: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.1rem;
+    text-align: center;
+  }
+
+  .arch-box .t {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--magenta-bright);
+    margin-bottom: 0.5rem;
+  }
+
+  .arch-box .v {
+    font-weight: 600;
+    color: var(--cream);
+    font-size: 0.95rem;
+  }
+
+  .arch-box .d {
+    font-size: 0.8rem;
+    color: var(--cream-dim);
+    margin-top: 0.3rem;
+  }
+
+  @media (max-width: 680px) {
+    .arch { grid-template-columns: 1fr; }
+  }
+
+  /* ===== MVP SCOPE TABLE ===== */
+  .scope-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.6rem 0 2.4rem;
+    font-size: 0.92rem;
+  }
+
+  .scope-table th {
+    text-align: left;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--grey);
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .scope-table td {
+    padding: 0.75rem 0.8rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--cream-dim);
+    vertical-align: top;
+  }
+
+  .scope-table tr:last-child td { border-bottom: none; }
+
+  .pill {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .pill.in { background: rgba(214,62,240,0.18); color: var(--magenta-bright); }
+  .pill.out { background: rgba(110,100,131,0.18); color: var(--grey); }
+  .pill.later { background: rgba(255,77,109,0.12); color: #ff8fa3; }
+
+  /* ===== MODULE MAP (signature element) ===== */
+  .module-map {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.9rem;
+    margin: 1.8rem 0 2.4rem;
+  }
+
+  .module-card {
+    background: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.3rem;
+    position: relative;
+  }
+
+  .module-card.core {
+    border-color: var(--magenta);
+    background: rgba(214,62,240,0.05);
+  }
+
+  .module-card .m-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--lime);
+    margin-bottom: 0.5rem;
+  }
+
+  .module-card.core .m-tag { color: var(--magenta-bright); }
+
+  .module-card .m-title {
+    font-weight: 600;
+    color: var(--cream);
+    font-size: 0.98rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .module-card .m-desc {
+    font-size: 0.82rem;
+    color: var(--cream-dim);
+  }
+
+  @media (max-width: 680px) {
+    .module-map { grid-template-columns: 1fr; }
+  }
+
+  /* ===== TIMELINE (weeks) ===== */
+  .weeks {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 1.8rem 0 2.4rem;
+  }
+
+  .week {
+    position: relative;
+    padding: 0 0 2rem 2rem;
+    border-left: 2px solid var(--line);
+    margin-left: -2px;
+  }
+
+  .week:last-child { padding-bottom: 0; }
+
+  .week::before {
+    content: "";
+    position: absolute;
+    left: -6px;
+    top: 0.3rem;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--magenta);
+    border: 2px solid var(--ink);
+  }
+
+  .week .wk-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--magenta-bright);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.3rem;
+  }
+
+  .week .wk-title {
+    font-weight: 600;
+    color: var(--cream);
+    margin-bottom: 0.4rem;
+    font-size: 1.02rem;
+  }
+
+  .week .wk-desc {
+    color: var(--cream-dim);
+    font-size: 0.92rem;
+  }
+
+  /* ===== FOOTER / DOCENTE NOTE ===== */
+  .docente-note {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 4rem 1.6rem 6rem;
+  }
+
+  .docente-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 2.2rem 2.4rem;
+    border-left: 3px solid var(--magenta);
+  }
+
+  .docente-card .label-tag { margin-bottom: 0.8rem; }
+
+  .docente-card p { color: var(--cream-dim); font-size: 0.96rem; margin-bottom: 0.8rem; }
+
+  .docente-card p:last-child { margin-bottom: 0; }
+
+  footer {
+    text-align: center;
+    padding: 2.5rem 1.6rem 3.5rem;
+    color: var(--grey);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+  }
+
+  /* ===== checklist ===== */
+  .checklist { list-style: none; margin: 1.4rem 0 2.2rem; }
+  .checklist li {
+    display: flex;
+    gap: 0.7rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--cream-dim);
+    font-size: 0.94rem;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before {
+    content: "✓";
+    color: var(--lime);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+</style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="brand"><span class="dot"></span> proyecto / gaming-hub</div>
+  <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú" aria-expanded="false">☰</button>
+  <nav id="navMenu">
+    <button data-target="diagnostico" class="active">Diagnóstico</button>
+    <button data-target="arquitectura">Arquitectura</button>
+    <button data-target="mvp">MVP</button>
+    <button data-target="revision">Revisión</button>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-eyebrow">Proyecto de cátedra — 2° año · Desarrollo de Software</div>
+  <h1>De la idea suelta<br>al <em>MVP que funciona</em></h1>
+  <p class="sub">Guía personal para la plataforma de eventos, noticias y suscripciones del mundo gaming. El proyecto más ambicioso de la serie — y por eso, el que más necesita un alcance bien recortado.</p>
+  <div class="pulse-line"></div>
+</section>
+
+<div class="scope-wrap">
+  <div class="scope-banner">
+    <span class="scope-label">Estás en:</span>
+    <div class="scope-stages">
+      <span class="scope-stage active">01 Diagnóstico</span>
+      <span class="scope-stage">02 Arquitectura</span>
+      <span class="scope-stage">03 MVP</span>
+      <span class="scope-stage">04 Revisión</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STAGE 01 — DIAGNÓSTICO ============ -->
+<section class="section" id="diagnostico">
+  <div class="stage-marker">
+    <span class="stage-num">01</span>
+    <span class="stage-label">Diagnóstico</span>
+  </div>
+  <h2>Esta idea pide cinco productos. Vos vas a entregar uno.</h2>
+  <p class="lead">"Calendario de eventos + portal de noticias + suscripciones + descuentos + lanzamientos, todo unificado" no es un MVP, es la visión de una empresa en 3 años. El trabajo de esta etapa no es sumar funcionalidades — es <b style="color:var(--cream)">elegir cuál de estos cinco productos vas a construir primero</b>, y dejar el resto como mapa de ruta.</p>
+
+  <div class="qgrid">
+    <div class="qcard">
+      <div class="q">¿De dónde van a salir las noticias y novedades?</div>
+      <div class="why">Si pensás conectar con APIs externas o hacer scraping de otros sitios, eso es un proyecto de integración en sí mismo — datos inconsistentes, límites de uso, formatos que cambian. <b>Para un MVP de cátedra, las noticias las publica un admin desde un panel propio.</b> Es menos "automágico" pero es algo que vos controlás de punta a punta.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">¿Qué significa exactamente "suscribirse a un evento"?</div>
+      <div class="why">¿Es solo guardarlo en una lista personal? ¿Es recibir una notificación cuando se acerca la fecha? ¿Es pagar para acceder a beneficios? Cada nivel es un proyecto de tamaño distinto. Elegí el más simple que igual demuestre el concepto: <b>guardar interés + ver notificación</b>.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">Los descuentos que ofrecés, ¿son reales (conectados a una tienda) o simbólicos dentro del sistema?</div>
+      <div class="why">Una integración de pagos o cupones reales con marcas externas es, otra vez, un proyecto aparte con riesgos legales y técnicos que no corresponden a un trabajo de cátedra. <b>Simulá el beneficio</b>: el usuario suscripto desbloquea un código o insignia dentro de la plataforma, sin que haya dinero real de por medio.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">¿Hay un solo tipo de usuario, o hay roles distintos (lector vs. quien publica eventos/noticias)?</div>
+      <div class="why">Necesitás como mínimo dos roles: <span class="mono" style="font-size:0.85em;">usuario</span> (consume contenido, se suscribe) y <span class="mono" style="font-size:0.85em;">admin</span> (publica eventos y noticias). Sin esta distinción, no hay manera de poblar la plataforma de contenido.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">Si tuvieras que elegir solo UNO de los 5 conceptos (calendario, noticias, suscripción, descuentos, lanzamientos) para que el sistema "sirva" desde el día uno, ¿cuál es?</div>
+      <div class="why">Esta es la pregunta que más importa de todo el documento. La respuesta más común y más sana es <b>"calendario de eventos + noticias", con suscripción simple como capa encima</b> — son las dos piezas que sin el otro, no tienen sentido juntas.</div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <span class="label-tag">Cómo usar esto con la IA</span>
+    No le pidas a la IA que te ayude a construir "la plataforma completa". Pedile ayuda para <b>recortar el alcance primero</b>. Un buen arquitecto, humano o IA, te va a devolver preguntas antes que código cuando el pedido es así de amplio — si la IA te tira código de entrada sin preguntar nada, no la dejes, hacele las preguntas vos mismo en el prompt.
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 1 — Recortar el alcance antes de diseñar</span>
+      <span class="prompt-tool">Usalo en Claude / ChatGPT / Copilot Chat</span>
+    </div>
+    <div class="prompt-body">Quiero construir una plataforma web que unifique el mundo de los videojuegos: calendario de eventos, portal de noticias, suscripción a eventos con notificaciones, y descuentos/beneficios simulados para suscriptores. Es un proyecto de la materia Desarrollo de Software (2° año), con tiempo de un cuatrimestre.
+
+Mis decisiones de alcance hasta ahora:
+- Noticias: <span class="ph">[curadas por un admin / otra opción]</span>
+- Suscripción a eventos: <span class="ph">[guardar interés + notificación / otra opción]</span>
+- Descuentos: <span class="ph">[simulados, sin integración real / otra opción]</span>
+
+Actuá como arquitecto de software senior. Antes de proponerme una arquitectura, decime:
+1. Si ves algún punto donde el alcance sigue siendo demasiado ambicioso para un cuatrimestre
+2. Cuáles de estas funcionalidades dependen unas de otras, y cuáles son completamente independientes
+3. Cuál sería, en tu opinión, el "núcleo mínimo" que ya se siente como una plataforma real, aunque le falten partes
+
+Hacé preguntas si necesitás más contexto, no asumas el alcance por mí.</div>
+  </div>
+
+  <div class="warn">
+    <span class="label-tag">Riesgo común en esta etapa — el más grande de los tres proyectos</span>
+    Empezar a construir las 5 funcionalidades en paralelo "un poco de cada una" durante todo el cuatrimestre, y llegar a la entrega con todo a medio hacer. Es preferible <b>tener 2 módulos completos y robustos</b> que 5 módulos rotos. Esta decisión se toma ahora, no en la semana 12.
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ STAGE 02 — ARQUITECTURA ============ -->
+<section class="section" id="arquitectura">
+  <div class="stage-marker">
+    <span class="stage-num">02</span>
+    <span class="stage-label">Arquitectura</span>
+  </div>
+  <h2>Mapa de módulos: cuál es el núcleo, cuál es satélite</h2>
+  <p class="lead">Esta plataforma tiene que pensarse como módulos separados que se pueden construir, probar y mostrar de forma independiente. Así, si llega la entrega y un módulo no está terminado, los demás siguen funcionando.</p>
+
+  <div class="module-map">
+    <div class="module-card core">
+      <div class="m-tag">Núcleo — MVP</div>
+      <div class="m-title">Calendario de eventos</div>
+      <div class="m-desc">Lista y vista de calendario de eventos gaming (lanzamientos, torneos, convenciones)</div>
+    </div>
+    <div class="module-card core">
+      <div class="m-tag">Núcleo — MVP</div>
+      <div class="m-title">Portal de noticias</div>
+      <div class="m-desc">Feed de novedades publicadas por un admin, con categorías</div>
+    </div>
+    <div class="module-card core">
+      <div class="m-tag">Núcleo — MVP</div>
+      <div class="m-title">Cuenta de usuario</div>
+      <div class="m-desc">Login simple + perfil con lista de eventos suscriptos</div>
+    </div>
+    <div class="module-card">
+      <div class="m-tag">Satélite — ampliación</div>
+      <div class="m-title">Notificaciones de eventos próximos</div>
+      <div class="m-desc">Aviso cuando un evento suscripto se acerca en fecha</div>
+    </div>
+    <div class="module-card">
+      <div class="m-tag">Satélite — ampliación</div>
+      <div class="m-title">Descuentos simulados</div>
+      <div class="m-desc">Insignias/códigos que se desbloquean al suscribirse, sin pago real</div>
+    </div>
+    <div class="module-card">
+      <div class="m-tag">Satélite — futuro</div>
+      <div class="m-title">Integración con APIs externas</div>
+      <div class="m-desc">Noticias o lanzamientos desde fuentes reales (Steam, IGDB, etc.)</div>
+    </div>
+  </div>
+
+  <div class="arch">
+    <div class="arch-box">
+      <div class="t">Frontend</div>
+      <div class="v">React + Vite</div>
+      <div class="d">Calendario, feed de noticias, perfil de usuario</div>
+    </div>
+    <div class="arch-box">
+      <div class="t">Backend / Datos</div>
+      <div class="v">Firebase Firestore + Auth</div>
+      <div class="d">Auth resuelve el login sin que tengas que construirlo a mano</div>
+    </div>
+    <div class="arch-box">
+      <div class="t">Estado en frontend</div>
+      <div class="v">Zustand o Context</div>
+      <div class="d">Usuario logueado, filtros activos, eventos suscriptos en memoria</div>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom: 1rem; font-size: 1.3rem; color: var(--cream);">Las entidades mínimas (lo que vas a guardar)</h3>
+
+  <table class="scope-table">
+    <tr><th>Entidad</th><th>Campos clave</th><th>Por qué existe</th></tr>
+    <tr>
+      <td><b style="color:var(--cream)">Evento</b></td>
+      <td class="mono">titulo, fecha, categoría, descripción, imagen</td>
+      <td>El calendario no existe sin esto</td>
+    </tr>
+    <tr>
+      <td><b style="color:var(--cream)">Noticia</b></td>
+      <td class="mono">titulo, cuerpo, fechaPublicación, autorId, categoría</td>
+      <td>El feed de novedades</td>
+    </tr>
+    <tr>
+      <td><b style="color:var(--cream)">Usuario</b></td>
+      <td class="mono">nombre, email, rol (usuario/admin)</td>
+      <td>Distingue quién consume contenido de quién lo publica</td>
+    </tr>
+    <tr>
+      <td><b style="color:var(--cream)">Suscripción</b></td>
+      <td class="mono">usuarioId, eventoId, fechaSuscripción</td>
+      <td>Conecta usuarios con los eventos que les interesan — es lo que habilita notificaciones y "beneficios" después</td>
+    </tr>
+  </table>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 2 — Diseño del modelo de datos</span>
+      <span class="prompt-tool">Pegale el resultado del Prompt 1 como contexto</span>
+    </div>
+    <div class="prompt-body">Con base en el alcance que definimos (calendario de eventos, portal de noticias, cuentas de usuario con suscripción a eventos), ayudame a:
+
+1. Diseñar la estructura de colecciones en Firestore, con ejemplos de documentos en JSON, para Evento, Noticia, Usuario y Suscripción
+2. Proponer cómo modelarías los roles de usuario (usuario común vs. admin) usando Firebase Auth
+3. Sugerirme cómo estructurarías las queries para mostrar "próximos eventos" ordenados por fecha, y "eventos a los que estoy suscripto"
+
+No me generes el código del front todavía. Quiero entender el modelo de datos y poder explicarlo en una defensa sin mirar el código.</div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 3 — Esqueleto del proyecto React</span>
+      <span class="prompt-tool">Recién ahora pedís código</span>
+    </div>
+    <div class="prompt-body">Ahora sí, ayudame a armar el esqueleto inicial del proyecto en React + Vite, con Firebase (Firestore + Auth), con esta estructura de carpetas:
+
+- /components → piezas de UI reutilizables (tarjeta de evento, tarjeta de noticia, navbar con menú funcional)
+- /pages → Home, Calendario, Noticias, Perfil, AdminPanel
+- /services → funciones que hablan con Firestore (crearEvento, suscribirseAEvento, publicarNoticia, etc.)
+- /store → estado global con Zustand (usuario logueado, lista de suscripciones)
+
+Asegurate de que la navegación entre páginas funcione de punta a punta — todos los links del menú principal tienen que llevar a una página real, aunque esté vacía por ahora. No me llenes de funcionalidad todavía.</div>
+  </div>
+
+  <div class="warn">
+    <span class="label-tag">Riesgo común en esta etapa</span>
+    Armar el menú de navegación con links que "van a andar después". Un menú con destinos rotos es de los primeros detalles que se nota en una demo o defensa. Desde el esqueleto inicial, cada botón del menú tiene que llevar a algún lado, aunque sea una pantalla vacía con un título.
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ STAGE 03 — MVP ============ -->
+<section class="section" id="mvp">
+  <div class="stage-marker">
+    <span class="stage-num">03</span>
+    <span class="stage-label">MVP — Construir el núcleo</span>
+  </div>
+  <h2>Dos módulos completos valen más que cinco a medias</h2>
+  <p class="lead">El MVP de esta plataforma son los 3 módulos "núcleo" del mapa de arquitectura: calendario, noticias y cuenta de usuario con suscripción. Todo lo demás es evolución, no carencia.</p>
+
+  <table class="scope-table">
+    <tr><th>Funcionalidad</th><th>Estado</th><th>Nota</th></tr>
+    <tr>
+      <td>Ver listado y calendario de próximos eventos</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>El punto de entrada principal de la plataforma</td>
+    </tr>
+    <tr>
+      <td>Ver feed de noticias publicadas por el admin</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>Segundo pilar — sin esto no hay "portal unificado"</td>
+    </tr>
+    <tr>
+      <td>Crear cuenta / login y suscribirse a un evento</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>Lo que convierte el sitio de "vidriera" a "plataforma con usuarios"</td>
+    </tr>
+    <tr>
+      <td>Panel admin simple para publicar eventos y noticias</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>Sin esto, el contenido tendría que cargarse a mano en la base de datos</td>
+    </tr>
+    <tr>
+      <td>Notificación cuando un evento suscripto se acerca</td>
+      <td><span class="pill later">Después</span></td>
+      <td>Valioso, pero la plataforma funciona sin esto el primer día</td>
+    </tr>
+    <tr>
+      <td>Descuentos/insignias simuladas para suscriptores</td>
+      <td><span class="pill later">Después</span></td>
+      <td>Buena capa de "gamificación" para sumar una vez que el núcleo esté sólido</td>
+    </tr>
+    <tr>
+      <td>Integración con fuentes externas (APIs de noticias/lanzamientos reales)</td>
+      <td><span class="pill out">Fuera de alcance</span></td>
+      <td>Proyecto de integración aparte — variabilidad y mantenimiento que no corresponden a un cuatrimestre</td>
+    </tr>
+    <tr>
+      <td>Descuentos reales conectados a tiendas/marcas</td>
+      <td><span class="pill out">Fuera de alcance</span></td>
+      <td>Implica acuerdos comerciales y pagos reales — no es un problema técnico de cátedra</td>
+    </tr>
+  </table>
+
+  <div class="tip">
+    <span class="label-tag">Cómo decidir qué entra y qué no</span>
+    Preguntate: <b>"¿esto es parte del núcleo, o es una capa que mejora algo que ya funciona?"</b> Notificaciones y descuentos mejoran la suscripción — pero la suscripción tiene que existir y funcionar primero, sin ellos.
+  </div>
+
+  <h3 style="margin-bottom: 1rem; margin-top: 2.4rem; font-size: 1.3rem; color: var(--cream);">Plan de 5 semanas (orientativo)</h3>
+
+  <div class="weeks">
+    <div class="week">
+      <div class="wk-label">Semana 1</div>
+      <div class="wk-title">Modelo de datos + esqueleto navegable</div>
+      <div class="wk-desc">Firestore con eventos y noticias de prueba. React con todas las páginas creadas y el menú funcionando de punta a punta, aunque el contenido sea estático.</div>
+    </div>
+    <div class="week">
+      <div class="wk-label">Semana 2</div>
+      <div class="wk-title">Calendario de eventos real</div>
+      <div class="wk-desc">Los eventos se leen de Firestore, se pueden filtrar por fecha/categoría, y se ven tanto en lista como en formato calendario.</div>
+    </div>
+    <div class="week">
+      <div class="wk-label">Semana 3</div>
+      <div class="wk-title">Portal de noticias + panel admin</div>
+      <div class="wk-desc">El feed de noticias funciona, y existe una pantalla (solo para el rol admin) donde se publican eventos y noticias nuevas.</div>
+    </div>
+    <div class="week">
+      <div class="wk-label">Semana 4</div>
+      <div class="wk-title">Cuenta de usuario y suscripciones</div>
+      <div class="wk-desc">Login funcional con Firebase Auth. Un usuario puede suscribirse a un evento y ver su lista de eventos suscriptos en su perfil.</div>
+    </div>
+    <div class="week">
+      <div class="wk-label">Semana 5</div>
+      <div class="wk-title">Pulido, casos borde, defensa</div>
+      <div class="wk-desc">Probar qué pasa si un usuario no logueado intenta suscribirse, si el admin intenta publicar un evento sin fecha, si el menú lleva a páginas vacías. Preparar la explicación de arquitectura.</div>
+    </div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 4 — Construir el flujo de suscripción a eventos</span>
+      <span class="prompt-tool">El prompt más importante del proyecto</span>
+    </div>
+    <div class="prompt-body">Quiero implementar la funcionalidad de suscripción a eventos. El flujo es:
+
+1. Un usuario logueado ve la página de un evento
+2. Hace click en "Suscribirme"
+3. Se crea un registro de suscripción vinculando su usuario con ese evento
+4. En su perfil, puede ver la lista de todos los eventos a los que está suscripto, y puede des-suscribirse
+
+Ayudame a implementarlo paso a paso:
+- Primero la función que verifica si el usuario está logueado, y si no, lo redirige a iniciar sesión antes de continuar
+- Después la función que crea (o elimina) la suscripción en Firestore
+- Por último el componente de perfil que lista las suscripciones del usuario actual
+
+Explicame cada función a medida que la escribís, no solo me tires el código.</div>
+  </div>
+
+  <div class="warn">
+    <span class="label-tag">Riesgo común en esta etapa</span>
+    Dejar que cualquiera se suscriba sin estar logueado, "para simplificar". Eso rompe el sentido de tener cuentas de usuario en primer lugar, y es exactamente el tipo de atajo que un profesor va a notar en la defensa.
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ STAGE 04 — REVISIÓN ============ -->
+<section class="section" id="revision">
+  <div class="stage-marker">
+    <span class="stage-num">04</span>
+    <span class="stage-label">Revisión — Control de calidad</span>
+  </div>
+  <h2>¿El núcleo se sostiene solo, sin las funciones satélite?</h2>
+  <p class="lead">Esta es la pregunta central de la revisión en este proyecto en particular: si sacás notificaciones y descuentos del medio, ¿la plataforma sigue teniendo sentido y se siente terminada? Si la respuesta es sí, elegiste bien el núcleo.</p>
+
+  <ul class="checklist">
+    <li>¿Todos los botones del menú principal llevan a una pantalla real, sin links rotos?</li>
+    <li>¿Puedo crear una cuenta, suscribirme a un evento y verlo reflejado en mi perfil sin que se rompa nada?</li>
+    <li>¿Puedo explicar, sin mirar el código, por qué separé "Suscripción" como su propia entidad en vez de guardarla dentro de Usuario o de Evento?</li>
+    <li>¿El panel admin le sirve a alguien que realmente tiene que publicar contenido todos los días, o solo sirve para la demo?</li>
+    <li>¿Dejé afuera del MVP funciones que no eran necesarias, en vez de simplemente no haber tenido tiempo de hacerlas?</li>
+  </ul>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 5 — Auditoría de lo construido</span>
+      <span class="prompt-tool">Usalo cuando creas que ya terminaste</span>
+    </div>
+    <div class="prompt-body">Te voy a pasar el código de mi plataforma de eventos y noticias gaming [pegá los archivos relevantes].
+
+Actuá como revisor de código senior, no como generador. Quiero que me digas:
+1. Qué casos borde no estoy manejando (usuario no logueado intentando suscribirse, admin publicando contenido incompleto, links del menú sin destino)
+2. Si hay algo en mi modelo de datos que me va a complicar cuando quiera agregar notificaciones o descuentos simulados más adelante
+3. Tres preguntas que probablemente me haga un profesor en la defensa, sobre por qué elegí este alcance y no el proyecto completo que tenía en mente al principio
+
+No me reescribas todo el proyecto. Señalame los puntos y explicame el porqué de cada uno.</div>
+  </div>
+
+  <h3 style="margin-bottom: 1rem; margin-top: 2.4rem; font-size: 1.3rem; color: var(--cream);">Hacia dónde puede crecer (después del MVP)</h3>
+
+  <div class="qgrid">
+    <div class="qcard">
+      <div class="q">Notificaciones de eventos próximos</div>
+      <div class="why">El siguiente paso natural una vez que la suscripción ya funciona — avisar antes de que llegue la fecha, por email o dentro de la app.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">Descuentos e insignias simuladas para usuarios suscriptos</div>
+      <div class="why">Una capa de gamificación que aumenta el valor percibido sin necesitar integración real con marcas — buen tema de ampliación.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">Conexión con fuentes externas reales de noticias o lanzamientos</div>
+      <div class="why">El salto de "plataforma con contenido propio" a "agregador real del mundo gaming" — un proyecto entero en sí mismo, ideal si esto sigue después de la materia.</div>
+    </div>
+  </div>
+</section>
+
+<div class="docente-note">
+  <div class="docente-card">
+    <span class="label-tag">Nota para la documentación de cátedra</span>
+    <p>Esta guía corresponde al proyecto <b style="color:var(--cream)">"Plataforma de eventos y noticias gaming"</b> dentro del trabajo práctico integrador de Desarrollo de Software (2° año). Es, de los tres proyectos de la serie, el que requiere el ejercicio más fuerte de <b style="color:var(--cream)">recorte de alcance</b> — la idea original incluía 5 funcionalidades de gran tamaño, y el trabajo pedagógico central fue ayudar al alumno a identificar el núcleo mínimo viable entre ellas.</p>
+    <p>Este es el tercer documento de la serie. Mismo esqueleto pedagógico (Diagnóstico → Arquitectura → MVP → Revisión) que los proyectos de barbería y taller mecánico, con paleta de color propia (magenta + verde lima sobre fondo violeta oscuro) y, a diferencia de los anteriores, un menú de navegación funcional fijo — justificado por ser una plataforma multi-sección en lugar de una herramienta de un solo flujo.</p>
+  </div>
+</div>
+
+<footer>
+  Proyecto 03 / Plataforma de Eventos y Noticias Gaming · Tecnicatura Superior en Desarrollo de Software
+</footer>
+
+<script>
+  // Menu toggle (mobile)
+  const menuToggle = document.getElementById('menuToggle');
+  const navMenu = document.getElementById('navMenu');
+
+  menuToggle.addEventListener('click', () => {
+    const isOpen = navMenu.classList.toggle('open');
+    menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+
+  // Smooth scroll + active state for nav buttons
+  const navButtons = document.querySelectorAll('nav button[data-target]');
+  const sections = Array.from(navButtons).map(btn => document.getElementById(btn.dataset.target));
+
+  navButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.target);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      // close mobile menu after click
+      navMenu.classList.remove('open');
+      menuToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // Highlight active section on scroll
+  function setActiveByScroll() {
+    let current = sections[0];
+    const scrollPos = window.scrollY + 120;
+    sections.forEach(sec => {
+      if (sec && sec.offsetTop <= scrollPos) {
+        current = sec;
+      }
+    });
+    navButtons.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.target === (current && current.id));
+    });
+
+    // also update the sticky scope banner stages
+    const scopeStages = document.querySelectorAll('.scope-stage');
+    scopeStages.forEach((stage, i) => {
+      stage.classList.toggle('active', sections[i] && sections[i].id === (current && current.id));
+    });
+  }
+
+  window.addEventListener('scroll', setActiveByScroll);
+  window.addEventListener('load', setActiveByScroll);
+</script>
+
+</body>
+</html>

@@ -1438,6 +1438,243 @@
             border-color: rgba(245,158,11,.6);
         }
 
+        /* ─── CHANGELOG TIMELINE ─── */
+        .changelog-section {
+            margin-top: 4rem;
+            padding-top: 4rem;
+            border-top: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .changelog-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--accent-a);
+            text-transform: uppercase;
+            letter-spacing: 0.4em;
+            margin-bottom: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .changelog-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .upd-timeline {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            padding-left: 20px;
+        }
+
+        .upd-timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 24px;
+            bottom: 24px;
+            width: 2px;
+            background: linear-gradient(to bottom,
+                var(--accent-a),
+                #378ADD,
+                #00e5a0,
+                #c8f135,
+                var(--accent-c),
+                var(--border));
+            opacity: .6;
+        }
+
+        .upd-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.6rem;
+            padding: 1.4rem 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .upd-dot {
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            border: 2px solid var(--border);
+            background: var(--surface);
+            transition: transform .3s, box-shadow .3s;
+            position: relative;
+            margin-left: -2px;
+        }
+
+        .upd-item:hover .upd-dot {
+            transform: scale(1.15);
+        }
+
+        .upd-body {
+            flex: 1;
+            padding-top: .2rem;
+        }
+
+        .upd-meta {
+            display: flex;
+            align-items: center;
+            gap: .7rem;
+            flex-wrap: wrap;
+            margin-bottom: .5rem;
+        }
+
+        .upd-date {
+            font-family: 'Space Mono', monospace;
+            font-size: .58rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            padding: .2rem .6rem;
+            border-radius: 3px;
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.1);
+            color: var(--muted);
+        }
+
+        .upd-badge {
+            font-family: 'Space Mono', monospace;
+            font-size: .52rem;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            padding: .15rem .5rem;
+            border-radius: 3px;
+        }
+
+        .upd-badge.yr2 {
+            background: rgba(245,158,11,.12);
+            color: var(--accent-a);
+            border: 1px solid rgba(245,158,11,.25);
+        }
+
+        .upd-badge.yr3 {
+            background: rgba(124,58,237,.12);
+            color: var(--accent-p);
+            border: 1px solid rgba(124,58,237,.25);
+        }
+
+        .upd-badge.proj {
+            background: rgba(245,158,11,.1);
+            color: #fbbf24;
+            border: 1px solid rgba(245,158,11,.2);
+        }
+
+        .upd-badge.mat {
+            background: rgba(6,182,212,.1);
+            color: var(--accent-c);
+            border: 1px solid rgba(6,182,212,.2);
+        }
+
+        .upd-body h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: .35rem;
+            line-height: 1.25;
+            transition: color .25s;
+        }
+
+        .upd-body p {
+            color: var(--muted);
+            font-size: .85rem;
+            line-height: 1.6;
+            margin-bottom: .8rem;
+        }
+
+        .upd-links {
+            display: flex;
+            gap: .5rem;
+            flex-wrap: wrap;
+        }
+
+        .upd-link {
+            font-family: 'Space Mono', monospace;
+            font-size: .58rem;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            text-decoration: none;
+            padding: .3rem .75rem;
+            border-radius: 4px;
+            border: 1px solid;
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            transition: all .2s;
+        }
+
+        /* per-entry dot & link colors */
+        .upd-item-proyectos .upd-dot { border-color: rgba(245,158,11,.5); box-shadow: 0 0 0 4px rgba(245,158,11,.07); }
+        .upd-item-proyectos:hover .upd-dot { box-shadow: 0 0 20px rgba(245,158,11,.3); }
+        .upd-item-proyectos .upd-body h3 { color: var(--accent-a); }
+        .upd-item-proyectos .upd-link { color: var(--accent-a); border-color: rgba(245,158,11,.3); }
+        .upd-item-proyectos .upd-link:hover { background: rgba(245,158,11,.1); border-color: rgba(245,158,11,.6); }
+
+        .upd-item-ia-arq .upd-dot { border-color: rgba(55,138,221,.5); box-shadow: 0 0 0 4px rgba(55,138,221,.07); }
+        .upd-item-ia-arq:hover .upd-dot { box-shadow: 0 0 20px rgba(55,138,221,.3); }
+        .upd-item-ia-arq .upd-body h3 { color: #378ADD; }
+        .upd-item-ia-arq .upd-link { color: #378ADD; border-color: rgba(55,138,221,.3); }
+        .upd-item-ia-arq .upd-link:hover { background: rgba(55,138,221,.1); }
+
+        .upd-item-fullstack .upd-dot { border-color: rgba(0,229,160,.5); box-shadow: 0 0 0 4px rgba(0,229,160,.07); }
+        .upd-item-fullstack:hover .upd-dot { box-shadow: 0 0 20px rgba(0,229,160,.3); }
+        .upd-item-fullstack .upd-body h3 { color: #00e5a0; }
+        .upd-item-fullstack .upd-link { color: #00e5a0; border-color: rgba(0,229,160,.3); }
+        .upd-item-fullstack .upd-link:hover { background: rgba(0,229,160,.08); }
+
+        .upd-item-ui .upd-dot { border-color: rgba(200,241,53,.5); box-shadow: 0 0 0 4px rgba(200,241,53,.07); }
+        .upd-item-ui:hover .upd-dot { box-shadow: 0 0 20px rgba(200,241,53,.25); }
+        .upd-item-ui .upd-body h3 { color: #c8f135; }
+        .upd-item-ui .upd-link { color: #c8f135; border-color: rgba(200,241,53,.3); }
+        .upd-item-ui .upd-link:hover { background: rgba(200,241,53,.07); }
+
+        .upd-item-rag .upd-dot { border-color: rgba(6,182,212,.5); box-shadow: 0 0 0 4px rgba(6,182,212,.07); }
+        .upd-item-rag:hover .upd-dot { box-shadow: 0 0 20px rgba(6,182,212,.25); }
+        .upd-item-rag .upd-body h3 { color: var(--accent-c); }
+        .upd-item-rag .upd-link { color: var(--accent-c); border-color: rgba(6,182,212,.3); }
+        .upd-item-rag .upd-link:hover { background: rgba(6,182,212,.08); }
+
+        .upd-item-bruscas .upd-dot { border-color: rgba(255,255,255,.15); }
+        .upd-item-bruscas .upd-body h3 { color: var(--muted); }
+
+        .upd-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: .4rem 0 .4rem calc(44px + 1.6rem);
+        }
+
+        .upd-divider-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .upd-divider-label {
+            font-family: 'Space Mono', monospace;
+            font-size: .52rem;
+            text-transform: uppercase;
+            letter-spacing: .15em;
+            color: var(--border);
+        }
+
+        @media(max-width: 600px) {
+            .upd-timeline { padding-left: 10px; }
+            .upd-timeline::before { left: 10px; }
+            .upd-dot { width: 36px; height: 36px; font-size: .9rem; }
+            .upd-item { gap: 1rem; }
+        }
+
         /* ─── BACK TO TOP ─── */
         .back-to-top {
             position: fixed;
@@ -2065,19 +2302,132 @@
             <a href="guiasistemaalumnos/index.html" class="proyectos-ver-todos">Ver todos los proyectos →</a>
         </section>
 
-        <!-- ÚLTIMAS ACTUALIZACIONES (LÍNEA DE TIEMPO) -->
-        <section class="year-section" style="margin-top: 4rem; border-top: 1px solid var(--border); padding-top: 4rem;">
-            <h2 class="year-title" style="color: var(--accent-a);">Línea de tiempo de actualizaciones</h2>
-            <div style="color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 0.9rem; line-height: 1.8;">
-                <p><strong>26 de Junio, 2026:</strong> Nueva sección <strong>Proyectos de Alumnos</strong> — 4 sistemas reales construidos por alumnos de 2° año: barbería, taller mecánico, gaming hub y comedor escolar (<a href="guiasistemaalumnos/index.html" style="color:var(--accent-a);text-decoration:none;">ver proyectos</a>).</p>
-                <p><strong>9 de Junio, 2026:</strong> Nueva guía <strong>IA como Arquitecto de Software</strong> agregada al programa de 2° año — flujo completo: GPT como arquitecto → Antigravity como ejecutor, caso agencia de autos y prompts listos para usar (<a href="2do/guia-alumno-ia-arquitecto.html" style="color:#378ADD;text-decoration:none;">ver guía</a>).</p>
-                <p><strong>27 de Mayo, 2026:</strong> Nueva clase de <strong>Full Stack: Sistema de Reservas con Next.js</strong> agregada al programa de 2° año — Programación y Desarrollo de Apps Móviles (<a href="2do/clase_fullstack_reservas.html" style="color:var(--accent-a);text-decoration:none;">ver clase Full Stack</a>).</p>
-                <p><strong>22 de Mayo, 2026:</strong> Nueva clase de <strong>Diseño de Interfaces (UI) con IA</strong> agregada al programa de 3° año (<a href="3ro/clase-disenio-ui-I26.html" style="color:var(--accent-p);text-decoration:none;">ver clase de UI</a>).</p>
-                <p><strong>20 de Mayo, 2026:</strong> Se incorporó material conceptual de refuerzo a la clase de <strong>IA & Decisiones</strong> 
-                   (<a href="https://www.youtube.com/watch?v=T-D1OfcDW1M" target="_blank" style="color:var(--accent-c);text-decoration:none;">ver video de RAG</a>, 
-                    <a href="https://www.youtube.com/watch?v=wjZofJX0v4M" target="_blank" style="color:var(--accent-c);text-decoration:none;">video de Redes Neuronales</a>, 
-                    <a href="3ro/clase-ia-decisiones-I26.html#refs" style="color:var(--accent-p);text-decoration:none;">ver todos en la clase</a>).</p>
-                <p><strong>20 de Mayo, 2026:</strong> Documentación del proyecto <strong>Las Bruscas</strong> añadida al repositorio.</p>
+        <!-- CHANGELOG TIMELINE -->
+        <section class="changelog-section">
+            <h2 class="changelog-title">Línea de tiempo de actualizaciones</h2>
+
+            <div class="upd-timeline">
+
+                <!-- 26 JUN: Proyectos -->
+                <div class="upd-item upd-item-proyectos">
+                    <div class="upd-dot">🚀</div>
+                    <div class="upd-body">
+                        <div class="upd-meta">
+                            <span class="upd-date">26 Jun 2026</span>
+                            <span class="upd-badge proj">Proyectos</span>
+                            <span class="upd-badge yr2">2° Año</span>
+                        </div>
+                        <h3>Proyectos de Alumnos — Hub de Sistemas Reales</h3>
+                        <p>4 sistemas construidos por alumnos: barbería, taller mecánico, gaming hub y comedor escolar. Cada uno con arquitectura, base de datos y flujo completo de usuario.</p>
+                        <div class="upd-links">
+                            <a href="guiasistemaalumnos/index.html" class="upd-link">Ver proyectos →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="upd-divider">
+                    <div class="upd-divider-line"></div>
+                    <span class="upd-divider-label">17 días antes</span>
+                    <div class="upd-divider-line"></div>
+                </div>
+
+                <!-- 09 JUN: IA Arquitecto -->
+                <div class="upd-item upd-item-ia-arq">
+                    <div class="upd-dot">🧠</div>
+                    <div class="upd-body">
+                        <div class="upd-meta">
+                            <span class="upd-date">9 Jun 2026</span>
+                            <span class="upd-badge yr2">2° Año</span>
+                        </div>
+                        <h3>IA como Arquitecto de Software</h3>
+                        <p>Flujo completo: GPT como arquitecto (planifica, define el core y delimita el MVP) y Antigravity como ejecutor. Caso real de agencia de autos con prompts listos para usar.</p>
+                        <div class="upd-links">
+                            <a href="2do/guia-alumno-ia-arquitecto.html" class="upd-link">Ver guía →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="upd-divider">
+                    <div class="upd-divider-line"></div>
+                    <span class="upd-divider-label">13 días antes</span>
+                    <div class="upd-divider-line"></div>
+                </div>
+
+                <!-- 27 MAY: Full Stack -->
+                <div class="upd-item upd-item-fullstack">
+                    <div class="upd-dot">⚡</div>
+                    <div class="upd-body">
+                        <div class="upd-meta">
+                            <span class="upd-date">27 May 2026</span>
+                            <span class="upd-badge yr2">2° Año</span>
+                        </div>
+                        <h3>Full Stack — Sistema de Reservas con Next.js</h3>
+                        <p>MVP profesional completo: Next.js 15, Prisma ORM, Tailwind CSS, Framer Motion y shadcn/ui. API REST, base de datos y formularios validados con Zod.</p>
+                        <div class="upd-links">
+                            <a href="2do/clase_fullstack_reservas.html" class="upd-link">Ver clase →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="upd-divider">
+                    <div class="upd-divider-line"></div>
+                    <span class="upd-divider-label">5 días antes</span>
+                    <div class="upd-divider-line"></div>
+                </div>
+
+                <!-- 22 MAY: UI -->
+                <div class="upd-item upd-item-ui">
+                    <div class="upd-dot">🎨</div>
+                    <div class="upd-body">
+                        <div class="upd-meta">
+                            <span class="upd-date">22 May 2026</span>
+                            <span class="upd-badge yr3">3° Año</span>
+                        </div>
+                        <h3>Diseño de Interfaces (UI) con IA</h3>
+                        <p>Elevar cualquier aplicación a nivel producción. Tailwind CSS, animaciones interactivas y frameworks modernos guiados por Inteligencia Artificial.</p>
+                        <div class="upd-links">
+                            <a href="3ro/clase-disenio-ui-I26.html" class="upd-link">Ver clase →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="upd-divider">
+                    <div class="upd-divider-line"></div>
+                    <span class="upd-divider-label">mismo día</span>
+                    <div class="upd-divider-line"></div>
+                </div>
+
+                <!-- 20 MAY: RAG + Las Bruscas -->
+                <div class="upd-item upd-item-rag">
+                    <div class="upd-dot">🤖</div>
+                    <div class="upd-body">
+                        <div class="upd-meta">
+                            <span class="upd-date">20 May 2026</span>
+                            <span class="upd-badge yr3">3° Año</span>
+                            <span class="upd-badge mat">Material</span>
+                        </div>
+                        <h3>Refuerzo Conceptual — IA &amp; Decisiones</h3>
+                        <p>Material adicional incorporado a la clase de IA: videos de RAG, Redes Neuronales y recursos de referencia para profundizar la comprensión de sistemas inteligentes.</p>
+                        <div class="upd-links">
+                            <a href="https://www.youtube.com/watch?v=T-D1OfcDW1M" target="_blank" class="upd-link">Video RAG →</a>
+                            <a href="https://www.youtube.com/watch?v=wjZofJX0v4M" target="_blank" class="upd-link">Redes Neuronales →</a>
+                            <a href="3ro/clase-ia-decisiones-I26.html#refs" class="upd-link">Ver en clase →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="upd-item upd-item-bruscas">
+                    <div class="upd-dot">🌊</div>
+                    <div class="upd-body">
+                        <div class="upd-meta">
+                            <span class="upd-date">20 May 2026</span>
+                            <span class="upd-badge proj">Proyecto</span>
+                        </div>
+                        <h3>Documentación — Las Bruscas</h3>
+                        <p>Documentación del proyecto añadida al repositorio.</p>
+                    </div>
+                </div>
+
             </div>
         </section>
     </main>

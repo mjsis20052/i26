@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>De la idea al MVP — Red Social / Foro de Libros</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0d0a0a;
+    --ink-soft: #161010;
+    --wine: #371a1c;
+    --wine-light: #482327;
+    --burgundy: #9c3b3f;
+    --burgundy-bright: #c25559;
+    --paper: #e8dcc3;
+    --paper-dim: #b3a890;
+    --grey: #847a6e;
+    --moss: #5c7a52;
+    --line: rgba(232, 220, 195, 0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle at 15% 10%, rgba(156,59,63,0.08), transparent 45%),
+                       radial-gradient(circle at 90% 60%, rgba(92,122,82,0.05), transparent 45%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  h1, h2, h3 { font-family: 'Fraunces', serif; font-weight: 600; letter-spacing: -0.01em; }
+
+  .mono { font-family: 'Space Mono', monospace; }
+
+  a { color: var(--burgundy-bright); text-decoration: none; }
+
+  ::selection { background: var(--burgundy); color: var(--paper); }
+
+  /* ===== HERO ===== */
+  .hero {
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 6vh 6vw;
+    position: relative;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 0%, rgba(156,59,63,0.16), transparent 60%),
+      linear-gradient(180deg, var(--ink) 0%, var(--ink-soft) 100%);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--burgundy-bright);
+    margin-bottom: 1.8rem;
+    opacity: 0;
+    animation: riseIn 0.8s 0.1s ease forwards;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.4rem, 7vw, 5rem);
+    line-height: 1.06;
+    max-width: 18ch;
+    color: var(--paper);
+    opacity: 0;
+    animation: riseIn 0.9s 0.3s ease forwards;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--burgundy-bright);
+    font-weight: 500;
+  }
+
+  .hero p.sub {
+    margin-top: 1.6rem;
+    max-width: 48ch;
+    font-size: 1.08rem;
+    color: var(--paper-dim);
+    opacity: 0;
+    animation: riseIn 0.9s 0.5s ease forwards;
+  }
+
+  .hero .spine-line {
+    margin-top: 3rem;
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--burgundy), transparent);
+    opacity: 0;
+    animation: riseIn 0.9s 0.7s ease forwards, growLine 1.4s 0.9s ease forwards;
+  }
+
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes growLine {
+    from { height: 0; }
+    to { height: 60px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-eyebrow, .hero h1, .hero p.sub, .hero .spine-line {
+      animation: none !important;
+      opacity: 1 !important;
+    }
+  }
+
+  /* ===== STICKY STAGE TRACKER ===== */
+  .ticket-wrap {
+    position: sticky;
+    top: 1.4rem;
+    z-index: 30;
+    display: flex;
+    justify-content: center;
+    padding: 0 1.4rem;
+    margin-top: -2.4rem;
+  }
+
+  .ticket {
+    background: var(--wine);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.85rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.55);
+    backdrop-filter: blur(8px);
+    max-width: 780px;
+    width: 100%;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.74rem;
+    border-left: 3px solid var(--burgundy);
+  }
+
+  .ticket-label {
+    color: var(--paper-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.65rem;
+    white-space: nowrap;
+  }
+
+  .ticket-stages {
+    display: flex;
+    gap: 0.4rem;
+    flex: 1;
+    overflow-x: auto;
+  }
+
+  .ticket-stage {
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    color: var(--grey);
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    cursor: default;
+  }
+
+  .ticket-stage.active {
+    background: var(--burgundy);
+    color: var(--paper);
+    border-color: var(--burgundy);
+    font-weight: 700;
+  }
+
+  @media (max-width: 720px) {
+    .ticket-label { display: none; }
+    .ticket-wrap { margin-top: -1.6rem; }
+  }
+
+  /* ===== SECTIONS ===== */
+  .section {
+    position: relative;
+    z-index: 2;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 6.5rem 1.6rem 2rem;
+  }
+
+  .stage-marker {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .stage-num {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    color: var(--burgundy-bright);
+    font-style: italic;
+  }
+
+  .stage-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+
+  .section h2 {
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    color: var(--paper);
+    margin-bottom: 0.6rem;
+  }
+
+  .section .lead {
+    color: var(--paper-dim);
+    font-size: 1.08rem;
+    max-width: 62ch;
+    margin-bottom: 2.6rem;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--line);
+    margin: 0 auto;
+    max-width: 880px;
+  }
+
+  /* ===== QUESTION CARDS ===== */
+  .qgrid {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2.4rem;
+  }
+
+  .qcard {
+    background: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--burgundy);
+    border-radius: 8px;
+    padding: 1.3rem 1.5rem;
+  }
+
+  .qcard .q {
+    font-weight: 600;
+    color: var(--paper);
+    font-size: 1.02rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .qcard .why {
+    color: var(--paper-dim);
+    font-size: 0.92rem;
+  }
+
+  .qcard .why b { color: var(--burgundy-bright); font-weight: 600; }
+
+  /* ===== PROMPT BLOCKS ===== */
+  .prompt-block {
+    background: var(--wine);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin: 1.6rem 0 2.2rem;
+    overflow: hidden;
+  }
+
+  .prompt-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 1.1rem;
+    background: var(--wine-light);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .prompt-head span {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--burgundy-bright);
+  }
+
+  .prompt-tool {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--grey);
+    border: 1px solid var(--line);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .prompt-body {
+    padding: 1.1rem 1.3rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.86rem;
+    color: var(--paper);
+    white-space: pre-wrap;
+    line-height: 1.7;
+  }
+
+  .prompt-body .ph { color: var(--burgundy-bright); }
+
+  /* ===== TIP / WARNING ===== */
+  .tip, .warn {
+    border-radius: 8px;
+    padding: 1.1rem 1.4rem;
+    margin: 1.4rem 0;
+    font-size: 0.95rem;
+    border: 1px solid var(--line);
+  }
+
+  .tip {
+    background: rgba(92,122,82,0.08);
+    border-left: 3px solid var(--moss);
+  }
+
+  .warn {
+    background: rgba(156,59,63,0.1);
+    border-left: 3px solid var(--burgundy);
+  }
+
+  .tip b, .warn b { color: var(--paper); }
+
+  .label-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--moss);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .warn .label-tag { color: var(--burgundy-bright); }
+
+  /* ===== ARCH DIAGRAM ===== */
+  .arch {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.9rem;
+    margin: 1.8rem 0 2.4rem;
+  }
+
+  .arch-box {
+    background: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.1rem;
+    text-align: center;
+  }
+
+  .arch-box .t {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--burgundy-bright);
+    margin-bottom: 0.5rem;
+  }
+
+  .arch-box .v {
+    font-weight: 600;
+    color: var(--paper);
+    font-size: 0.95rem;
+  }
+
+  .arch-box .d {
+    font-size: 0.8rem;
+    color: var(--paper-dim);
+    margin-top: 0.3rem;
+  }
+
+  @media (max-width: 680px) {
+    .arch { grid-template-columns: 1fr; }
+  }
+
+  /* ===== MVP SCOPE TABLE ===== */
+  .scope-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.6rem 0 2.4rem;
+    font-size: 0.92rem;
+  }
+
+  .scope-table th {
+    text-align: left;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--grey);
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .scope-table td {
+    padding: 0.75rem 0.8rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--paper-dim);
+    vertical-align: top;
+  }
+
+  .scope-table tr:last-child td { border-bottom: none; }
+
+  .pill {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .pill.in { background: rgba(156,59,63,0.2); color: var(--burgundy-bright); }
+  .pill.out { background: rgba(132,122,110,0.18); color: var(--grey); }
+  .pill.later { background: rgba(92,122,82,0.16); color: #8fae7f; }
+
+  /* ===== THREAD DIAGRAM (signature element) ===== */
+  .thread-diagram {
+    background: var(--ink-soft);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1.6rem 1.8rem;
+    margin: 1.8rem 0 2.4rem;
+  }
+
+  .thread-diagram .td-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--grey);
+    margin-bottom: 1.2rem;
+  }
+
+  .thread-node {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    padding: 0.6rem 0;
+    position: relative;
+  }
+
+  .thread-node .tn-bar {
+    width: 2px;
+    background: var(--line);
+    flex-shrink: 0;
+    align-self: stretch;
+  }
+
+  .thread-node .tn-content {
+    flex: 1;
+  }
+
+  .thread-node .tn-meta {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--burgundy-bright);
+    margin-bottom: 0.2rem;
+  }
+
+  .thread-node .tn-text {
+    font-size: 0.85rem;
+    color: var(--paper-dim);
+  }
+
+  .thread-l0 { margin-left: 0; }
+  .thread-l1 { margin-left: 1.6rem; }
+  .thread-l2 { margin-left: 3.2rem; }
+
+  /* ===== TIMELINE (weeks) ===== */
+  .weeks {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 1.8rem 0 2.4rem;
+  }
+
+  .week {
+    position: relative;
+    padding: 0 0 2rem 2rem;
+    border-left: 2px solid var(--line);
+    margin-left: -2px;
+  }
+
+  .week:last-child { padding-bottom: 0; }
+
+  .week::before {
+    content: "";
+    position: absolute;
+    left: -6px;
+    top: 0.3rem;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--burgundy);
+    border: 2px solid var(--ink);
+  }
+
+  .week .wk-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--burgundy-bright);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.3rem;
+  }
+
+  .week .wk-title {
+    font-weight: 600;
+    color: var(--paper);
+    margin-bottom: 0.4rem;
+    font-size: 1.02rem;
+  }
+
+  .week .wk-desc {
+    color: var(--paper-dim);
+    font-size: 0.92rem;
+  }
+
+  /* ===== FOOTER / DOCENTE NOTE ===== */
+  .docente-note {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 4rem 1.6rem 6rem;
+  }
+
+  .docente-card {
+    background: var(--wine);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 2.2rem 2.4rem;
+    border-left: 3px solid var(--burgundy);
+  }
+
+  .docente-card .label-tag { margin-bottom: 0.8rem; }
+
+  .docente-card p { color: var(--paper-dim); font-size: 0.96rem; margin-bottom: 0.8rem; }
+
+  .docente-card p:last-child { margin-bottom: 0; }
+
+  footer {
+    text-align: center;
+    padding: 2.5rem 1.6rem 3.5rem;
+    color: var(--grey);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+  }
+
+  /* ===== checklist ===== */
+  .checklist { list-style: none; margin: 1.4rem 0 2.2rem; }
+  .checklist li {
+    display: flex;
+    gap: 0.7rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--paper-dim);
+    font-size: 0.94rem;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before {
+    content: "✓";
+    color: var(--burgundy-bright);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-eyebrow">Proyecto de cátedra — 2° año · Desarrollo de Software</div>
+  <h1>De la idea suelta<br>al <em>MVP que funciona</em></h1>
+  <p class="sub">Guía personal para la red social de libros: publicaciones sobre títulos específicos, debates abiertos, comentarios anidados y comunidad.</p>
+  <div class="spine-line"></div>
+</section>
+
+<div class="ticket-wrap">
+  <div class="ticket">
+    <span class="ticket-label">Tu lugar en la guía:</span>
+    <div class="ticket-stages">
+      <span class="ticket-stage active">01 Diagnóstico</span>
+      <span class="ticket-stage">02 Estructura</span>
+      <span class="ticket-stage">03 MVP</span>
+      <span class="ticket-stage">04 Relectura</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STAGE 01 — DIAGNÓSTICO ============ -->
+<section class="section" id="diagnostico">
+  <div class="stage-marker">
+    <span class="stage-num">01</span>
+    <span class="stage-label">Diagnóstico</span>
+  </div>
+  <h2>"Red social" es la categoría más fácil de hacer crecer sin control</h2>
+  <p class="lead">De los proyectos de la cátedra, este es el que tiene el riesgo de alcance más alto: cualquiera puede imaginar un feed infinito, likes, notificaciones push, mensajes privados, algoritmos de recomendación... Tu compañera ya hizo el trabajo más importante con dos decisiones claras: <b style="color:var(--paper)">publicaciones sobre libros y debates abiertos convivientes</b>, y <b style="color:var(--paper)">comentarios anidados tipo hilo</b>. Esta etapa es afinar el resto antes de tocar código.</p>
+
+  <div class="qgrid">
+    <div class="qcard">
+      <div class="q">Si un post puede ser "sobre un libro" o "debate libre", ¿qué campos cambian entre uno y otro?</div>
+      <div class="why">Un post sobre un libro necesita estar vinculado a un libro de la base (título, autor). Un debate libre no tiene ese vínculo. <b>Lo más simple es modelar un solo tipo de "Publicación" con un campo de libro opcional</b> — si está vacío, es un debate abierto; si tiene un libro asociado, es una reseña/comentario sobre ese título.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">¿Quién puede agregar un libro nuevo a la base: cualquier usuario, o solo un admin?</div>
+      <div class="why">Como decidiste cargar los libros a mano (sin API externa), alguien tiene que poder sumarlos. <b>Dejar que cualquier usuario agregue un libro</b> (como en Goodreads) evita un cuello de botella de moderación, pero corre el riesgo de duplicados ("Cien años de soledad" cargado tres veces con nombres distintos). Definilo ahora.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">Los comentarios anidados, ¿tienen un límite de profundidad, o pueden anidarse infinitamente como en Reddit?</div>
+      <div class="why">Reddit permite anidar sin límite real, pero eso complica mucho tanto el modelo de datos como el renderizado en pantalla. <b>Un límite razonable (por ejemplo 3 niveles)</b> es mucho más manejable para un proyecto de cátedra y sigue sintiéndose como un hilo de debate real.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">¿Qué hace que algo sea "comunidad" en este MVP: solo publicar y comentar, o también hay perfiles, seguir usuarios, reputación?</div>
+      <div class="why">"Comunidad" es una palabra que puede significar desde "hay usuarios con nombre" hasta "hay sistema de reputación con insignias". Para el MVP, <b>usuarios con perfil básico (nombre, lista de sus posts) alcanza</b> — seguir usuarios y reputación quedan como evolución futura.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">¿Hace falta moderación (reportar contenido, banear usuarios) desde el MVP?</div>
+      <div class="why">En un proyecto de cátedra, probablemente no vas a tener usuarios reales generando contenido tóxico — pero es buena práctica dejar pensado, aunque sea en el modelo de datos, un campo de "estado" en publicaciones y comentarios (visible/oculto) para cuando haga falta.</div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <span class="label-tag">Cómo usar esto con la IA</span>
+    En este proyecto en particular, es clave que en el primer prompt le aclares a la IA explícitamente <b>qué NO querés que te proponga</b> (feed con algoritmo, notificaciones en tiempo real, mensajería privada). Si no lo decís, es muy probable que la IA — entrenada con miles de ejemplos de "redes sociales" — te empiece a sugerir todo eso por inercia.
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 1 — Cierre del diagnóstico</span>
+      <span class="prompt-tool">Usalo en Claude / ChatGPT / Copilot Chat</span>
+    </div>
+    <div class="prompt-body">Estoy diseñando una red social / foro sobre libros, como proyecto de la materia Desarrollo de Software (2° año, tecnicatura). La idea central: los usuarios pueden publicar sobre un libro específico O abrir un debate libre, comentar con respuestas anidadas (como Reddit), y formar comunidad alrededor de la lectura.
+
+Estas son mis decisiones:
+- Tipo de publicación: un solo modelo de "Publicación" con libro asociado opcional
+- Quién agrega libros nuevos: <span class="ph">[cualquier usuario / solo admin]</span>
+- Profundidad máxima de comentarios anidados: <span class="ph">[ej: 3 niveles]</span>
+- Qué incluye "comunidad" en el MVP: <span class="ph">[tu respuesta]</span>
+
+IMPORTANTE: NO quiero un feed con algoritmo de recomendación, NO quiero notificaciones push en tiempo real, NO quiero mensajería privada entre usuarios. Estas quedan fuera de alcance a propósito.
+
+Actuá como arquitecto de software senior. Todavía no generes código. Ayudame a:
+1. Identificar las entidades principales del sistema
+2. Proponerme cómo modelar los comentarios anidados de forma que no sea un dolor de cabeza ni en la base de datos ni al renderizarlos
+3. Sugerirme 3 funcionalidades para el MVP y 3 que deberían quedar fuera de alcance por ahora
+
+Hacé preguntas si te falta información, no asumas nada.</div>
+  </div>
+
+  <div class="warn">
+    <span class="label-tag">Riesgo común en esta etapa</span>
+    Dejar que la conversación con la IA se vaya hacia "che, y no le sumamos también..." sin que vos frenes. En este proyecto más que en ningún otro de la cátedra, cada funcionalidad nueva que se te ocurra tiene que pasar primero por la pregunta: <b>¿esto hace falta para que la comunidad pueda debatir sobre libros, o es una idea de Instagram que se metió sin que la invitaras?</b>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ STAGE 02 — ESTRUCTURA ============ -->
+<section class="section" id="estructura">
+  <div class="stage-marker">
+    <span class="stage-num">02</span>
+    <span class="stage-label">Estructura — Arquitectura</span>
+  </div>
+  <h2>El índice del libro antes que los capítulos</h2>
+  <p class="lead">La pieza más delicada de este proyecto es el modelo de comentarios anidados. Vale la pena dedicarle tiempo extra acá, en el papel, antes de que se convierta en un problema de código difícil de desarmar.</p>
+
+  <div class="arch">
+    <div class="arch-box">
+      <div class="t">Frontend</div>
+      <div class="v">React + Vite</div>
+      <div class="d">Feed de publicaciones, vista de post con hilo de comentarios, perfil de usuario</div>
+    </div>
+    <div class="arch-box">
+      <div class="t">Backend / Datos</div>
+      <div class="v">Firebase Firestore + Auth</div>
+      <div class="d">Auth resuelve cuentas de usuario sin construir login desde cero</div>
+    </div>
+    <div class="arch-box">
+      <div class="t">Estado en frontend</div>
+      <div class="v">Zustand o Context</div>
+      <div class="d">Usuario logueado, comentario al que se está respondiendo</div>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom: 1rem; font-size: 1.3rem; color: var(--paper);">Las entidades mínimas (lo que vas a guardar)</h3>
+
+  <table class="scope-table">
+    <tr><th>Entidad</th><th>Campos clave</th><th>Por qué existe</th></tr>
+    <tr>
+      <td><b style="color:var(--paper)">Usuario</b></td>
+      <td class="mono">nombre, email, fechaRegistro</td>
+      <td>Quién publica y comenta</td>
+    </tr>
+    <tr>
+      <td><b style="color:var(--paper)">Libro</b></td>
+      <td class="mono">titulo, autor, año, cargadoPor</td>
+      <td>La base propia, cargada a mano por usuarios o admin</td>
+    </tr>
+    <tr>
+      <td><b style="color:var(--paper)">Publicación</b></td>
+      <td class="mono">autorId, libroId (opcional), titulo, cuerpo, fecha</td>
+      <td>Un solo modelo cubre tanto "post sobre un libro" como "debate libre" — libroId vacío = debate abierto</td>
+    </tr>
+    <tr>
+      <td><b style="color:var(--paper)">Comentario</b></td>
+      <td class="mono">publicacionId, comentarioPadreId (opcional), autorId, cuerpo, nivel</td>
+      <td>comentarioPadreId nulo = comentario de primer nivel; si no, es respuesta a otro comentario</td>
+    </tr>
+  </table>
+
+  <div class="tip">
+    <span class="label-tag">Por qué "comentarioPadreId" en vez de comentarios anidados dentro de comentarios</span>
+    Guardar cada comentario como un documento plano con una referencia a su padre (en vez de anidar comentarios dentro de comentarios en el JSON) es mucho más fácil de consultar, actualizar y mostrar con límite de profundidad. El árbol se reconstruye en el frontend a partir de esas referencias, no se guarda anidado en la base.
+  </div>
+
+  <div class="thread-diagram">
+    <div class="td-label">Cómo se ve un hilo de 3 niveles, reconstruido a partir de comentarioPadreId</div>
+    <div class="thread-node thread-l0">
+      <div class="tn-content">
+        <div class="tn-meta">@martina · comentarioPadreId: null</div>
+        <div class="tn-text">"Para mí el final de la novela se siente apurado comparado con el resto."</div>
+      </div>
+    </div>
+    <div class="thread-node thread-l1">
+      <div class="tn-content">
+        <div class="tn-meta">@jonathan · comentarioPadreId: [id de Martina]</div>
+        <div class="tn-text">"Totalmente, sobre todo el último capítulo."</div>
+      </div>
+    </div>
+    <div class="thread-node thread-l2">
+      <div class="tn-content">
+        <div class="tn-meta">@valeria · comentarioPadreId: [id de Jonathan]</div>
+        <div class="tn-text">"Acá frenamos — nivel 3 es el máximo definido para este MVP."</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 2 — Diseño del modelo de datos y comentarios anidados</span>
+      <span class="prompt-tool">Pegale el resultado del Prompt 1 como contexto</span>
+    </div>
+    <div class="prompt-body">Con base en las entidades que definimos (Usuario, Libro, Publicación, Comentario con comentarioPadreId), ayudame a:
+
+1. Diseñar la estructura de colecciones en Firestore, con ejemplos de documentos en JSON
+2. Explicarme cómo reconstruir el árbol de comentarios anidados en el frontend a partir de una lista plana de comentarios con comentarioPadreId, respetando un máximo de 3 niveles de profundidad
+3. Proponerme cómo armar el componente de React que renderiza ese árbol de forma recursiva, sin que el código se vuelva imposible de leer
+
+No me generes el código completo del front todavía. Quiero entender el modelo y el algoritmo de reconstrucción primero, y poder explicarlo en una defensa sin mirar el código.</div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 3 — Esqueleto del proyecto React</span>
+      <span class="prompt-tool">Recién ahora pedís código</span>
+    </div>
+    <div class="prompt-body">Ahora sí, ayudame a armar el esqueleto inicial del proyecto en React + Vite, con Firebase (Firestore + Auth), con esta estructura de carpetas:
+
+- /components → piezas de UI reutilizables (tarjeta de publicación, componente de comentario recursivo, formulario de nuevo libro)
+- /pages → Feed, DetallePublicacion, Libros, Perfil
+- /services → funciones que hablan con Firestore (crearPublicacion, comentar, agregarLibro, etc.)
+- /store → estado global con Zustand
+
+No me llenes de funcionalidad todavía. Quiero el esqueleto navegable, con datos de prueba (mock), antes de conectar la lógica real.</div>
+  </div>
+
+  <div class="warn">
+    <span class="label-tag">Riesgo común en esta etapa</span>
+    Pedirle a la IA "hacé el componente de comentarios anidados" sin haber entendido primero el algoritmo de reconstrucción del árbol. Vas a recibir código recursivo que funciona pero que no vas a poder explicar ni depurar si algo sale mal — y en este proyecto, ese componente es justamente el que más preguntas va a generar en la defensa.
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ STAGE 03 — MVP ============ -->
+<section class="section" id="mvp">
+  <div class="stage-marker">
+    <span class="stage-num">03</span>
+    <span class="stage-label">MVP — Construir lo esencial</span>
+  </div>
+  <h2>Una comunidad chica que funciona bien, no una grande que promete</h2>
+  <p class="lead">El MVP de esta red social tiene que demostrar las dos decisiones centrales — publicaciones con o sin libro asociado, y comentarios anidados — funcionando de punta a punta. Todo lo que suene a "feature de red social famosa" queda afuera a propósito.</p>
+
+  <table class="scope-table">
+    <tr><th>Funcionalidad</th><th>Estado</th><th>Nota</th></tr>
+    <tr>
+      <td>Crear cuenta / login</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>Sin usuarios identificados no hay comunidad posible</td>
+    </tr>
+    <tr>
+      <td>Agregar un libro nuevo a la base (a mano)</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>Necesario para que existan publicaciones atadas a un libro</td>
+    </tr>
+    <tr>
+      <td>Crear una publicación, sobre un libro o como debate libre</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>El corazón del contenido de la plataforma</td>
+    </tr>
+    <tr>
+      <td>Comentar y responder comentarios (anidado, hasta 3 niveles)</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>Es lo que distingue esto de un blog simple — la pieza técnica central</td>
+    </tr>
+    <tr>
+      <td>Ver perfil de usuario con sus publicaciones</td>
+      <td><span class="pill in">MVP</span></td>
+      <td>Mínimo para que un usuario se sienta "alguien" dentro de la comunidad</td>
+    </tr>
+    <tr>
+      <td>Reacciones tipo "me gusta" en publicaciones/comentarios</td>
+      <td><span class="pill later">Después</span></td>
+      <td>Suma valor, pero el debate funciona sin esto el primer día</td>
+    </tr>
+    <tr>
+      <td>Seguir a otros usuarios / sistema de reputación</td>
+      <td><span class="pill later">Después</span></td>
+      <td>Buena evolución una vez que haya contenido real circulando</td>
+    </tr>
+    <tr>
+      <td>Feed con algoritmo de recomendación</td>
+      <td><span class="pill out">Fuera de alcance</span></td>
+      <td>Decidido a propósito en el diagnóstico — un orden cronológico simple alcanza</td>
+    </tr>
+    <tr>
+      <td>Notificaciones en tiempo real / mensajería privada</td>
+      <td><span class="pill out">Fuera de alcance</span></td>
+      <td>Decidido a propósito en el diagnóstico — no es necesario para que la comunidad debata</td>
+    </tr>
+  </table>
+
+  <div class="tip">
+    <span class="label-tag">Cómo decidir qué entra y qué no</span>
+    Preguntate: <b>"¿esto hace falta para que dos personas puedan debatir sobre un libro, de punta a punta?"</b> Si la respuesta es no, es una función de red social genérica que se coló, no algo que esta comunidad necesite.
+  </div>
+
+  <h3 style="margin-bottom: 1rem; margin-top: 2.4rem; font-size: 1.3rem; color: var(--paper);">Plan de 5 semanas (orientativo)</h3>
+
+  <div class="weeks">
+    <div class="week">
+      <div class="wk-label">Semana 1</div>
+      <div class="wk-title">Modelo de datos + esqueleto navegable</div>
+      <div class="wk-desc">Firestore con libros y publicaciones de prueba. React con todas las páginas creadas, sin lógica real — solo navegación.</div>
+    </div>
+    <div class="week">
+      <div class="wk-label">Semana 2</div>
+      <div class="wk-title">Cuentas de usuario + agregar libros</div>
+      <div class="wk-desc">Login funcional con Firebase Auth. Un usuario puede agregar un libro nuevo a la base.</div>
+    </div>
+    <div class="week">
+      <div class="wk-label">Semana 3</div>
+      <div class="wk-title">Crear y ver publicaciones</div>
+      <div class="wk-desc">Un usuario puede crear una publicación (con o sin libro asociado) y verla en el feed y en su propio detalle.</div>
+    </div>
+    <div class="week">
+      <div class="wk-label">Semana 4</div>
+      <div class="wk-title">Comentarios anidados</div>
+      <div class="wk-desc">El componente recursivo de comentarios funciona: se puede comentar, responder a un comentario, y se respeta el límite de 3 niveles.</div>
+    </div>
+    <div class="week">
+      <div class="wk-label">Semana 5</div>
+      <div class="wk-title">Pulido, casos borde, defensa</div>
+      <div class="wk-desc">Probar qué pasa si se intenta responder más allá del nivel máximo, si se publica sin título, si dos comentarios llegan casi al mismo tiempo. Preparar la explicación de arquitectura.</div>
+    </div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 4 — Construir el componente de comentarios anidados</span>
+      <span class="prompt-tool">El prompt más importante del proyecto</span>
+    </div>
+    <div class="prompt-body">Quiero implementar el sistema de comentarios anidados dentro de una publicación. El flujo es:
+
+1. Se muestran todos los comentarios de la publicación, organizados en árbol según comentarioPadreId
+2. Cada comentario tiene un botón "Responder", que abre un formulario para comentar con ese comentario como padre
+3. Los comentarios de nivel 3 (el máximo) no muestran botón "Responder"
+4. Al enviar un comentario nuevo, se guarda en Firestore y se actualiza la vista sin recargar la página
+
+Ayudame a implementarlo paso a paso:
+- Primero la función que toma la lista plana de comentarios de Firestore y la convierte en un árbol anidado, calculando el nivel de cada uno
+- Después el componente de React que renderiza ese árbol de forma recursiva, mostrando la indentación visual según el nivel
+- Por último la función que crea un comentario nuevo, validando que no se pueda responder más allá del nivel 3
+
+Explicame cada función a medida que la escribís, no solo me tires el código.</div>
+  </div>
+
+  <div class="warn">
+    <span class="label-tag">Riesgo común en esta etapa</span>
+    Construir el árbol de comentarios recalculándolo desde cero cada vez que se renderiza el componente, sin memorizar el resultado. En una publicación con muchos comentarios esto se nota como lentitud — vale la pena, aunque sea a nivel conceptual, entender que el cálculo del árbol y el renderizado son dos pasos distintos.
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ STAGE 04 — RELECTURA ============ -->
+<section class="section" id="relectura">
+  <div class="stage-marker">
+    <span class="stage-num">04</span>
+    <span class="stage-label">Relectura — Revisar y evolucionar</span>
+  </div>
+  <h2>Una segunda lectura, ahora del propio código</h2>
+  <p class="lead">Así como una buena reseña viene de releer un libro con otra mirada, esta etapa es volver sobre lo construido con ojo crítico — no para encontrar errores por encontrarlos, sino para poder defenderlo con seguridad.</p>
+
+  <ul class="checklist">
+    <li>¿Puedo crear una publicación con libro asociado y otra como debate libre, sin que el sistema las trate distinto de forma rara?</li>
+    <li>¿Puedo comentar, responder un comentario, y responder esa respuesta (3 niveles) sin que la interfaz se rompa o se vea confusa?</li>
+    <li>¿Puedo explicar, sin mirar el código, por qué usé comentarioPadreId en vez de anidar comentarios dentro de comentarios en la base de datos?</li>
+    <li>¿Evité a propósito el feed con algoritmo y las notificaciones en tiempo real, o simplemente no llegué a hacerlas?</li>
+    <li>¿La plataforma se siente como un espacio de debate sobre libros, o como una red social genérica con libros de tema?</li>
+  </ul>
+
+  <div class="prompt-block">
+    <div class="prompt-head">
+      <span>Prompt 5 — Auditoría de lo construido</span>
+      <span class="prompt-tool">Usalo cuando creas que ya terminaste</span>
+    </div>
+    <div class="prompt-body">Te voy a pasar el código de mi red social de libros [pegá los archivos relevantes].
+
+Actuá como revisor de código senior, no como generador. Quiero que me digas:
+1. Qué casos borde no estoy manejando (comentarios en el límite de profundidad, publicaciones sin libro ni título, libros duplicados en la base)
+2. Si hay algo en mi modelo de datos que me va a complicar cuando quiera agregar reacciones o sistema de seguir usuarios más adelante
+3. Tres preguntas que probablemente me haga un profesor en la defensa, sobre por qué elegí este modelo de comentarios anidados y por qué dejé feed-algorítmico y notificaciones fuera del MVP
+
+No me reescribas todo el proyecto. Señalame los puntos y explicame el porqué de cada uno.</div>
+  </div>
+
+  <h3 style="margin-bottom: 1rem; margin-top: 2.4rem; font-size: 1.3rem; color: var(--paper);">Hacia dónde puede crecer (después del MVP)</h3>
+
+  <div class="qgrid">
+    <div class="qcard">
+      <div class="q">Reacciones (me gusta / no me gusta) en publicaciones y comentarios</div>
+      <div class="why">Capa simple de interacción que no rompe el modelo existente — se agrega como una colección nueva de "reacciones" vinculada a publicación/comentario y usuario.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">Seguir usuarios y ver sus publicaciones en una vista personalizada</div>
+      <div class="why">El salto de "comunidad abierta" a "comunidad con relaciones entre personas" — buen tema de ampliación si el proyecto sigue después de la materia.</div>
+    </div>
+    <div class="qcard">
+      <div class="q">Búsqueda y filtrado de publicaciones por libro, autor o género</div>
+      <div class="why">A medida que crece el contenido, encontrar publicaciones relevantes se vuelve un problema real — buen siguiente paso técnico una vez que el núcleo esté sólido.</div>
+    </div>
+  </div>
+</section>
+
+<div class="docente-note">
+  <div class="docente-card">
+    <span class="label-tag">Nota para la documentación de cátedra</span>
+    <p>Esta guía corresponde al proyecto <b style="color:var(--paper)">"Red social / foro de libros"</b> dentro del trabajo práctico integrador de Desarrollo de Software (2° año). El riesgo central identificado en el diagnóstico fue el crecimiento descontrolado de alcance típico de cualquier "red social" (feed algorítmico, notificaciones en tiempo real, mensajería) — se decidió explícitamente excluir estas funciones del MVP. El segundo foco pedagógico fue el modelado correcto de comentarios anidados mediante referencia al padre (comentarioPadreId), en vez de anidamiento literal en la base de datos.</p>
+    <p>Este es el quinto documento de la serie. Mismo esqueleto pedagógico (Diagnóstico → Arquitectura → MVP → Relectura) que los proyectos anteriores, con paleta de color propia (vino/burdeos + papel envejecido) que evoca encuadernación y club de lectura, diferenciándolo visualmente del resto.</p>
+  </div>
+</div>
+
+<footer>
+  Proyecto 05 / Red Social de Libros · Tecnicatura Superior en Desarrollo de Software
+</footer>
+
+</body>
+</html>

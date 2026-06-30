@@ -384,6 +384,15 @@ main {
 
 /* ── Per-card color themes ── */
 
+/* Red Social Libros: burgundy */
+.card-libros { --c: #9c3b3f; --c2: #c25559; }
+.card-libros .proj-card-strip { background: linear-gradient(90deg, #371a1c, #9c3b3f, #c25559); }
+.card-libros:hover { border-color: #9c3b3f; box-shadow: 0 28px 60px rgba(156,59,63,.22); }
+.card-libros:hover .proj-card-body h2 { color: #c25559; }
+.card-libros .proj-card-icon { background: rgba(156,59,63,.12); border-color: rgba(156,59,63,.25); }
+.card-libros .proj-card-cta { color: #9c3b3f; }
+.card-libros:hover .proj-card-arrow { color: #9c3b3f; }
+
 /* Barbería: copper */
 .card-barberia { --c: #c17a3f; --c2: #e0985c; }
 .card-barberia .proj-card-strip { background: linear-gradient(90deg, #c17a3f, #e0985c); }
@@ -646,6 +655,29 @@ footer {
         <span class="proj-tag">Menús</span>
         <span class="proj-tag">Inventario</span>
         <span class="proj-tag">Escolar</span>
+      </div>
+      <div class="proj-card-footer">
+        <span class="proj-card-cta">Ver proyecto</span>
+        <span class="proj-card-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- 05 · Red Social Libros -->
+    <a href="proyecto-05-red-social-libros.html" class="proj-card card-libros">
+      <div class="proj-card-strip"></div>
+      <div class="proj-card-head">
+        <div class="proj-card-icon">📚</div>
+        <div class="proj-card-num">Proyecto 05</div>
+      </div>
+      <div class="proj-card-body">
+        <h2>Red Social / Foro de Libros</h2>
+        <p>Plataforma comunitaria para lectores: reseñas, listas de lectura, foros de debate y recomendaciones. Diseño editorial con identidad literaria.</p>
+      </div>
+      <div class="proj-card-tags">
+        <span class="proj-tag">Red Social</span>
+        <span class="proj-tag">Foro</span>
+        <span class="proj-tag">Reseñas</span>
+        <span class="proj-tag">Comunidad</span>
       </div>
       <div class="proj-card-footer">
         <span class="proj-card-cta">Ver proyecto</span>
